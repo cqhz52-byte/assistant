@@ -524,9 +524,9 @@
 }
 
 .selector-block {
-  margin-top: 14px;
+  margin-top: 12px;
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .compact-block {
@@ -544,7 +544,7 @@
 }
 
 .field {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .field span,
@@ -557,8 +557,8 @@
 .field select,
 .field textarea {
   width: 100%;
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 11px 13px;
+  border-radius: 14px;
   border: 1px solid rgba(35, 35, 35, 0.1);
   background: rgba(255, 255, 255, 0.92);
   color: var(--text-strong);
@@ -581,10 +581,10 @@
 .compact-selection-card {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 14px;
+  gap: 10px;
   align-items: start;
-  padding: 14px 16px;
-  border-radius: 20px;
+  padding: 11px 13px;
+  border-radius: 16px;
   border: 1px solid rgba(35, 35, 35, 0.08);
   background: linear-gradient(145deg, rgba(255, 247, 237, 0.92), rgba(255, 255, 255, 0.96));
 }
@@ -602,7 +602,7 @@
 
 .hospital-list {
   margin-top: 8px;
-  max-height: 180px;
+  max-height: 160px;
   overflow: auto;
 }
 
@@ -615,15 +615,15 @@
 }
 
 .compact-filter-row {
-  gap: 10px;
+  gap: 8px;
 }
 
 .compact-search-field {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .compact-device-card {
-  padding: 12px 14px;
+  padding: 10px 12px;
 }
 
 .compact-device-card strong {
@@ -631,8 +631,8 @@
 }
 
 .empty-search-state {
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 10px 12px;
+  border-radius: 14px;
   border: 1px dashed rgba(35, 35, 35, 0.12);
   color: var(--text-soft);
   background: rgba(255, 255, 255, 0.82);

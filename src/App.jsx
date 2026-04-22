@@ -278,6 +278,14 @@ function App() {
     () => ['全部省份', ...new Set(hospitals.map((hospital) => hospital.province).filter(Boolean))],
     [],
   )
+  const doctorOptions = useMemo(
+    () => [...new Set([...doctorSuggestions, formState.doctorName].filter(Boolean))],
+    [formState.doctorName],
+  )
+  const engineerSuggestionOptions = useMemo(
+    () => [...new Set([...engineerOptions, formState.engineerName].filter(Boolean))],
+    [formState.engineerName],
+  )
 
   const filteredHospitals = useMemo(() => {
     const keyword = hospitalKeyword.trim().toLowerCase()
@@ -770,30 +778,32 @@ function App() {
             <div className="field-row compact-filter-row">
               <label className="field">
                 <span>医生</span>
-                <select
+                <input
+                  list="doctor-options"
                   value={formState.doctorName}
                   onChange={(event) => updateField('doctorName', event.target.value)}
-                >
-                  {doctorSuggestions.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
+                  placeholder="输入或选择医生"
+                />
+                <datalist id="doctor-options">
+                  {doctorOptions.map((item) => (
+                    <option key={item} value={item} />
                   ))}
-                </select>
+                </datalist>
               </label>
 
               <label className="field">
                 <span>跟台人员</span>
-                <select
+                <input
+                  list="engineer-options"
                   value={formState.engineerName}
                   onChange={(event) => updateField('engineerName', event.target.value)}
-                >
-                  {engineerOptions.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
+                  placeholder="输入或选择人员"
+                />
+                <datalist id="engineer-options">
+                  {engineerSuggestionOptions.map((item) => (
+                    <option key={item} value={item} />
                   ))}
-                </select>
+                </datalist>
               </label>
             </div>
 
