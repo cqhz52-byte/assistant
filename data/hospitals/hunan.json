@@ -1,0 +1,310 @@
+[
+  {
+    "id": "hosp-hunan-001",
+    "name": "中南大学湘雅医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [
+      "湘雅医院"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-hunan-002",
+    "name": "中南大学湘雅三医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [
+      "湘雅三医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-003",
+    "name": "中南大学湘雅二医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [
+      "湘雅二医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-004",
+    "name": "南华大学附属南华医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "衡阳",
+    "cityFullName": "衡阳市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-005",
+    "name": "南华大学附属第一医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "衡阳",
+    "cityFullName": "衡阳市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-006",
+    "name": "南华大学附属第二医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "衡阳",
+    "cityFullName": "衡阳市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-007",
+    "name": "娄底市中心医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "娄底",
+    "cityFullName": "娄底市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-008",
+    "name": "岳阳市第一人民医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "岳阳",
+    "cityFullName": "岳阳市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-009",
+    "name": "常德市第一人民医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "常德",
+    "cityFullName": "常德市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-010",
+    "name": "怀化市第一人民医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "怀化",
+    "cityFullName": "怀化市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-011",
+    "name": "株洲市中心医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "株洲",
+    "cityFullName": "株洲市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-012",
+    "name": "永州市中心医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "永州",
+    "cityFullName": "永州市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-013",
+    "name": "湖南中医药大学第一附属医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-014",
+    "name": "湖南中医药大学第二附属医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-015",
+    "name": "湖南省中医药研究院附属医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-016",
+    "name": "湖南省人民医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-017",
+    "name": "湖南省儿童医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-018",
+    "name": "湖南省肿瘤医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [
+      "湖南肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-019",
+    "name": "湘潭市中心医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "湘潭",
+    "cityFullName": "湘潭市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-020",
+    "name": "益阳市中心医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "益阳",
+    "cityFullName": "益阳市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-021",
+    "name": "衡阳市中心医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "衡阳",
+    "cityFullName": "衡阳市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-022",
+    "name": "邵阳市中心医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "邵阳",
+    "cityFullName": "邵阳市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-023",
+    "name": "郴州市第一人民医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "郴州",
+    "cityFullName": "郴州市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-024",
+    "name": "长沙市中心医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hunan-025",
+    "name": "长沙市第四医院",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "city": "长沙",
+    "cityFullName": "长沙市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

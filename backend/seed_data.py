@@ -2,9 +2,20 @@ import json
 from pathlib import Path
 
 DATA_ROOT = Path(__file__).resolve().parents[1] / 'data'
+HOSPITALS_ROOT = DATA_ROOT / 'hospitals'
 
-with (DATA_ROOT / 'hospital-database.json').open('r', encoding='utf-8') as hospital_file:
-    HOSPITALS = json.load(hospital_file)
+
+def load_hospitals() -> list[dict]:
+    hospitals: list[dict] = []
+    for file_path in sorted(HOSPITALS_ROOT.glob('*.json')):
+        if file_path.name == 'manifest.json':
+            continue
+        with file_path.open('r', encoding='utf-8') as hospital_file:
+            hospitals.extend(json.load(hospital_file))
+    return hospitals
+
+
+HOSPITALS = load_hospitals()
 
 DEVICES = [
     {

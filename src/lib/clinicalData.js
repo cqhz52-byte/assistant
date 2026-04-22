@@ -1,6 +1,4 @@
-import hospitalDatabase from '../../data/hospital-database.json'
-
-const hospitals = hospitalDatabase
+import { hospitals } from './hospitalDatabase'
 
 const productLines = [
   {

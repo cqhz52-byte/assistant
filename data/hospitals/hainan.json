@@ -1,0 +1,62 @@
+[
+  {
+    "id": "hosp-hainan-001",
+    "name": "哈尔滨医科大学鸿森医院",
+    "province": "海南",
+    "provinceFullName": "海南省",
+    "city": "三亚",
+    "cityFullName": "三亚市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hainan-002",
+    "name": "海南农垦总医院",
+    "province": "海南",
+    "provinceFullName": "海南省",
+    "city": "海口",
+    "cityFullName": "海口市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hainan-003",
+    "name": "海南医学院第一附属医院",
+    "province": "海南",
+    "provinceFullName": "海南省",
+    "city": "海口",
+    "cityFullName": "海口市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hainan-004",
+    "name": "海南省人民医院",
+    "province": "海南",
+    "provinceFullName": "海南省",
+    "city": "海口",
+    "cityFullName": "海口市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-hainan-005",
+    "name": "海口市人民医院",
+    "province": "海南",
+    "provinceFullName": "海南省",
+    "city": "海口",
+    "cityFullName": "海口市",
+    "region": "中南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

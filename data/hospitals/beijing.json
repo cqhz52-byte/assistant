@@ -1,0 +1,480 @@
+[
+  {
+    "id": "hosp-beijing-001",
+    "name": "中国医学科学院北京协和医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "北京协和医院",
+      "北京协和"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-beijing-002",
+    "name": "中日友好医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "中日医院"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-beijing-003",
+    "name": "北京大学第一医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "北大医院",
+      "北大一院"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-beijing-004",
+    "name": "中国医学科学院整形外科医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-005",
+    "name": "中国医学科学院肿瘤医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-006",
+    "name": "中国医学科学院阜外医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-007",
+    "name": "北京东直门医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-008",
+    "name": "北京中医药大学东方医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-009",
+    "name": "北京中医药大学第三附属医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-010",
+    "name": "北京医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-011",
+    "name": "北京博爱医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-012",
+    "name": "北京回龙观医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-013",
+    "name": "北京大学人民医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "北大人民医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-014",
+    "name": "北京大学口腔医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-015",
+    "name": "北京大学第三医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "北医三院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-016",
+    "name": "北京大学第六医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-017",
+    "name": "北京大学肿瘤医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "北大肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-018",
+    "name": "北京市昌平区中西医结合医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-019",
+    "name": "北京广安门医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-020",
+    "name": "北京望京医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-021",
+    "name": "北京西苑医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-022",
+    "name": "首都儿科研究所附属儿童医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-023",
+    "name": "首都医科大学宣武医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "宣武医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-024",
+    "name": "首都医科大学附属北京世纪坛医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-025",
+    "name": "首都医科大学附属北京中医医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-026",
+    "name": "首都医科大学附属北京佑安医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-027",
+    "name": "首都医科大学附属北京儿童医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-028",
+    "name": "首都医科大学附属北京友谊医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-029",
+    "name": "首都医科大学附属北京口腔医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-030",
+    "name": "首都医科大学附属北京同仁医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-031",
+    "name": "首都医科大学附属北京地坛医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-032",
+    "name": "首都医科大学附属北京天坛医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "北京天坛医院",
+      "天坛医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-033",
+    "name": "首都医科大学附属北京妇产医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-034",
+    "name": "首都医科大学附属北京安定医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-035",
+    "name": "首都医科大学附属北京安贞医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "北京安贞医院",
+      "安贞医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-036",
+    "name": "首都医科大学附属北京朝阳医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-037",
+    "name": "首都医科大学附属北京积水潭医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-beijing-038",
+    "name": "首都医科大学附属北京胸科医院",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "city": "北京",
+    "cityFullName": "北京市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

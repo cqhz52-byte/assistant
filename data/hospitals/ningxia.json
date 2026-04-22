@@ -1,0 +1,38 @@
+[
+  {
+    "id": "hosp-ningxia-001",
+    "name": "宁夏人民医院",
+    "province": "宁夏",
+    "provinceFullName": "宁夏回族自治区",
+    "city": "银川",
+    "cityFullName": "银川市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-ningxia-002",
+    "name": "宁夏医科大学总医院",
+    "province": "宁夏",
+    "provinceFullName": "宁夏回族自治区",
+    "city": "银川",
+    "cityFullName": "银川市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-ningxia-003",
+    "name": "银川市第一人民医院",
+    "province": "宁夏",
+    "provinceFullName": "宁夏回族自治区",
+    "city": "银川",
+    "cityFullName": "银川市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

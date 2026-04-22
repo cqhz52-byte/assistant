@@ -1,0 +1,26 @@
+[
+  {
+    "id": "hosp-tibet-001",
+    "name": "西藏自治区人民医院",
+    "province": "西藏",
+    "provinceFullName": "西藏自治区",
+    "city": "拉萨",
+    "cityFullName": "拉萨市",
+    "region": "西南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-tibet-002",
+    "name": "西藏自治区藏医院",
+    "province": "西藏",
+    "provinceFullName": "西藏自治区",
+    "city": "拉萨",
+    "cityFullName": "拉萨市",
+    "region": "西南",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

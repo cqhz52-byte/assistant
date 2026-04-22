@@ -1,0 +1,172 @@
+[
+  {
+    "id": "hosp-inner-mongolia-001",
+    "name": "内蒙古中医医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "呼和浩特",
+    "cityFullName": "呼和浩特市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-002",
+    "name": "内蒙古医科大学第二附属医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "呼和浩特",
+    "cityFullName": "呼和浩特市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-003",
+    "name": "内蒙古医科大学附属医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "呼和浩特",
+    "cityFullName": "呼和浩特市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [
+      "内蒙古医大附院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-004",
+    "name": "内蒙古国际蒙医医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "呼和浩特",
+    "cityFullName": "呼和浩特市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-005",
+    "name": "内蒙古妇幼保健院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "呼和浩特",
+    "cityFullName": "呼和浩特市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-006",
+    "name": "内蒙古林业总医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "呼伦贝尔",
+    "cityFullName": "呼伦贝尔市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-007",
+    "name": "内蒙古民族大学附属医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "通辽",
+    "cityFullName": "通辽市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-008",
+    "name": "内蒙古自治区人民医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "呼和浩特",
+    "cityFullName": "呼和浩特市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-009",
+    "name": "内蒙古自治区肿瘤医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "呼和浩特",
+    "cityFullName": "呼和浩特市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-010",
+    "name": "包头医学院第一附属医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "包头",
+    "cityFullName": "包头市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-011",
+    "name": "包头市中心医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "包头",
+    "cityFullName": "包头市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-012",
+    "name": "包钢医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "包头",
+    "cityFullName": "包头市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-013",
+    "name": "赤峰市医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "赤峰",
+    "cityFullName": "赤峰市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-inner-mongolia-014",
+    "name": "鄂尔多斯市中心医院",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "city": "鄂尔多斯",
+    "cityFullName": "鄂尔多斯市",
+    "region": "华北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

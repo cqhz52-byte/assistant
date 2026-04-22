@@ -44,7 +44,7 @@ const steps = [
   { id: 'summary', label: '总结归档', hint: '提交到公司内部病例数据库。' },
 ]
 
-const hospitalRegions = ['全部', '华北', '华东', '华中', '华南', '西南', '西北']
+const hospitalRegions = ['全部', '华北', '东北', '华东', '中南', '西南', '西北', '全国']
 
 function formatDateTime(value) {
   if (!value) return '未保存'
@@ -57,6 +57,12 @@ function formatDateTime(value) {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+function formatHospitalMeta(hospital) {
+  const location = [hospital.province, hospital.city].filter(Boolean)
+  const uniqueLocation = location.filter((item, index) => location.indexOf(item) === index)
+  return [...uniqueLocation, hospital.region, hospital.level].filter(Boolean).join(' · ')
 }
 
 function getHospitalById(id) {
@@ -230,6 +236,7 @@ function App() {
   const [formState, setFormState] = useState(() => normalizeDraft(null))
   const [hospitalKeyword, setHospitalKeyword] = useState('')
   const [hospitalRegion, setHospitalRegion] = useState('全部')
+  const [hospitalProvince, setHospitalProvince] = useState('全部省份')
   const [notice, setNotice] = useState('')
   const [saveState, setSaveState] = useState('loading')
   const [lastSavedAt, setLastSavedAt] = useState('')
@@ -272,20 +279,31 @@ function App() {
     [],
   )
 
+  const hospitalProvinceOptions = useMemo(
+    () => ['全部省份', ...new Set(hospitals.map((hospital) => hospital.province).filter(Boolean))],
+    [],
+  )
+
   const filteredHospitals = useMemo(() => {
     const keyword = hospitalKeyword.trim().toLowerCase()
     const regionMatched =
       hospitalRegion === '全部'
         ? hospitals
         : hospitals.filter((hospital) => hospital.region === hospitalRegion)
+    const provinceMatched =
+      hospitalProvince === '全部省份'
+        ? regionMatched
+        : regionMatched.filter((hospital) => hospital.province === hospitalProvince)
 
-    if (!keyword) return regionMatched
+    if (!keyword) return provinceMatched
 
-    return regionMatched.filter((hospital) => {
+    return provinceMatched.filter((hospital) => {
       const target = [
         hospital.name,
         hospital.province,
+        hospital.provinceFullName,
         hospital.city,
+        hospital.cityFullName,
         hospital.region,
         hospital.level,
         ...(hospital.aliases ?? []),
@@ -294,7 +312,7 @@ function App() {
         .toLowerCase()
       return target.includes(keyword)
     })
-  }, [hospitalKeyword, hospitalRegion])
+  }, [hospitalKeyword, hospitalProvince, hospitalRegion])
 
   const visibleHospitals = useMemo(() => filteredHospitals.slice(0, 12), [filteredHospitals])
 
@@ -362,9 +380,11 @@ function App() {
         if (!active) return
 
         const nextDraft = normalizeDraft(draft, profile?.name || demoProfile.name)
+        const draftHospital = nextDraft.hospitalId ? getHospitalById(nextDraft.hospitalId) : null
         setFormState(nextDraft)
         setHospitalKeyword('')
         setHospitalRegion('全部')
+        setHospitalProvince(draftHospital?.province ?? '全部省份')
         setLastSavedAt(draft?.savedAt ?? '')
 
         if (draft) {
@@ -438,6 +458,7 @@ function App() {
   function selectHospital(hospital) {
     setHospitalKeyword('')
     setHospitalRegion(hospital.region)
+    setHospitalProvince(hospital.province)
     updateField('hospitalId', hospital.id)
   }
 
@@ -526,6 +547,7 @@ function App() {
     setFormState(nextDraft)
     setHospitalKeyword('')
     setHospitalRegion('全部')
+    setHospitalProvince('全部省份')
     setStepIndex(0)
     setNotice('已清空草稿并恢复默认模板。')
     setLastSavedAt('')
@@ -625,6 +647,7 @@ function App() {
       setFormState(nextDraft)
       setHospitalKeyword('')
       setHospitalRegion('全部')
+      setHospitalProvince('全部省份')
       setView('dashboard')
       setStepIndex(0)
       setLastSavedAt('')
@@ -706,7 +729,7 @@ function App() {
               <div className="selector-block compact-block">
                 <div className="block-title">
                   <strong>区域筛选</strong>
-                  <span>先按区域缩小范围，再从医院库快速选择</span>
+                  <span>先按区域和省份缩小范围，再从医院库快速选择</span>
                 </div>
                 <div className="chip-row">
                   {hospitalRegions.map((region) => (
@@ -722,14 +745,30 @@ function App() {
                 </div>
               </div>
 
-              <label className="field">
-                <span>搜索医院</span>
-                <input
-                  value={hospitalKeyword}
-                  onChange={(event) => setHospitalKeyword(event.target.value)}
-                  placeholder="例如：协和 / 华西 / 上海 / 广州 / 四川 / 三甲"
-              />
-            </label>
+              <div className="field-row">
+                <label className="field">
+                  <span>省份</span>
+                  <select
+                    value={hospitalProvince}
+                    onChange={(event) => setHospitalProvince(event.target.value)}
+                  >
+                    {hospitalProvinceOptions.map((province) => (
+                      <option key={province} value={province}>
+                        {province}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="field">
+                  <span>搜索医院</span>
+                  <input
+                    value={hospitalKeyword}
+                    onChange={(event) => setHospitalKeyword(event.target.value)}
+                    placeholder="例如：协和 / 华西 / 瑞金 / 浙江 / 广州 / 三甲"
+                  />
+                </label>
+              </div>
 
               <div className="search-result-meta">
                 <span>匹配 {filteredHospitals.length} 家医院</span>
@@ -752,9 +791,7 @@ function App() {
                       onClick={() => selectHospital(hospital)}
                     >
                       <strong>{hospital.name}</strong>
-                      <span>
-                        {hospital.province} · {hospital.city} · {hospital.region} · {hospital.level}
-                      </span>
+                      <span>{formatHospitalMeta(hospital)}</span>
                     </button>
                   ))
               )}

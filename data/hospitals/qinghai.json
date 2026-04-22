@@ -1,0 +1,110 @@
+[
+  {
+    "id": "hosp-qinghai-001",
+    "name": "青海大学附属医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-qinghai-002",
+    "name": "青海省中医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-qinghai-003",
+    "name": "青海省人民医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-qinghai-004",
+    "name": "青海省妇女儿童医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-qinghai-005",
+    "name": "青海省心脑血管病医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-qinghai-006",
+    "name": "青海省第三人民医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-qinghai-007",
+    "name": "青海省第四人民医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-qinghai-008",
+    "name": "青海省藏医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-qinghai-009",
+    "name": "青海红十字医院",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "city": "西宁",
+    "cityFullName": "西宁市",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

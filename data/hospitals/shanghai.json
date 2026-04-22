@@ -1,0 +1,351 @@
+[
+  {
+    "id": "hosp-shanghai-001",
+    "name": "上海中医药大学附属龙华医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "龙华医院"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-shanghai-002",
+    "name": "复旦大学附属中山医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "中山医院",
+      "上海中山医院"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-shanghai-003",
+    "name": "复旦大学附属华山医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "华山医院",
+      "上海华山医院"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-shanghai-004",
+    "name": "上海东方医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-005",
+    "name": "上海中医药大学附属曙光医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-006",
+    "name": "上海交通大学医学院附属上海儿童医学中心",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-007",
+    "name": "上海交通大学医学院附属第九人民医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "上海九院",
+      "第九人民医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-008",
+    "name": "上海仁济医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-009",
+    "name": "上海华东医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-010",
+    "name": "上海同济医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-011",
+    "name": "上海岳阳医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-012",
+    "name": "上海市中医医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-013",
+    "name": "上海市儿童医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-014",
+    "name": "上海市公共卫生临床中心",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-015",
+    "name": "上海市第一人民医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-016",
+    "name": "上海市第一妇婴保健院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-017",
+    "name": "上海市第六人民医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-018",
+    "name": "上海市第十人民医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-019",
+    "name": "上海市精神卫生中心",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-020",
+    "name": "上海市肺科医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-021",
+    "name": "上海市胸科医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-022",
+    "name": "上海新华医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-023",
+    "name": "上海瑞金医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-024",
+    "name": "国际和平妇幼保健院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-025",
+    "name": "复旦大学附属儿科医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-026",
+    "name": "复旦大学附属妇产科医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-027",
+    "name": "复旦大学附属眼耳鼻喉科医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shanghai-028",
+    "name": "复旦大学附属肿瘤医院",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "city": "上海",
+    "cityFullName": "上海市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "上海肿瘤医院"
+    ],
+    "featured": false
+  }
+]

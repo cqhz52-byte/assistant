@@ -1,0 +1,544 @@
+[
+  {
+    "id": "hosp-fujian-001",
+    "name": "复旦大学附属中山医院",
+    "province": "上海",
+    "provinceFullName": "福建省",
+    "city": "上海",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "厦门",
+      "中山医院",
+      "上海中山医院"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-fujian-002",
+    "name": "三明市第一医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "三明",
+    "cityFullName": "三明市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-003",
+    "name": "三明市第二医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "三明",
+    "cityFullName": "三明市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-004",
+    "name": "中國人民解放軍聯勤保障部隊第九〇〇醫院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "原 中國人民解放軍福州總醫院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-005",
+    "name": "北京中医药大学东直门医院厦门医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "厦门市中医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-006",
+    "name": "华侨大学附属厦门长庚医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-007",
+    "name": "南平市第一医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "南平",
+    "cityFullName": "南平市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-008",
+    "name": "厦门医学院附属仙岳医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "厦门市仙岳医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-009",
+    "name": "厦门医学院附属口腔医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "厦门市口腔医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-010",
+    "name": "厦门医学院附属第二医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-011",
+    "name": "厦门大学附属中山医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-012",
+    "name": "厦门大学附属厦门眼科中心",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-013",
+    "name": "厦门大学附属妇女儿童医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "厦门市妇幼保健院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-014",
+    "name": "厦门大学附属心血管病医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-015",
+    "name": "厦门大学附属成功医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "中国人民解放军陆军第七十三集团军医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-016",
+    "name": "厦门大学附属第一医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-017",
+    "name": "厦门大学附属翔安医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "厦门大学医学中心"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-018",
+    "name": "厦门市第五医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "厦门",
+    "cityFullName": "厦门市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-019",
+    "name": "宁德市闽东医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "宁德",
+    "cityFullName": "宁德市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-020",
+    "name": "泉州市第一医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "泉州",
+    "cityFullName": "泉州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-021",
+    "name": "漳州市中医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "漳州",
+    "cityFullName": "漳州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-022",
+    "name": "漳州市医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "漳州",
+    "cityFullName": "漳州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-023",
+    "name": "福州大學 附屬省立醫院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "福建省立医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-024",
+    "name": "福州市中医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-025",
+    "name": "福州市传染病医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-026",
+    "name": "福州市眼科醫院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-027",
+    "name": "福州市第一總医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-028",
+    "name": "福州市第二总医院妇幼保健院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "福州市妇幼保健院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-029",
+    "name": "福州市第二總医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-030",
+    "name": "福州市第四医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-031",
+    "name": "福州市結核病防治院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "福州肺科医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-032",
+    "name": "福建医科大学附属口腔医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-033",
+    "name": "福建医科大学附属第一医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "福建附一"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-034",
+    "name": "福建医科大学附属第二医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "泉州",
+    "cityFullName": "泉州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-035",
+    "name": "福建省人民医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-036",
+    "name": "福建省妇幼保健院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-037",
+    "name": "福建省第三人民医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-038",
+    "name": "福建省第二人民医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-039",
+    "name": "福建省肿瘤医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-040",
+    "name": "福建醫科大學附屬協和醫院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "福州",
+    "cityFullName": "福州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-041",
+    "name": "莆田学院附属医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "莆田",
+    "cityFullName": "莆田市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-042",
+    "name": "莆田市第一医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "莆田",
+    "cityFullName": "莆田市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-fujian-043",
+    "name": "龙岩市第一医院",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "city": "龙岩",
+    "cityFullName": "龙岩市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

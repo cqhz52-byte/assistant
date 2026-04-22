@@ -1,0 +1,26 @@
+[
+  {
+    "id": "hosp-xinjiang-bingtuan-001",
+    "name": "新疆生产建设兵团总医院",
+    "province": "新疆兵团",
+    "provinceFullName": "新疆生产建设兵团",
+    "city": "",
+    "cityFullName": "",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-xinjiang-bingtuan-002",
+    "name": "石河子大学医学院第一附属医院",
+    "province": "新疆兵团",
+    "provinceFullName": "新疆生产建设兵团",
+    "city": "",
+    "cityFullName": "",
+    "region": "西北",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  }
+]

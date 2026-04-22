@@ -1,0 +1,233 @@
+[
+  {
+    "slug": "anhui",
+    "province": "安徽",
+    "provinceFullName": "安徽省",
+    "region": "华东",
+    "count": 28
+  },
+  {
+    "slug": "beijing",
+    "province": "北京",
+    "provinceFullName": "北京市",
+    "region": "华北",
+    "count": 38
+  },
+  {
+    "slug": "chongqing",
+    "province": "重庆",
+    "provinceFullName": "重庆市",
+    "region": "西南",
+    "count": 12
+  },
+  {
+    "slug": "fujian",
+    "province": "福建",
+    "provinceFullName": "福建省",
+    "region": "华东",
+    "count": 43
+  },
+  {
+    "slug": "gansu",
+    "province": "甘肃",
+    "provinceFullName": "甘肃省",
+    "region": "西北",
+    "count": 33
+  },
+  {
+    "slug": "guangdong",
+    "province": "广东",
+    "provinceFullName": "广东省",
+    "region": "中南",
+    "count": 179
+  },
+  {
+    "slug": "guangxi",
+    "province": "广西",
+    "provinceFullName": "广西壮族自治区",
+    "region": "中南",
+    "count": 29
+  },
+  {
+    "slug": "guizhou",
+    "province": "贵州",
+    "provinceFullName": "贵州省",
+    "region": "西南",
+    "count": 37
+  },
+  {
+    "slug": "hainan",
+    "province": "海南",
+    "provinceFullName": "海南省",
+    "region": "中南",
+    "count": 5
+  },
+  {
+    "slug": "hebei",
+    "province": "河北",
+    "provinceFullName": "河北省",
+    "region": "华北",
+    "count": 31
+  },
+  {
+    "slug": "heilongjiang",
+    "province": "黑龙江",
+    "provinceFullName": "黑龙江省",
+    "region": "东北",
+    "count": 41
+  },
+  {
+    "slug": "henan",
+    "province": "河南",
+    "provinceFullName": "河南省",
+    "region": "中南",
+    "count": 27
+  },
+  {
+    "slug": "hubei",
+    "province": "湖北",
+    "provinceFullName": "湖北省",
+    "region": "中南",
+    "count": 37
+  },
+  {
+    "slug": "hunan",
+    "province": "湖南",
+    "provinceFullName": "湖南省",
+    "region": "中南",
+    "count": 25
+  },
+  {
+    "slug": "inner-mongolia",
+    "province": "内蒙古",
+    "provinceFullName": "内蒙古自治区",
+    "region": "华北",
+    "count": 14
+  },
+  {
+    "slug": "jiangsu",
+    "province": "江苏",
+    "provinceFullName": "江苏省",
+    "region": "华东",
+    "count": 58
+  },
+  {
+    "slug": "jiangxi",
+    "province": "江西",
+    "provinceFullName": "江西省",
+    "region": "华东",
+    "count": 34
+  },
+  {
+    "slug": "jilin",
+    "province": "吉林",
+    "provinceFullName": "吉林省",
+    "region": "东北",
+    "count": 22
+  },
+  {
+    "slug": "liaoning",
+    "province": "辽宁",
+    "provinceFullName": "辽宁省",
+    "region": "东北",
+    "count": 40
+  },
+  {
+    "slug": "ningxia",
+    "province": "宁夏",
+    "provinceFullName": "宁夏回族自治区",
+    "region": "西北",
+    "count": 3
+  },
+  {
+    "slug": "pla",
+    "province": "解放军",
+    "provinceFullName": "中国人民解放军",
+    "region": "全国",
+    "count": 93
+  },
+  {
+    "slug": "qinghai",
+    "province": "青海",
+    "provinceFullName": "青海省",
+    "region": "西北",
+    "count": 9
+  },
+  {
+    "slug": "shaanxi",
+    "province": "陕西",
+    "provinceFullName": "陕西省",
+    "region": "西北",
+    "count": 26
+  },
+  {
+    "slug": "shandong",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "region": "华东",
+    "count": 47
+  },
+  {
+    "slug": "shanghai",
+    "province": "上海",
+    "provinceFullName": "上海市",
+    "region": "华东",
+    "count": 28
+  },
+  {
+    "slug": "shanxi",
+    "province": "山西",
+    "provinceFullName": "山西省",
+    "region": "华北",
+    "count": 36
+  },
+  {
+    "slug": "sichuan",
+    "province": "四川",
+    "provinceFullName": "四川省",
+    "region": "西南",
+    "count": 43
+  },
+  {
+    "slug": "tianjin",
+    "province": "天津",
+    "provinceFullName": "天津市",
+    "region": "华北",
+    "count": 27
+  },
+  {
+    "slug": "tibet",
+    "province": "西藏",
+    "provinceFullName": "西藏自治区",
+    "region": "西南",
+    "count": 2
+  },
+  {
+    "slug": "xinjiang",
+    "province": "新疆",
+    "provinceFullName": "新疆维吾尔自治区",
+    "region": "西北",
+    "count": 8
+  },
+  {
+    "slug": "xinjiang-bingtuan",
+    "province": "新疆兵团",
+    "provinceFullName": "新疆生产建设兵团",
+    "region": "西北",
+    "count": 2
+  },
+  {
+    "slug": "yunnan",
+    "province": "云南",
+    "provinceFullName": "云南省",
+    "region": "西南",
+    "count": 25
+  },
+  {
+    "slug": "zhejiang",
+    "province": "浙江",
+    "provinceFullName": "浙江省",
+    "region": "华东",
+    "count": 60
+  }
+]

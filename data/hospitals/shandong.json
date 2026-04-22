@@ -1,0 +1,590 @@
+[
+  {
+    "id": "hosp-shandong-001",
+    "name": "山东大学齐鲁医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "齐鲁医院"
+    ],
+    "featured": true
+  },
+  {
+    "id": "hosp-shandong-002",
+    "name": "东营市人民医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "东营",
+    "cityFullName": "东营市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-003",
+    "name": "临沂市人民医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "临沂",
+    "cityFullName": "临沂市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-004",
+    "name": "临沂市妇幼保健院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "临沂",
+    "cityFullName": "临沂市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-005",
+    "name": "临沂市肿瘤医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "临沂",
+    "cityFullName": "临沂市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-006",
+    "name": "兖矿新里程医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济宁",
+    "cityFullName": "济宁市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "兖矿集团总医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-007",
+    "name": "北大医疗鲁中医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "淄博",
+    "cityFullName": "淄博市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "齐鲁石化公司中心医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-008",
+    "name": "单县中心医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "菏泽",
+    "cityFullName": "菏泽市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-009",
+    "name": "山东中医药大学第一附属医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-010",
+    "name": "山东中医药大学第二附属医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "济南铁路中心医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-011",
+    "name": "山东大学第二医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-012",
+    "name": "山东省千佛山医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-013",
+    "name": "山东省立医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-014",
+    "name": "山东省肿瘤医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "山东肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-015",
+    "name": "山东第一医科大学第二附属医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "泰安",
+    "cityFullName": "泰安市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-016",
+    "name": "山东第二医科大学附属医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "潍坊",
+    "cityFullName": "潍坊市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-017",
+    "name": "山东青岛中西医结合医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "青岛市第五人民医院、海慈医院西院区"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-018",
+    "name": "枣庄市立医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "枣庄",
+    "cityFullName": "枣庄市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-019",
+    "name": "泰安市中心医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "泰安",
+    "cityFullName": "泰安市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-020",
+    "name": "济南市中医医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-021",
+    "name": "济南市中心医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-022",
+    "name": "济南市章丘区中医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-023",
+    "name": "济南市第四人民医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济南",
+    "cityFullName": "济南市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-024",
+    "name": "济宁医学院附属医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济宁",
+    "cityFullName": "济宁市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-025",
+    "name": "济宁市第一人民医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "济宁",
+    "cityFullName": "济宁市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-026",
+    "name": "淄博市中心医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "淄博",
+    "cityFullName": "淄博市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-027",
+    "name": "滨州医学院附属医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "滨州",
+    "cityFullName": "滨州市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-028",
+    "name": "潍坊市中医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "潍坊",
+    "cityFullName": "潍坊市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "山东第二医科大学附属中医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-029",
+    "name": "潍坊市人民医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "潍坊",
+    "cityFullName": "潍坊市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-030",
+    "name": "烟台山医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "烟台",
+    "cityFullName": "烟台市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-031",
+    "name": "烟台毓璜顶医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "烟台",
+    "cityFullName": "烟台市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-032",
+    "name": "聊城市人民医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "聊城",
+    "cityFullName": "聊城市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-033",
+    "name": "聊城市第二人民医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "聊城",
+    "cityFullName": "聊城市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-034",
+    "name": "胜利油田中心医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "东营",
+    "cityFullName": "东营市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-035",
+    "name": "菏泽市立医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "菏泽",
+    "cityFullName": "菏泽市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-036",
+    "name": "附属青岛眼科医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-037",
+    "name": "青岛大学附属医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "青大附院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-038",
+    "name": "青岛妇女儿童医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "青岛市妇幼保健院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-039",
+    "name": "青岛市中心医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-040",
+    "name": "青岛市即墨区中医医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-041",
+    "name": "青岛市口腔医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-042",
+    "name": "青岛市市立医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-043",
+    "name": "青岛市海慈医疗集团",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "青岛大学附属青岛市海慈医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-044",
+    "name": "青岛市精神卫生中心",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "青岛市第七人民医院"
+    ],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-045",
+    "name": "青岛市胶州中心医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-046",
+    "name": "青岛心血管病医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "id": "hosp-shandong-047",
+    "name": "青岛西海岸新区中医医院",
+    "province": "山东",
+    "provinceFullName": "山东省",
+    "city": "青岛",
+    "cityFullName": "青岛市",
+    "region": "华东",
+    "level": "三级甲等",
+    "aliases": [
+      "青岛市黄岛区中医医院"
+    ],
+    "featured": false
+  }
+]

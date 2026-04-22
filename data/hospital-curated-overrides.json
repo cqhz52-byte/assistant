@@ -1,0 +1,826 @@
+[
+  {
+    "name": "北京协和医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "协和医院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "中国人民解放军总医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "301医院",
+      "解放军总医院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "北京医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "首都医科大学附属北京天坛医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "北京天坛医院",
+      "天坛医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "首都医科大学附属北京安贞医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "北京安贞医院",
+      "安贞医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "中日友好医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "中日医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "北京大学第三医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "北医三院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "首都医科大学宣武医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "宣武医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "北京大学人民医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "北大人民医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "北京大学第一医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "北大医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "北京大学肿瘤医院",
+    "province": "北京",
+    "city": "北京",
+    "aliases": [
+      "北大肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "天津医科大学总医院",
+    "province": "天津",
+    "city": "天津",
+    "aliases": [
+      "天津总医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "天津市肿瘤医院",
+    "province": "天津",
+    "city": "天津",
+    "aliases": [
+      "天津肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "河北医科大学第二医院",
+    "province": "河北",
+    "city": "石家庄",
+    "aliases": [
+      "河北医大二院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "山西白求恩医院",
+    "province": "山西",
+    "city": "太原",
+    "aliases": [
+      "山西白求恩"
+    ],
+    "featured": false
+  },
+  {
+    "name": "内蒙古医科大学附属医院",
+    "province": "内蒙古",
+    "city": "呼和浩特",
+    "aliases": [
+      "内蒙古医大附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "中国医科大学附属第一医院",
+    "province": "辽宁",
+    "city": "沈阳",
+    "aliases": [
+      "中国医大一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "中国医科大学附属盛京医院",
+    "province": "辽宁",
+    "city": "沈阳",
+    "aliases": [
+      "盛京医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "吉林大学第一医院",
+    "province": "吉林",
+    "city": "长春",
+    "aliases": [
+      "吉大一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "哈尔滨医科大学附属第一医院",
+    "province": "黑龙江",
+    "city": "哈尔滨",
+    "aliases": [
+      "哈医大一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "哈尔滨医科大学附属第二医院",
+    "province": "黑龙江",
+    "city": "哈尔滨",
+    "aliases": [
+      "哈医大二院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "上海交通大学医学院附属瑞金医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "瑞金医院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "复旦大学附属中山医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "中山医院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "复旦大学附属华山医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "华山医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "上海长征医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "长征医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "上海中医药大学附属龙华医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "龙华医院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "上海交通大学医学院附属仁济医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "仁济医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "上海交通大学医学院附属第九人民医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "上海九院",
+      "第九人民医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "上海交通大学附属第六人民医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "上海六院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "同济大学附属第十人民医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "上海十院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "复旦大学附属肿瘤医院",
+    "province": "上海",
+    "city": "上海",
+    "aliases": [
+      "上海肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "南京鼓楼医院",
+    "province": "江苏",
+    "city": "南京",
+    "aliases": [
+      "鼓楼医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "江苏省人民医院",
+    "province": "江苏",
+    "city": "南京",
+    "aliases": [
+      "省人民医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "东南大学附属中大医院",
+    "province": "江苏",
+    "city": "南京",
+    "aliases": [
+      "中大医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "苏州大学附属第一医院",
+    "province": "江苏",
+    "city": "苏州",
+    "aliases": [
+      "苏大附一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "江苏省肿瘤医院",
+    "province": "江苏",
+    "city": "南京",
+    "aliases": [
+      "江苏肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "浙江大学医学院附属第一医院",
+    "province": "浙江",
+    "city": "杭州",
+    "aliases": [
+      "浙大一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "浙江大学医学院附属第二医院",
+    "province": "浙江",
+    "city": "杭州",
+    "aliases": [
+      "浙大二院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "浙江大学医学院附属邵逸夫医院",
+    "province": "浙江",
+    "city": "杭州",
+    "aliases": [
+      "邵逸夫医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "浙江省人民医院",
+    "province": "浙江",
+    "city": "杭州",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "中国科学技术大学附属第一医院",
+    "province": "安徽",
+    "city": "合肥",
+    "aliases": [
+      "安徽省立医院",
+      "中科大附一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "安徽医科大学第一附属医院",
+    "province": "安徽",
+    "city": "合肥",
+    "aliases": [
+      "安医大一附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "厦门大学附属第一医院",
+    "province": "福建",
+    "city": "厦门",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "福建医科大学附属协和医院",
+    "province": "福建",
+    "city": "福州",
+    "aliases": [
+      "福建协和医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "福建医科大学附属第一医院",
+    "province": "福建",
+    "city": "福州",
+    "aliases": [
+      "福建附一"
+    ],
+    "featured": false
+  },
+  {
+    "name": "福建省立医院",
+    "province": "福建",
+    "city": "福州",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "山东大学齐鲁医院",
+    "province": "山东",
+    "city": "济南",
+    "aliases": [
+      "齐鲁医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "山东省立医院",
+    "province": "山东",
+    "city": "济南",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "青岛大学附属医院",
+    "province": "山东",
+    "city": "青岛",
+    "aliases": [
+      "青大附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "山东省肿瘤医院",
+    "province": "山东",
+    "city": "济南",
+    "aliases": [
+      "山东肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "江西省人民医院",
+    "province": "江西",
+    "city": "南昌",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "武汉大学中南医院",
+    "province": "湖北",
+    "city": "武汉",
+    "aliases": [
+      "中南医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "华中科技大学同济医学院附属协和医院",
+    "province": "湖北",
+    "city": "武汉",
+    "aliases": [
+      "武汉协和医院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "华中科技大学同济医学院附属同济医院",
+    "province": "湖北",
+    "city": "武汉",
+    "aliases": [
+      "武汉同济医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "湖北省肿瘤医院",
+    "province": "湖北",
+    "city": "武汉",
+    "aliases": [
+      "湖北肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "中南大学湘雅医院",
+    "province": "湖南",
+    "city": "长沙",
+    "aliases": [
+      "湘雅医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "中南大学湘雅二医院",
+    "province": "湖南",
+    "city": "长沙",
+    "aliases": [
+      "湘雅二医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "中南大学湘雅三医院",
+    "province": "湖南",
+    "city": "长沙",
+    "aliases": [
+      "湘雅三医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "湖南省肿瘤医院",
+    "province": "湖南",
+    "city": "长沙",
+    "aliases": [
+      "湖南肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "郑州大学第一附属医院",
+    "province": "河南",
+    "city": "郑州",
+    "aliases": [
+      "郑大一附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "河南省人民医院",
+    "province": "河南",
+    "city": "郑州",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "河南省肿瘤医院",
+    "province": "河南",
+    "city": "郑州",
+    "aliases": [
+      "郑州大学附属肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "南昌大学第一附属医院",
+    "province": "江西",
+    "city": "南昌",
+    "aliases": [
+      "南大一附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "广州医科大学附属第一医院",
+    "province": "广东",
+    "city": "广州",
+    "aliases": [
+      "广医一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "中山大学附属第一医院",
+    "province": "广东",
+    "city": "广州",
+    "aliases": [
+      "中山一院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "中山大学附属第六医院",
+    "province": "广东",
+    "city": "广州",
+    "aliases": [
+      "中山六院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "广东省人民医院",
+    "province": "广东",
+    "city": "广州",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "南方医科大学南方医院",
+    "province": "广东",
+    "city": "广州",
+    "aliases": [
+      "南方医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "中山大学肿瘤防治中心",
+    "province": "广东",
+    "city": "广州",
+    "aliases": [
+      "中山肿瘤"
+    ],
+    "featured": false
+  },
+  {
+    "name": "深圳市人民医院",
+    "province": "广东",
+    "city": "深圳",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "深圳大学总医院",
+    "province": "广东",
+    "city": "深圳",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "北京大学深圳医院",
+    "province": "广东",
+    "city": "深圳",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "广西医科大学第一附属医院",
+    "province": "广西",
+    "city": "南宁",
+    "aliases": [
+      "广医一附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "广西壮族自治区人民医院",
+    "province": "广西",
+    "city": "南宁",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "海南医科大学第一附属医院",
+    "province": "海南",
+    "city": "海口",
+    "aliases": [
+      "海医一附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "重庆市肿瘤医院",
+    "province": "重庆",
+    "city": "重庆",
+    "aliases": [
+      "重庆肿瘤医院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "重庆医科大学附属第一医院",
+    "province": "重庆",
+    "city": "重庆",
+    "aliases": [
+      "重医附一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "重庆医科大学附属第二医院",
+    "province": "重庆",
+    "city": "重庆",
+    "aliases": [
+      "重医附二院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "四川大学华西医院",
+    "province": "四川",
+    "city": "成都",
+    "aliases": [
+      "华西医院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "四川省人民医院",
+    "province": "四川",
+    "city": "成都",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "四川省肿瘤医院",
+    "province": "四川",
+    "city": "成都",
+    "aliases": [
+      "四川肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "四川大学华西第二医院",
+    "province": "四川",
+    "city": "成都",
+    "aliases": [
+      "华西二院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "昆明医科大学第一附属医院",
+    "province": "云南",
+    "city": "昆明",
+    "aliases": [
+      "昆医大附一院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "云南省肿瘤医院",
+    "province": "云南",
+    "city": "昆明",
+    "aliases": [
+      "云南肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "贵州医科大学附属医院",
+    "province": "贵州",
+    "city": "贵阳",
+    "aliases": [
+      "贵医附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "贵州省人民医院",
+    "province": "贵州",
+    "city": "贵阳",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "西安交通大学第一附属医院",
+    "province": "陕西",
+    "city": "西安",
+    "aliases": [
+      "西交大一附院"
+    ],
+    "featured": true
+  },
+  {
+    "name": "西安交通大学第二附属医院",
+    "province": "陕西",
+    "city": "西安",
+    "aliases": [
+      "西交大二附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "陕西省肿瘤医院",
+    "province": "陕西",
+    "city": "西安",
+    "aliases": [
+      "陕西肿瘤医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "兰州大学第一医院",
+    "province": "甘肃",
+    "city": "兰州",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "甘肃省人民医院",
+    "province": "甘肃",
+    "city": "兰州",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "新疆医科大学第一附属医院",
+    "province": "新疆",
+    "city": "乌鲁木齐",
+    "aliases": [
+      "新医大一附院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "新疆维吾尔自治区人民医院",
+    "province": "新疆",
+    "city": "乌鲁木齐",
+    "aliases": [
+      "新疆人民医院"
+    ],
+    "featured": false
+  },
+  {
+    "name": "宁夏医科大学总医院",
+    "province": "宁夏",
+    "city": "银川",
+    "aliases": [],
+    "featured": false
+  },
+  {
+    "name": "青海大学附属医院",
+    "province": "青海",
+    "city": "西宁",
+    "aliases": [],
+    "featured": false
+  }
+]
