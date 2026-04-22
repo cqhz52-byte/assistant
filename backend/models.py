@@ -36,6 +36,8 @@ class Hospital(TimestampMixin, Base):
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    province: Mapped[str] = mapped_column(String(64), default='', nullable=False)
+    city: Mapped[str] = mapped_column(String(64), default='', nullable=False)
     region: Mapped[str] = mapped_column(String(64), nullable=False)
     level: Mapped[str] = mapped_column(String(32), nullable=False)
 

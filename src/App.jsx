@@ -45,18 +45,6 @@ const steps = [
 ]
 
 const hospitalRegions = ['全部', '华北', '华东', '华中', '华南', '西南', '西北']
-const featuredHospitalIds = [
-  'hsp-bjxh',
-  'hsp-bj301',
-  'hsp-shruj',
-  'hsp-shrh',
-  'hsp-whxt',
-  'hsp-gzzy',
-  'hsp-cdhx',
-  'hsp-cqzl',
-  'hsp-xajt1',
-  'hsp-shlh',
-]
 
 function formatDateTime(value) {
   if (!value) return '未保存'
@@ -280,10 +268,7 @@ function App() {
   const selectedDevice = useMemo(() => getDeviceById(formState.deviceId), [formState.deviceId])
 
   const featuredHospitals = useMemo(
-    () =>
-      featuredHospitalIds
-        .map((id) => hospitals.find((item) => item.id === id))
-        .filter(Boolean),
+    () => hospitals.filter((item) => item.featured).slice(0, 12),
     [],
   )
 
@@ -297,7 +282,16 @@ function App() {
     if (!keyword) return regionMatched
 
     return regionMatched.filter((hospital) => {
-      const target = `${hospital.name} ${hospital.region} ${hospital.level}`.toLowerCase()
+      const target = [
+        hospital.name,
+        hospital.province,
+        hospital.city,
+        hospital.region,
+        hospital.level,
+        ...(hospital.aliases ?? []),
+      ]
+        .join(' ')
+        .toLowerCase()
       return target.includes(keyword)
     })
   }, [hospitalKeyword, hospitalRegion])
@@ -687,13 +681,13 @@ function App() {
           <div className="selector-block">
               <div className="block-title">
                 <strong>医院</strong>
-                <span>内置全国重点医院库，支持热门医院一键选、区域筛选和搜索</span>
+                <span>独立医院数据库文件，支持热门医院一键选、区域筛选和跨省市搜索</span>
               </div>
 
               <div className="selector-block compact-block">
                 <div className="block-title">
                   <strong>热门医院</strong>
-                  <span>不输入也可以直接点击常用大医院</span>
+                  <span>不输入也可以直接点击常用头部医院</span>
                 </div>
                 <div className="chip-row">
                   {featuredHospitals.map((hospital) => (
@@ -733,7 +727,7 @@ function App() {
                 <input
                   value={hospitalKeyword}
                   onChange={(event) => setHospitalKeyword(event.target.value)}
-                placeholder="例如：协和 / 华西 / 上海 / 华东 / 三甲"
+                  placeholder="例如：协和 / 华西 / 上海 / 广州 / 四川 / 三甲"
               />
             </label>
 
@@ -755,14 +749,14 @@ function App() {
                     className={`selector-card ${
                       formState.hospitalId === hospital.id ? 'selected' : ''
                     }`}
-                    onClick={() => selectHospital(hospital)}
-                  >
-                    <strong>{hospital.name}</strong>
-                    <span>
-                      {hospital.region} · {hospital.level}
-                    </span>
-                  </button>
-                ))
+                      onClick={() => selectHospital(hospital)}
+                    >
+                      <strong>{hospital.name}</strong>
+                      <span>
+                        {hospital.province} · {hospital.city} · {hospital.region} · {hospital.level}
+                      </span>
+                    </button>
+                  ))
               )}
             </div>
           </div>

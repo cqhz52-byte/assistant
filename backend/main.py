@@ -46,7 +46,16 @@ def seed_reference_data() -> None:
 
         for item in HOSPITALS:
             if item['id'] not in existing_hospital_ids:
-                db.add(Hospital(**item))
+                db.add(
+                    Hospital(
+                        id=item['id'],
+                        name=item['name'],
+                        province=item.get('province', ''),
+                        city=item.get('city', ''),
+                        region=item['region'],
+                        level=item['level'],
+                    )
+                )
 
         for item in DEVICES:
             if item['id'] not in existing_device_ids:
