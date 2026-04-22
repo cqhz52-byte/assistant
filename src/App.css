@@ -150,6 +150,10 @@
   margin-top: 16px;
 }
 
+.demo-fill-button {
+  margin-left: 12px;
+}
+
 .status-ribbon,
 .mini-pill,
 .chip,

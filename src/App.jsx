@@ -21,12 +21,14 @@ import {
 } from './lib/clinicalData'
 import {
   createCaseRecord,
+  demoCredentials,
   demoProfile,
   formatErrorMessage,
   getCaseSupportBootstrap,
   getCurrentProfile,
   getCurrentSession,
   getModeLabel,
+  isDemoSession,
   signInWithPassword,
   signOut,
   signUpWithPassword,
@@ -126,6 +128,7 @@ function AuthScreen({
   onChange,
   onSubmit,
   onToggleMode,
+  onUseDemoAccount,
 }) {
   return (
     <main className="auth-shell">
@@ -133,13 +136,21 @@ function AuthScreen({
         <div className="auth-brand">
           <img src="/curaway-logo.jpg" alt="Curaway" className="auth-logo" />
           <p className="eyebrow">Internal Server Login</p>
-          <h1>登录 Curaway 临床跟台系统</h1>
+          <h1>登录伽奈维临床跟台系统</h1>
           <p className="hero-text">
             病例、耗材与图片索引将写入公司内部服务器。首次使用可直接注册工程师账号。
           </p>
         </div>
 
         {authMessage ? <div className="notice-banner">{authMessage}</div> : null}
+        <div className="notice-banner">
+          演示模式可直接登录：
+          <strong> {demoCredentials.email} </strong>
+          / <strong>{demoCredentials.password}</strong>
+          <button type="button" className="ghost-button demo-fill-button" onClick={onUseDemoAccount}>
+            一键填入演示账号
+          </button>
+        </div>
 
         <form className="auth-form" onSubmit={onSubmit}>
           {authMode === 'signup' ? (
@@ -240,6 +251,7 @@ function App() {
     role: 'engineer',
   })
   const [loadedUserKey, setLoadedUserKey] = useState('')
+  const demoMode = isDemoSession(session)
 
   const selectedHospital = useMemo(() => getHospitalById(formState.hospitalId), [formState.hospitalId])
   const selectedProductLine = useMemo(
@@ -1104,6 +1116,15 @@ function App() {
         authPending={authPending}
         onChange={updateAuthField}
         onSubmit={handleAuthSubmit}
+        onUseDemoAccount={() => {
+          setAuthMode('signin')
+          setAuthForm((current) => ({
+            ...current,
+            email: demoCredentials.email,
+            password: demoCredentials.password,
+          }))
+          setAuthMessage('已填入演示账号，可直接点击登录。')
+        }}
         onToggleMode={() => {
           setAuthMode((current) => (current === 'signin' ? 'signup' : 'signin'))
           setAuthMessage('')
@@ -1179,8 +1200,9 @@ function App() {
       </header>
 
       <div className="notice-banner">
-        当前接入公司服务器。默认本地开发地址为 `/api`，生产环境请将 `VITE_API_BASE_URL` 指向公司域名，例如
-        `https://case.yourcompany.com/api`。
+        {demoMode
+          ? '当前为演示模式，病例数据仅保存在当前浏览器，不会写入公司服务器。'
+          : '当前接入公司服务器。默认本地开发地址为 `/api`，生产环境请将 `VITE_API_BASE_URL` 指向公司域名，例如 `https://case.yourcompany.com/api`。'}
       </div>
 
       {notice ? <div className="notice-banner">{notice}</div> : null}
