@@ -1,18 +1,11 @@
 # Curaway Clinical Case Support
 
-面向医疗器械临床跟台场景的响应式 Web App，支持：
+面向医疗器械临床跟台场景的响应式 Web App，现已切换为“公司内部服务器 + Python API + 自建数据库”架构。
 
-- Curaway 品牌化移动端界面
-- 产品线模板录入
-- IndexedDB 本地草稿缓存
-- Supabase 在线登录
-- Supabase 在线病例数据库
-- 本地演示模式回退
+当前覆盖的主要产品线：
 
-当前已支持的主要产品线：
-
-- CT 引导下穿刺导航机器人
-- IRE 陡脉冲治疗系统
+- CT引导下穿刺导航机器人
+- IRE陡脉冲治疗系统
 - 射频消融治疗系统
 - 活检穿刺系统
 - 静脉射频腔内闭合系统
@@ -22,12 +15,28 @@
 ## 技术栈
 
 - 前端：React 19 + Vite
-- 样式：自定义品牌化 CSS
-- 在线数据库与登录：Supabase
-- 本地演示后端：Node `server/index.js`
-- Vercel Functions：`api/` 目录
+- 界面：品牌化 CSS，移动端优先
+- 后端：FastAPI + SQLAlchemy + JWT
+- 数据库：PostgreSQL
+- 本地草稿：IndexedDB / localStorage fallback
+- 部署：公司内网服务器或 Docker
 
-## 本地运行
+## 目录说明
+
+- [src/App.jsx](D:/Python/codex-app/src/App.jsx)
+  - 主界面、登录流程、分步跟台表单
+- [src/lib/caseSupportService.js](D:/Python/codex-app/src/lib/caseSupportService.js)
+  - 公司服务器 API、登录态与病例提交
+- [backend/main.py](D:/Python/codex-app/backend/main.py)
+  - FastAPI 接口入口
+- [backend/models.py](D:/Python/codex-app/backend/models.py)
+  - SQLAlchemy 数据模型
+- [backend/sql/schema.sql](D:/Python/codex-app/backend/sql/schema.sql)
+  - PostgreSQL 初始化脚本
+- [deploy/docker-compose.yml](D:/Python/codex-app/deploy/docker-compose.yml)
+  - 公司服务器 Docker 编排示例
+
+## 前端启动
 
 安装依赖：
 
@@ -41,104 +50,102 @@ npm install
 npm run dev
 ```
 
-如需本地 Node 演示接口：
+默认会把 `/api` 代理到本地 `8000` 端口。
+
+## Python 后端启动
+
+安装 Python 依赖：
+
+```bash
+pip install -r backend/requirements.txt
+```
+
+启动 API：
 
 ```bash
 npm run dev:server
 ```
 
-## Supabase 接入
-
-### 1. 创建 Supabase 项目
-
-在 Supabase 控制台新建项目后，获取：
-
-- `Project URL`
-- `Publishable key` 或 `Anon key`
-
-### 2. 配置环境变量
-
-复制 `.env.example` 为 `.env`，填入：
+或直接运行：
 
 ```bash
-VITE_SUPABASE_URL=https://your-project-ref.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
+python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 3. 执行数据库 SQL
+## 环境变量
 
-将 [supabase/schema.sql](D:/Python/codex-app/supabase/schema.sql) 的内容复制到 Supabase SQL Editor 执行。
+复制根目录 [.env.example](D:/Python/codex-app/.env.example) 到 `.env`，至少配置：
 
-这份 SQL 会完成：
+```bash
+VITE_API_BASE_URL=https://case.yourcompany.com/api
+DATABASE_URL=postgresql+psycopg://case_user:change_me@127.0.0.1:5432/case_support
+JWT_SECRET=replace-with-a-long-random-secret
+CORS_ORIGINS=http://localhost:5173,https://case.yourcompany.com
+```
 
-- `profiles` 用户资料表
-- `hospitals` 医院表
-- `devices` 设备表
-- `clinical_cases` 病例表
-- 新用户自动建档触发器
-- RLS 权限策略
-- 初始化医院和设备种子数据
+说明：
 
-### 4. 登录方式
+- `VITE_API_BASE_URL`
+  - 手机端和浏览器访问的 API 地址
+- `DATABASE_URL`
+  - 公司服务器 PostgreSQL 连接串
+- `JWT_SECRET`
+  - 登录 token 的签名密钥
+- `CORS_ORIGINS`
+  - 允许访问 API 的前端域名
 
-前端已集成：
+## 数据库初始化
 
-- 邮箱 + 密码登录
-- 邮箱 + 密码注册
+如果你直接使用 PostgreSQL，可执行：
 
-注册时会把 `name` 和 `role` 写入 `auth.users.raw_user_meta_data`，并由触发器同步到 `profiles`。
+```bash
+psql "$DATABASE_URL" -f backend/sql/schema.sql
+```
 
-## 当前运行模式
+这份脚本会创建：
 
-系统有两种模式：
+- `users`
+- `hospitals`
+- `devices`
+- `clinical_cases`
+- `case_details`
+- `consumables`
+- `media`
 
-### Supabase 在线模式
+并自动写入一批常用医院和设备主数据。
 
-当检测到以下环境变量时自动启用：
+## Docker 部署
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_PUBLISHABLE_KEY`
+如果公司服务器已安装 Docker，可直接使用：
 
-此时：
+```bash
+cd deploy
+docker compose up -d --build
+```
 
-- 页面先进入登录界面
-- 登录后从 Supabase 读取病例
-- 提交跟台记录会写入 `clinical_cases`
+这会启动：
 
-### 本地演示模式
+- PostgreSQL 数据库
+- FastAPI 病例服务
 
-如果未配置 Supabase 环境变量：
+默认开放端口：
 
-- 不强制登录
-- 自动使用演示账号进入系统
-- 数据走本地 `api/` 和 `server/db.json`
+- `5432`
+- `8000`
 
-这样便于本地开发和无网演示。
+## 当前能力
 
-## 主要目录
+- 邮箱密码注册 / 登录
+- JWT 登录态管理
+- 4 步分步跟台录入
+- 按产品线动态切换参数模板
+- 耗材模板快速套用
+- 草稿离线缓存
+- 病例、耗材、附件元数据写入公司数据库
 
-- [src/App.jsx](D:/Python/codex-app/src/App.jsx)
-  - 主界面、登录流程、病例录入
-- [src/lib/caseSupportService.js](D:/Python/codex-app/src/lib/caseSupportService.js)
-  - Supabase / 本地双模式数据服务
-- [src/lib/supabaseClient.js](D:/Python/codex-app/src/lib/supabaseClient.js)
-  - Supabase 客户端初始化
-- [src/lib/clinicalData.js](D:/Python/codex-app/src/lib/clinicalData.js)
-  - 产品线、设备、医院、快捷模板
-- [supabase/schema.sql](D:/Python/codex-app/supabase/schema.sql)
-  - Supabase 表结构、RLS、触发器、种子数据
+## 下一步可继续扩展
 
-## 部署到 Vercel
-
-1. 将仓库导入 Vercel
-2. Framework 选择 `Vite`
-3. 在 Vercel 项目中设置环境变量：
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_PUBLISHABLE_KEY`
-4. 触发部署
-
-如果你需要，我可以下一步继续帮你：
-
-- 把病例图片上传接到 Supabase Storage
-- 增加管理员视角的病例筛选和统计
-- 接入真实的医院 / 产品 / 耗材后台管理
+- 对接公司文件服务器或对象存储，真正上传图片和视频
+- 接入扫码枪 / OCR，自动录入耗材批号
+- 增加管理员端统计报表和区域筛选
+- 增加医院、医生、产品、耗材后台主数据管理

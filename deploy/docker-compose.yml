@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16
+    container_name: curaway-case-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: case_support
+      POSTGRES_USER: case_user
+      POSTGRES_PASSWORD: change_me
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../backend/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    container_name: curaway-case-api
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg://case_user:change_me@db:5432/case_support
+      JWT_SECRET: replace-with-a-long-random-secret
+      CORS_ORIGINS: http://localhost:5173,https://case.yourcompany.com
+    ports:
+      - '8000:8000'
+
+volumes:
+  postgres_data:

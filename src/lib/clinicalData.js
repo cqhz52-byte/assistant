@@ -10,20 +10,20 @@ const hospitals = [
 const productLines = [
   {
     id: 'robot',
-    name: 'CT 引导穿刺导航机器人',
-    shortName: '导航机器人',
+    name: 'CT引导下穿刺导航机器人',
+    shortName: '穿刺导航机器人',
     icon: 'CT',
     accent: 'orange',
-    description: '适用于 CT 引导下穿刺、活检及消融路径规划。',
-    quickProcedures: ['肺结节活检', '肝肿瘤穿刺', '椎体病灶活检'],
+    description: '适用于 CT 引导下活检、消融路径规划与精准穿刺定位。',
+    quickProcedures: ['肺结节活检', '肝肿瘤穿刺', '深部病灶定位'],
   },
   {
     id: 'ire',
-    name: 'IRE 陡脉冲治疗系统',
+    name: 'IRE陡脉冲治疗系统',
     shortName: 'IRE',
     icon: 'IR',
     accent: 'charcoal',
-    description: '适用于软组织消融及高精度能量释放。',
+    description: '用于软组织消融及高精度能量释放，重点关注脉冲参数与电极布局。',
     quickProcedures: ['肝肿瘤 IRE', '胰腺病灶 IRE', '肾脏病灶 IRE'],
   },
   {
@@ -32,7 +32,7 @@ const productLines = [
     shortName: '射频消融',
     icon: 'RF',
     accent: 'orange',
-    description: '用于肿瘤、疼痛或静脉腔内闭合等场景。',
+    description: '覆盖甲状腺、肝脏、肺部等射频消融场景。',
     quickProcedures: ['甲状腺结节消融', '肝肿瘤消融', '肺结节消融'],
   },
   {
@@ -41,7 +41,7 @@ const productLines = [
     shortName: '活检穿刺',
     icon: 'BX',
     accent: 'charcoal',
-    description: '支持一次性针具、同轴活检针和导向套管。',
+    description: '支持活检针、同轴针和导向套管的标准化跟台记录。',
     quickProcedures: ['肺部活检', '肝脏活检', '淋巴结活检'],
   },
   {
@@ -50,8 +50,8 @@ const productLines = [
     shortName: '静脉闭合',
     icon: 'VN',
     accent: 'orange',
-    description: '面向静脉曲张治疗与腔内热闭合。',
-    quickProcedures: ['大隐静脉闭合', '小隐静脉闭合', '穿通支闭合'],
+    description: '面向静脉曲张治疗与腔内热闭合，突出耗材和闭合周期记录。',
+    quickProcedures: ['大隐静脉闭合', '小隐静脉闭合', '交通支闭合'],
   },
   {
     id: 'electrosurgical',
@@ -59,7 +59,7 @@ const productLines = [
     shortName: '高频电刀',
     icon: 'ES',
     accent: 'charcoal',
-    description: '覆盖切割、凝血和术中能量管理。',
+    description: '覆盖切割、凝血与能量模式管理，适用于手术室常规跟台。',
     quickProcedures: ['开放手术', '腹腔镜手术', '门诊小手术'],
   },
   {
@@ -68,7 +68,7 @@ const productLines = [
     shortName: '神经热凝',
     icon: 'NT',
     accent: 'orange',
-    description: '用于疼痛科神经阻滞与热凝治疗。',
+    description: '适用于疼痛科热凝治疗，重点记录靶温、时长与阻抗变化。',
     quickProcedures: ['三叉神经痛', '腰椎小关节痛', '交感神经热凝'],
   },
 ]
@@ -78,7 +78,7 @@ const devices = [
     id: 'dev-ctnav-pro',
     productLineId: 'robot',
     modelName: 'CT-Nav Pro 导航机器人',
-    category: '导航机器人',
+    category: '穿刺导航机器人',
     snPrefix: 'CTN',
     parameterSchema: [
       { key: 'plannedDepth', label: '计划进针深度', unit: 'mm', placeholder: '82', min: 0, max: 300 },
@@ -137,7 +137,7 @@ const devices = [
       { key: 'cycleCount', label: '闭合周期', unit: '次', placeholder: '6', min: 0, max: 30 },
       { key: 'targetTemp', label: '工作温度', unit: '°C', placeholder: '120', min: 60, max: 140 },
     ],
-    defaultConsumables: ['静脉闭合导管', '鞘管', '超声耦合剂'],
+    defaultConsumables: ['静脉闭合导管', '鞘管', '耦合剂'],
   },
   {
     id: 'dev-es-300',
@@ -148,7 +148,7 @@ const devices = [
     parameterSchema: [
       { key: 'cutPower', label: '切割功率', unit: 'W', placeholder: '80', min: 0, max: 300 },
       { key: 'coagPower', label: '凝血功率', unit: 'W', placeholder: '45', min: 0, max: 200 },
-      { key: 'modeCount', label: '启用模式', unit: '个', placeholder: '2', min: 1, max: 10 },
+      { key: 'modeCount', label: '启用模式', unit: '种', placeholder: '2', min: 1, max: 10 },
     ],
     defaultConsumables: ['电刀笔', '负极板', '脚踏开关'],
   },
@@ -167,17 +167,17 @@ const devices = [
   },
 ]
 
-const doctorSuggestions = ['朱海峰', '李颖', '陈莉', '杨博', '周玮', '刘晨']
+const doctorSuggestions = ['朱海峰', '李颖', '陈萍', '杨博', '周玮', '刘晨']
 const engineerOptions = ['王工', '李工', '周工', '陈工']
 const quickOutcomes = ['参数稳定', '路径顺利', '闭合完成', '样本充足', '无设备报警']
 const quickComplications = ['未见异常', '穿刺阻力偏大', '阻抗偏高', '温控波动', '图像复扫']
 const statusOptions = ['待执行', '进行中', '已完成', '待同步']
 
 const dashboardMetrics = [
-  { id: 'today', label: '今日跟台', value: '6 场', helper: '2 场正在进行' },
-  { id: 'month', label: '本月累计', value: '48 场', helper: 'CT 导航与消融占比最高' },
-  { id: 'warning', label: '耗材预警', value: '4 项', helper: '射频针与活检针需要补货' },
-  { id: 'sync', label: '已入库', value: '126 条', helper: '支持后续接 Supabase' },
+  { id: 'today', label: '今日跟台', value: '6 场', helper: '2 场正在进行中' },
+  { id: 'month', label: '本月累计', value: '48 场', helper: '导航机器人和消融产品占比最高' },
+  { id: 'warning', label: '耗材预警', value: '4 项', helper: '射频针和活检针建议补货' },
+  { id: 'sync', label: '已入库', value: '126 条', helper: '来自公司内部病例数据库' },
 ]
 
 const todayTasks = [
@@ -186,7 +186,7 @@ const todayTasks = [
     time: '08:30',
     hospital: '上海中医药大学附属龙华医院',
     doctor: '朱海峰',
-    procedure: 'CT 导航肺结节活检',
+    procedure: 'CT 引导肺结节活检',
     status: '进行中',
   },
   {
@@ -213,7 +213,7 @@ const recentCases = [
     hospital: '重庆市肿瘤医院',
     doctor: '刘晨',
     device: 'IRE-2000 陡脉冲治疗系统',
-    productLine: 'IRE 陡脉冲治疗系统',
+    productLine: 'IRE陡脉冲治疗系统',
     status: '已完成',
     summary: '双针通道建立顺利，术中参数稳定。',
     updatedAt: '2026-04-22T09:20:00+08:00',
@@ -221,7 +221,7 @@ const recentCases = [
   {
     id: 'case-20260421-014',
     hospital: '广州医科大学附属第一医院',
-    doctor: '陈莉',
+    doctor: '陈萍',
     device: 'RF-90 射频消融主机',
     productLine: '射频消融治疗系统',
     status: '进行中',
@@ -233,7 +233,7 @@ const recentCases = [
     hospital: '上海中医药大学附属龙华医院',
     doctor: '杨博',
     device: 'CT-Nav Pro 导航机器人',
-    productLine: 'CT 引导穿刺导航机器人',
+    productLine: 'CT引导下穿刺导航机器人',
     status: '已完成',
     summary: '定位准确，已完成病灶取样与复扫。',
     updatedAt: '2026-04-20T18:10:00+08:00',
@@ -243,34 +243,34 @@ const recentCases = [
 const moduleRoadmap = [
   {
     id: 'capture',
-    title: '产品化跟台录入',
-    description: '按产品线选择模板，动态生成参数区和耗材建议，尽量少打字。',
+    title: '低输入量录入',
+    description: '按产品线自动切换参数模板、快捷医生和耗材模板，减少术中打字。',
   },
   {
     id: 'database',
-    title: '病例数据库',
-    description: '当前版本支持写入本地病例库，下一步可直接切换到 Supabase。',
+    title: '公司内网病例库',
+    description: '病例、耗材和附件统一写入公司服务器，便于区域和产品维度统计。',
   },
   {
     id: 'dashboard',
     title: '管理驾驶舱',
-    description: '按产品、医院、区域、医生和耗材维度查看病例趋势。',
+    description: '按产品、医院、区域和工程师维度查看手术量、耗材趋势与故障率。',
   },
   {
     id: 'ocr',
     title: 'OCR / 扫码扩展',
-    description: '为耗材批号、排班单、病灶信息预留图像识别入口。',
+    description: '为耗材批号、排班表与术中影像预留扫码识别和 OCR 扩展入口。',
   },
 ]
 
 const schemaHighlights = [
-  { table: 'users', columns: 'id, name, role, department, region' },
+  { table: 'users', columns: 'id, email, name, role, department, region, password_hash' },
   { table: 'hospitals', columns: 'id, name, region, level' },
-  { table: 'devices', columns: 'id, model_name, category, sn_prefix, parameter_schema' },
+  { table: 'devices', columns: 'id, product_line_id, model_name, category, sn_prefix' },
   { table: 'clinical_cases', columns: 'id, case_date, hospital_id, doctor_name, engineer_id, status' },
   { table: 'case_details', columns: 'case_id, device_id, parameters, outcome, complications' },
   { table: 'consumables', columns: 'id, case_id, item_name, quantity, batch_no' },
-  { table: 'media', columns: 'id, case_id, file_url, type, captured_at' },
+  { table: 'media', columns: 'id, case_id, file_name, file_url, file_type, file_size' },
 ]
 
 function createEntryId(prefix) {
