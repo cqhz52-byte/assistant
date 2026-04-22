@@ -1,0 +1,103 @@
+{
+  "tools": [
+    {
+      "id": "demonstration",
+      "name": "demonstration",
+      "displayName": "产品交互演示",
+      "fileName": "demonstration/index.html",
+      "category": "simulation",
+      "icon": "🧪",
+      "size": 77519,
+      "updatedAt": "2026-04-21T14:49:57.567Z",
+      "url": "app/demonstration/index.html"
+    },
+    {
+      "id": "绝缘路径",
+      "name": "绝缘路径",
+      "displayName": "绝缘路径",
+      "fileName": "绝缘路径.html",
+      "category": "general",
+      "icon": "🧰",
+      "size": 178398,
+      "updatedAt": "2026-04-13T02:01:27.275Z",
+      "url": "app/%E7%BB%9D%E7%BC%98%E8%B7%AF%E5%BE%84.html"
+    },
+    {
+      "id": "ZY面试官",
+      "name": "ZY面试官",
+      "displayName": "面试助手",
+      "fileName": "ZY面试官.html",
+      "category": "interview",
+      "icon": "🎯",
+      "size": 85079,
+      "updatedAt": "2026-04-14T10:47:43.268Z",
+      "url": "app/ZY%E9%9D%A2%E8%AF%95%E5%AE%98.html"
+    },
+    {
+      "id": "命",
+      "name": "命",
+      "displayName": "五行八卦",
+      "fileName": "命.html",
+      "category": "general",
+      "icon": "🧰",
+      "size": 44794,
+      "updatedAt": "2026-04-15T07:26:29.762Z",
+      "url": "app/%E5%91%BD.html"
+    },
+    {
+      "id": "性格测评",
+      "name": "性格测评",
+      "displayName": "性格测评",
+      "fileName": "性格测评.html",
+      "category": "assessment",
+      "icon": "🧠",
+      "size": 65483,
+      "updatedAt": "2026-04-18T13:53:17.720Z",
+      "url": "app/%E6%80%A7%E6%A0%BC%E6%B5%8B%E8%AF%84.html"
+    },
+    {
+      "id": "样本量计算器",
+      "name": "样本量计算器",
+      "displayName": "样本计算",
+      "fileName": "样本量计算器.html",
+      "category": "calculation",
+      "icon": "🧮",
+      "size": 24448,
+      "updatedAt": "2026-03-17T00:53:11.049Z",
+      "url": "app/%E6%A0%B7%E6%9C%AC%E9%87%8F%E8%AE%A1%E7%AE%97%E5%99%A8.html"
+    },
+    {
+      "id": "med-reg-app",
+      "name": "med-reg-app",
+      "displayName": "医疗法规助手",
+      "fileName": "med-reg-app/dist/index.html",
+      "category": "regulatory",
+      "icon": "📜",
+      "size": 435,
+      "updatedAt": "2026-04-20T08:48:27.284Z",
+      "url": "app/med-reg-app/dist/index.html"
+    },
+    {
+      "id": "guide",
+      "name": "guide",
+      "displayName": "注册助手",
+      "fileName": "guide.html",
+      "category": "guidance",
+      "icon": "🧭",
+      "size": 74859,
+      "updatedAt": "2026-04-13T02:00:01.015Z",
+      "url": "app/guide.html"
+    },
+    {
+      "id": "IRE仿真",
+      "name": "IRE仿真",
+      "displayName": "IRE仿真",
+      "fileName": "IRE仿真.html",
+      "category": "simulation",
+      "icon": "🧪",
+      "size": 36599,
+      "updatedAt": "2026-04-06T08:06:47.661Z",
+      "url": "app/IRE%E4%BB%BF%E7%9C%9F.html"
+    }
+  ]
+}

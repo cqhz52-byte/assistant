@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>临床试验样本量实时计算器 (指导原则标准版)</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  
+  <style>
+    /* ================= 网页全局重置与美化 ================= */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f1f5f9;
+      margin: 0;
+      padding: 40px 20px;
+      color: #334155;
+    }
+
+    .calculator-wrapper {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      border: 1px solid #e2e8f0;
+      max-width: 900px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .calc-header {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calc-header h3 { margin: 0; color: white; font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+    .badge { background: #10b981; color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+
+    .calc-body { padding: 30px; }
+    .form-group { margin-bottom: 25px; }
+    .form-group > label { display: block; font-weight: bold; color: #475569; margin-bottom: 12px; font-size: 14px; }
+
+    .radio-group { display: flex; gap: 15px; background: #f8fafc; padding: 6px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .radio-label { flex: 1; text-align: center; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: bold; color: #64748b; cursor: pointer; transition: all 0.2s ease; }
+    .radio-label input { display: none; }
+    .radio-label.active { background: #ffffff; color: #2563eb; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-color: #93c5fd;}
+
+    .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px; }
+    .param-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; }
+    .param-card h4 { margin: 0 0 15px 0; font-size: 14px; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+
+    .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .input-row:last-child { margin-bottom: 0; }
+    .input-row label { font-size: 13px; color: #475569; font-weight: 500; }
+    .input-row select { padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; outline: none; background: white; cursor: pointer; width: 140px; box-sizing: border-box;}
+
+    .input-with-unit { display: flex; align-items: center; background: white; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; width: 140px; box-sizing: border-box; transition: 0.2s; }
+    .input-with-unit:focus-within { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+    .input-with-unit input { flex: 1; border: none; padding: 8px 12px; font-size: 14px; outline: none; text-align: right; font-weight: bold; color: #0f172a; width: 100%; min-width: 0; }
+    .input-with-unit span { padding: 8px 12px; background: #f1f5f9; color: #64748b; font-size: 13px; font-weight: bold; border-left: 1px solid #cbd5e1; }
+
+    .highlight-row { background: #eff6ff; padding: 12px; border-radius: 8px; border: 1px dashed #93c5fd; margin-top: 20px;}
+    .highlight-row label { color: #1d4ed8; font-weight: bold; }
+
+    .inline-params { display: flex; gap: 30px; background: #fffbeb; padding: 20px; border-radius: 8px; border: 1px solid #fde68a; }
+    .inline-params .input-row { flex: 1; margin-bottom: 0; }
+
+    .calc-footer { border-top: 1px dashed #cbd5e1; background: #f8fafc; padding: 30px; }
+    .result-display { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; text-align: center; }
+    
+    .result-item { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; flex: 1; box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
+    .res-label { font-size: 13px; color: #64748b; font-weight: bold; }
+    .res-val { font-size: 24px; font-weight: 900; color: #334155; }
+    
+    .result-item.primary { background: #dcfce7; border-color: #86efac; transform: scale(1.05); box-shadow: 0 10px 15px rgba(22, 163, 74, 0.1);}
+    .result-item.primary .res-label { color: #166534; font-size: 14px;}
+    .result-item.primary .res-val { color: #15803d; font-size: 32px; }
+    .result-item.sub { font-size: 12px; color: #64748b; margin-top: 5px;}
+
+    .generated-text { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; }
+    .text-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #e2e8f0;}
+    .text-header span { font-weight: bold; font-size: 15px; color: #8b5cf6; }
+    
+    .copy-btn { background: #8b5cf6; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: 0.2s; font-weight: bold; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);}
+    .copy-btn:hover { background: #7c3aed; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(139, 92, 246, 0.4);}
+    
+    .rich-preview { font-size: 14px; line-height: 1.8; color: #334155; text-align: justify; overflow-x: hidden; }
+    .rich-preview p { margin: 12px 0; }
+
+    /* =======================================================
+       🚀 移动端自适应黑科技 (当屏幕宽度小于 768px 时自动生效)
+       ======================================================= */
+    @media (max-width: 768px) {
+      body { padding: 10px; } 
+      .calc-header { flex-direction: column; gap: 10px; padding: 15px; text-align: center; }
+      
+      .radio-group { flex-direction: column; gap: 8px; }
+      .radio-label { padding: 15px; font-size: 15px; } 
+
+      .params-grid { grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px;}
+      .calc-body { padding: 15px; }
+      .param-card { padding: 15px; }
+
+      .input-row { flex-direction: column; align-items: stretch; gap: 8px; }
+      .input-row label { font-size: 14px; }
+      .input-row select, .input-with-unit { width: 100%; } 
+      
+      .inline-params { flex-direction: column; gap: 20px; padding: 15px; }
+      .inline-params .input-row { width: 100%; }
+
+      .calc-footer { padding: 15px; }
+      .result-display { flex-direction: column; gap: 15px; margin-bottom: 20px;}
+      .result-item.primary { transform: none; } 
+
+      .text-header { flex-direction: column; gap: 12px; align-items: stretch; }
+      .text-header span { text-align: center; }
+      .copy-btn { width: 100%; padding: 15px; font-size: 16px; } 
+      
+      .rich-preview { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <div class="calculator-wrapper">
+      <div class="calc-header">
+        <h3>🧮 临床试验样本量计算器</h3>
+        <span class="badge">《指导原则》像素级对齐版</span>
+      </div>
+
+      <div class="calc-body">
+        <div class="form-group">
+          <label>1. 试验设计类型</label>
+          <div class="radio-group">
+            <label class="radio-label" :class="{ active: design === 'superiority' }">
+              <input type="radio" value="superiority" v-model="design" /> 🏆 双臂优效性
+            </label>
+            <label class="radio-label" :class="{ active: design === 'non-inferiority' }">
+              <input type="radio" value="non-inferiority" v-model="design" /> 🤝 双臂非劣效
+            </label>
+            <label class="radio-label" :class="{ active: design === 'single-arm' }">
+              <input type="radio" value="single-arm" v-model="design" /> 🎯 单臂目标值
+            </label>
+          </div>
+        </div>
+
+        <div class="params-grid">
+          <div class="param-card">
+            <h4>📊 2. 统计学基础参数</h4>
+            <div class="input-row">
+              <label>显著性水平 (α)</label>
+              <select v-model.number="alpha">
+                <option value="0.05">0.05 (双侧) / 0.025 (单侧)</option>
+                <option value="0.01">0.01 (双侧) / 0.005 (单侧)</option>
+              </select>
+            </div>
+            <div class="input-row">
+              <label>检验效能 (1-β, Power)</label>
+              <select v-model.number="power">
+                <option value="0.80">80%</option>
+                <option value="0.90">90%</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="param-card">
+            <h4>🏥 3. 临床预期有效率</h4>
+            <div class="input-row">
+              <label>试验组预期率 (P<sub>T</sub>)</label>
+              <div class="input-with-unit">
+                <input type="number" v-model.number="p1" min="0" max="100" step="0.1" inputmode="decimal" @focus="$event.target.select()" />
+                <span>%</span>
+              </div>
+            </div>
+            <div class="input-row">
+              <label v-html="design === 'single-arm' ? '目标值/历史率 (P<sub>0</sub>)' : '对照组预期率 (P<sub>C</sub>)'"></label>
+              <div class="input-with-unit">
+                <input type="number" v-model.number="p2" min="0" max="100" step="0.1" inputmode="decimal" @focus="$event.target.select()" />
+                <span>%</span>
+              </div>
+            </div>
+            <div class="input-row highlight-row" v-if="design !== 'single-arm'">
+              <label>{{ design === 'non-inferiority' ? '非劣效界值 (Δ)' : '优效性界值 (Δ)' }}</label>
+              <div class="input-with-unit">
+                <input type="number" v-model.number="margin" min="0" max="100" step="0.1" inputmode="decimal" @focus="$event.target.select()" />
+                <span>%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group inline-params">
+          <div class="input-row">
+            <label>4. 预计脱落率</label>
+            <div class="input-with-unit">
+              <input type="number" v-model.number="dropout" min="0" max="100" step="1" inputmode="decimal" @focus="$event.target.select()" />
+              <span>%</span>
+            </div>
+          </div>
+          <div class="input-row" v-if="design !== 'single-arm'">
+            <label>5. 分配比例 (N<sub>T</sub> : N<sub>C</sub>)</label>
+            <select v-model.number="ratio">
+              <option value="1">1 : 1</option>
+              <option value="2">2 : 1</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-footer">
+        <div class="result-display">
+          <div class="result-item">
+            <span class="res-label">理论样本量 (无脱落)</span>
+            <span class="res-val">{{ rawTotalN }} 例</span>
+          </div>
+          <div class="result-item primary">
+            <span class="res-label">最终计划总样本量</span>
+            <span class="res-val">{{ finalTotalN }} 例</span>
+            <div class="sub" v-if="design !== 'single-arm'">
+              (试验组: {{ finalN1 }} 例，对照组: {{ finalN2 }} 例)
+            </div>
+          </div>
+        </div>
+
+        <div class="generated-text">
+          <div class="text-header">
+            <span>📝 指导原则金标准带推导文本 (直接展示分数除线)</span>
+            <button class="copy-btn" @click="copyRichText">📋 一键拷贝入 Word</button>
+          </div>
+          <div class="rich-preview" v-html="generatedHtmlContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+
+    createApp({
+      setup() {
+        const design = ref('non-inferiority'); 
+        const alpha = ref(0.05); 
+        const power = ref(0.80);
+        const p1 = ref(95); 
+        const p2 = ref(95); 
+        const margin = ref(10); 
+        const dropout = ref(20); 
+        const ratio = ref(1); 
+
+        // 统一 Z 值处理：即使是单侧0.025检验，公式符号按惯例写 Z_{1-α/2} 且取 1.96
+        const getZAlpha = (a) => a === 0.05 ? 1.960 : 2.576; 
+        const getZBeta = (p) => p === 0.80 ? 0.842 : 1.282;
+
+        // 生成完美的居中分数排版 CSS 结构
+        const renderFrac = (num, den) => {
+            return `<span style="display: inline-block; vertical-align: middle; text-align: center; margin: 0 4px;"><span style="display: block; border-bottom: 1px solid #333; padding: 0 4px;">${num}</span><span style="display: block; padding: 0 4px;">${den}</span></span>`;
+        };
+
+        const calcData = computed(() => {
+            const PT = p1.value / 100;
+            const PC = p2.value / 100;
+            const delta = margin.value / 100;
+            const k = ratio.value;
+            const Za = getZAlpha(alpha.value);
+            const Zb = getZBeta(power.value);
+            
+            let n_raw = 0;
+            let p_pool = 0, sigma_sq = 0, var0 = 0, varT = 0, num = 0, den = 0;
+            
+            if (design.value === 'superiority') {
+                p_pool = (k * PT + PC) / (k + 1); 
+                sigma_sq = p_pool * (1 - p_pool);
+                num = (1 + 1/k) * Math.pow(Za + Zb, 2) * sigma_sq;
+                den = Math.pow(Math.abs(PT - PC) - delta, 2);
+                n_raw = den !== 0 ? num / den : 0;
+            } else if (design.value === 'non-inferiority') {
+                varT = (PC * (1 - PC)) + (PT * (1 - PT) / k);
+                num = Math.pow(Za + Zb, 2) * varT;
+                den = Math.pow(Math.abs(PT - PC) - delta, 2);
+                n_raw = den !== 0 ? num / den : 0;
+            } else if (design.value === 'single-arm') {
+                var0 = PC * (1 - PC); 
+                varT = PT * (1 - PT); 
+                num = Math.pow(Za * Math.sqrt(var0) + Zb * Math.sqrt(varT), 2);
+                den = Math.pow(PT - PC, 2);
+                n_raw = den !== 0 ? num / den : 0;
+            }
+
+            const n_c = Math.ceil(n_raw);
+            const n_t = Math.ceil(n_raw * k);
+            const total_raw = design.value === 'single-arm' ? n_c : n_c + n_t;
+            
+            const drop_rate = dropout.value / 100;
+            const final_c = Math.ceil(n_c / (1 - drop_rate));
+            const final_t = Math.ceil(n_t / (1 - drop_rate));
+            const final_total = design.value === 'single-arm' ? final_c : final_c + final_t;
+
+            return { PT, PC, delta, k, Za, Zb, n_raw, num, den, p_pool, sigma_sq, var0, varT, n_c, n_t, total_raw, final_c, final_t, final_total };
+        });
+
+        const rawTotalN = computed(() => calcData.value.total_raw);
+        const finalN1 = computed(() => calcData.value.final_t);
+        const finalN2 = computed(() => calcData.value.final_c);
+        const finalTotalN = computed(() => calcData.value.final_total);
+
+        const generatedHtmlContent = computed(() => {
+          const d = calcData.value;
+          const pt_str = `${p1.value}%`;
+          const pc_str = `${p2.value}%`;
+          const D_val = parseFloat(Math.abs(d.PT - d.PC).toFixed(4));
+          const delta_val = parseFloat(d.delta.toFixed(4));
+          
+          let html = "";
+          
+          if (design.value === 'superiority') {
+            const k_factor = d.k === 1 ? '2' : `(1 + 1/${d.k})`;
+            const k_factor_num = d.k === 1 ? '2' : parseFloat((1 + 1/d.k).toFixed(2));
+            const z_sum_round = parseFloat(Math.pow(d.Za + d.Zb, 2).toFixed(2));
+            const sig_sq_round = parseFloat(d.sigma_sq.toFixed(4));
+
+            html = `
+              <p>本研究样本量计算依据优效性检验公式。</p>
+              <p style="text-align: center; font-size: 16px; font-family: 'Times New Roman', serif; margin: 20px 0;">
+                n<sub>T</sub> = n<sub>C</sub> = ${renderFrac(`${k_factor}(Z<sub>1-α/2</sub> + Z<sub>1-β</sub>)² σ²`, `(|D| - Δ)²`)}
+              </p>
+              <p>
+              |D|为预期的两组均数之差的绝对值，实试验组预期率为 ${pt_str} - 对照组预期率为 ${pc_str} = ${parseFloat((D_val*100).toFixed(2))}% = ${D_val}<br>
+              σ为对照组预期标准差；我们使用两组预期比例的算术平均值来估算这个合并方差，<br>
+              两组的平均预期值 = (试验组预期率 + 对照组预期率) / 2 = ${parseFloat((d.p_pool*100).toFixed(2))}%<br>
+              σ² = ${parseFloat(d.p_pool.toFixed(4))}(1 - ${parseFloat(d.p_pool.toFixed(4))}) = ${sig_sq_round}<br>
+              Δ为优效性界值，Δ界值 = ${delta_val}。<br>
+              </p>
+              <p>两组样本量计算：<br>
+                n<sub>T</sub> = n<sub>C</sub> = ${renderFrac(`${k_factor_num} * ${z_sum_round} * ${sig_sq_round}`, d.delta===0 ? `${D_val} * ${D_val}` : `(${D_val} - ${delta_val})²`)} = ${d.n_raw.toFixed(2)}
+              </p>
+              <p>按照 ${dropout.value}%预期脱落率，即试验组和对照组各 ${d.final_c} 例，总计 ${d.final_total} 例。<br>
+                n<sub>T</sub> = n<sub>C</sub> = ${renderFrac(d.n_raw.toFixed(1), `1 - ${dropout.value/100}`)} = ${(d.n_raw / (1 - dropout.value/100)).toFixed(2)} ≈ ${d.final_c}
+              </p>
+            `;
+          } 
+          else if (design.value === 'non-inferiority') {
+            const bracket_term = d.k === 1 ? 
+                `【P<sub>C</sub>(1 - P<sub>C</sub>) + P<sub>T</sub>(1 - P<sub>T</sub>)】` : 
+                `【P<sub>C</sub>(1 - P<sub>C</sub>) + P<sub>T</sub>(1 - P<sub>T</sub>)/k】`;
+            
+            const num_bracket_term = d.k === 1 ?
+                `【${d.PC} × ${parseFloat((1-d.PC).toFixed(4))} + ${d.PT} × ${parseFloat((1-d.PT).toFixed(4))}】` :
+                `【${d.PC} × ${parseFloat((1-d.PC).toFixed(4))} + ${d.PT} × ${parseFloat((1-d.PT).toFixed(4))} / ${d.k}】`;
+
+            html = `
+              <p>样本量的计算，采用《医疗器械临床试验设计指导原则》中推荐的公式：</p>
+              <p style="text-align: center; font-size: 16px; font-family: 'Times New Roman', serif; margin: 20px 0;">
+                N<sub>T</sub> = N<sub>C</sub> = ${renderFrac(`(Z<sub>1-α/2</sub> + Z<sub>1-β</sub>)² ${bracket_term}`, `(D - Δ)²`)}
+              </p>
+              <p>式中：<br>
+              &nbsp;&nbsp;• <b>N<sub>T</sub> 和 N<sub>C</sub></b>：分别为试验组和对照组的样本量。<br>
+              &nbsp;&nbsp;• <b>P<sub>T</sub> 和 P<sub>C</sub></b>：分别为试验组和对照组的预期有效率。经申办者和临床专家综合考虑，预设试验组预期率为 ${pt_str}，对照组为 ${pc_str}。<br>
+              &nbsp;&nbsp;• <b>D</b>：试验组和对照组预期率差的绝对值，本试验为非劣效设计，D=|P<sub>T</sub> - P<sub>C</sub>|，即 D=${D_val}。<br>
+              &nbsp;&nbsp;• <b>Δ</b>：非劣效界值，临床专家认可的非劣效界值为 ${margin.value}%。<br>
+              &nbsp;&nbsp;• <b>α</b>：统计检验的显著性水平，也是假阳性率，取单侧α=${alpha.value/2}。<br>
+              &nbsp;&nbsp;• <b>β</b>：1-β为检验效能把握度，取β=${(1-power.value).toFixed(2)}，表示当两总体确有差异时，按α水准有 ${power.value*100}% 的把握能发现他们有所差别。<br>
+              </p>
+              <p>各值代入公式，计算得到：<br>
+                N<sub>T</sub> = N<sub>C</sub> = ${renderFrac(`(${d.Za} + ${d.Zb})² ${num_bracket_term}`, `(${D_val} - ${delta_val})²`)} = ${d.n_raw.toFixed(2)} ≈ ${Math.ceil(d.n_raw)}
+              </p>
+              <p>考虑研究过程中最大可能出现近 ${dropout.value}%的脱落率，按脱落率 ${dropout.value}%计算，每组的计划入组患者数量增加至 ${d.final_c} 例，试验组和对照组将按照 ${d.k}:1 的比例进行随机化分组，两组入选的患者总数为 <b>${d.final_total}</b> 例。</p>
+            `;
+          } 
+          else {
+            html = `
+              <p>由于缺乏合适的临床阳性对照器械，本临床试验采用单组目标值 (OPC/PG) 检验设计。主要有效性终点样本量的计算基于单组样本率与预设目标值比较的公式：</p>
+              <p style="text-align: center; font-size: 16px; font-family: 'Times New Roman', serif; margin: 20px 0;">
+                N = ${renderFrac(`[ Z<sub>1-α/2</sub> √(P<sub>0</sub>(1-P<sub>0</sub>)) + Z<sub>1-β</sub> √(P<sub>T</sub>(1-P<sub>T</sub>)) ]²`, `(P<sub>T</sub> - P<sub>0</sub>)²`)}
+              </p>
+              <p>参数定义与取值依据如下：<br>
+              &nbsp;&nbsp;• <b>α</b>：统计检验的显著性水平，设定为 ${alpha.value}（双侧），对应临界值 Z<sub>1-α/2</sub> = ${d.Za}；<br>
+              &nbsp;&nbsp;• <b>1-β</b>：检验效能把握度，设定为 ${power.value * 100}%，对应分位数 Z<sub>1-β</sub> = ${d.Zb}；<br>
+              &nbsp;&nbsp;• <b>P<sub>T</sub> (试验组预期值)</b>：经综合考虑，预期有效率为 ${pt_str}；<br>
+              &nbsp;&nbsp;• <b>P<sub>0</sub> (无效假设/历史值)</b>：参考相关文献，设定临床可接受的最低目标值为 ${pc_str}。<br>
+              </p>
+              <p>各值代入公式，计算得到：<br>
+                N = ${renderFrac(`[${d.Za} × ${Math.sqrt(d.var0).toFixed(4)} + ${d.Zb} × ${Math.sqrt(d.varT).toFixed(4)}]²`, `(${d.PT} - ${d.PC})²`)} = ${d.n_raw.toFixed(2)} ≈ ${Math.ceil(d.n_raw)}
+              </p>
+              <p>考虑研究过程中最大可能出现近 ${dropout.value}%的脱落率，按脱落率 ${dropout.value}%计算：<br>
+                N = ${renderFrac(Math.ceil(d.n_raw), `1 - ${dropout.value/100}`)} = ${(Math.ceil(d.n_raw) / (1 - dropout.value/100)).toFixed(2)} ≈ ${d.final_c} 例
+              </p>
+            `;
+          }
+          return html.trim().replace(/\n/g, ''); 
+        });
+
+        const copyRichText = async () => {
+          try {
+            const htmlString = generatedHtmlContent.value;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString.replace(/<br>/gi, '\n').replace(/<\/p>/gi, '\n\n');
+            const plainString = tempDiv.textContent || tempDiv.innerText || "";
+
+            if (navigator.clipboard && navigator.clipboard.write) {
+              const clipboardItem = new ClipboardItem({
+                'text/html': new Blob([htmlString], { type: 'text/html' }),
+                'text/plain': new Blob([plainString], { type: 'text/plain' })
+              });
+              await navigator.clipboard.write([clipboardItem]);
+              alert('✅ 带有《指导原则》标准公式和步骤推导的排版文本已成功复制！\n现在您可以直接粘贴到 Word 文档或编辑器中了。');
+            } else {
+              throw new Error("Clipboard API not fully supported.");
+            }
+          } catch (err) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = generatedHtmlContent.value.replace(/<br>/gi, '\n').replace(/<\/p>/gi, '\n\n');
+            const textarea = document.createElement('textarea');
+            textarea.value = tempDiv.textContent;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('✅ 文本已复制（手机浏览器或非安全环境可能降级为纯文本格式）。');
+          }
+        };
+
+        return {
+          design, alpha, power, p1, p2, margin, dropout, ratio,
+          rawTotalN, finalN1, finalN2, finalTotalN,
+          generatedHtmlContent, copyRichText
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

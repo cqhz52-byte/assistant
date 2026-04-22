@@ -1,0 +1,18 @@
+{
+  "name": "Clinical Case Support",
+  "short_name": "Case Support",
+  "description": "医疗器械临床跟台移动工作台，支持分步录入、离线草稿和后续云端同步。",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#eef8fb",
+  "theme_color": "#0f766e",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

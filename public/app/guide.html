@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>注册文件AI助手 V21.3 - 浙江伽奈维质量中心</title>
+    <style>
+        /* --- 全局高级变量 --- */
+        :root {
+            --primary: #0f62fe;
+            --primary-hover: #005a9e;
+            --secondary: #00b386;
+            --bg-body: #f3f2f1;
+            --bg-paper: #ffffff;
+            --text-main: #201f1e;
+            --text-muted: #605e5c;
+            --border-light: #edebe9;
+            --yellow-hl: #fff100;
+            --red-del: #d13438;
+            --blue-ins: #0f62fe;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-lg: 0 12px 28px rgba(0,0,0,0.12);
+        }
+
+        * { box-sizing: border-box; font-family: "Segoe UI", -apple-system, "Microsoft YaHei", sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; display: flex; height: 100vh; background: var(--bg-body); color: var(--text-main); overflow: hidden; }
+
+        /* --- 移动端顶部导航 --- */
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 1000; box-shadow: var(--shadow-sm); align-items: center; justify-content: space-between; padding: 0 20px; }
+        .mobile-header .logo { font-size: 18px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .menu-btn { background: none; border: none; font-size: 24px; color: var(--primary); cursor: pointer; }
+
+        /* --- 左侧高级侧边栏 --- */
+        .sidebar { width: 320px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 2px 0 10px rgba(0,0,0,0.02); }
+        .sidebar-header { padding: 30px 25px; background: linear-gradient(135deg, #0f62fe, #00bcf2); color: white; position: relative; overflow: hidden; }
+        .sidebar-header::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); transform: rotate(45deg); pointer-events: none; }
+        .sidebar-header h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px; position: relative; z-index: 1; }
+        .sidebar-header p { margin: 8px 0 0 0; font-size: 13px; opacity: 0.9; position: relative; z-index: 1; }
+        
+        .nav-list { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+        .nav-list::-webkit-scrollbar { width: 6px; }
+        .nav-list::-webkit-scrollbar-thumb { background: #c8c6c4; border-radius: 3px; }
+        .nav-item { padding: 16px 25px; border-bottom: 1px solid #f3f2f1; cursor: pointer; transition: all 0.2s; font-size: 14px; color: #444; position: relative; }
+        .nav-item:hover { background: #faf9f8; padding-left: 30px; color: var(--primary); }
+        .nav-item.active { background: #eff6fc; color: var(--primary); font-weight: bold; }
+        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); border-radius: 0 4px 4px 0; }
+
+        /* --- 右侧主内容区 --- */
+        .main-content { flex: 1; padding: 40px 50px; overflow-y: auto; position: relative; scroll-behavior: smooth; }
+        
+        .header-top-bar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+        .btn-manual { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 6px; }
+        .btn-manual:hover { background: var(--primary); color: white; }
+
+        .section-container { display: none; max-width: 1000px; margin: 0 auto; animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .section-container.active { display: block; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header-title { font-size: 28px; color: var(--text-main); margin-bottom: 15px; font-weight: 300; }
+        .header-title strong { font-weight: 600; color: var(--primary); }
+        .desc { color: var(--text-muted); line-height: 1.7; margin-bottom: 30px; font-size: 15px; }
+
+        /* --- 高级版英雄横幅 --- */
+        .hero-banner { background: white; padding: 40px; border-radius: 16px; box-shadow: var(--shadow-sm); margin-bottom: 30px; display: flex; flex-direction: column; gap: 15px; border: 1px solid var(--border-light); }
+        .hero-banner h1 { margin: 0; font-size: 32px; color: var(--primary); }
+        .hero-banner p { margin: 0; font-size: 16px; color: var(--text-muted); line-height: 1.8; }
+
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .feat-card { background: white; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); transition: 0.3s; }
+        .feat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: transparent; }
+        .feat-icon { font-size: 32px; margin-bottom: 15px; display: inline-block; background: #eff6fc; width: 60px; height: 60px; line-height: 60px; text-align: center; border-radius: 12px; color: var(--primary); }
+        .feat-card h3 { margin: 0 0 12px 0; font-size: 18px; color: var(--text-main); }
+        .feat-card p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        /* --- Word 模拟器 (拟真纸张 UI) --- */
+        .simulator { background: #f3f2f1; border-radius: 12px; border: 1px solid var(--border-light); overflow: hidden; margin-bottom: 40px; }
+        .sim-toolbar { background: white; padding: 12px 25px; border-bottom: 1px solid var(--border-light); font-size: 13px; display: flex; gap: 20px; color: #666; font-weight: 500; }
+        .sim-toolbar span:first-child { color: var(--primary); position: relative; }
+        .sim-toolbar span:first-child::after { content: ''; position: absolute; bottom: -12px; left: 0; right: 0; height: 2px; background: var(--primary); }
+        
+        .word-canvas-wrapper { padding: 30px; overflow-x: auto; }
+        .word-canvas { background: white; padding: 50px 60px; min-height: 400px; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-family: "SimSun", serif; font-size: 16px; line-height: 2; position: relative; border-radius: 4px; }
+        
+        .sim-footer { background: white; padding: 20px; border-top: 1px solid var(--border-light); display: flex; justify-content: center; gap: 15px; }
+
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 28px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(15,98,254,0.3); }
+        .btn:hover { background: var(--primary-hover); box-shadow: 0 4px 10px rgba(15,98,254,0.4); }
+        .btn:disabled { background: #c8c6c4; cursor: not-allowed; box-shadow: none; color: white; }
+        .btn-reset { background: white; color: var(--text-main); border: 1px solid #c8c6c4; box-shadow: none; }
+        .btn-reset:hover { background: #f3f2f1; }
+
+        /* Word 内容交互态 */
+        .para { padding: 2px 5px; border-radius: 3px; display: inline-block; width: 100%; transition: background-color 0.3s; margin-bottom: 8px; }
+        .sim-selection { background-color: #cce8ff !important; }
+        .hl-yellow { background-color: var(--yellow-hl) !important; box-shadow: 0 0 0 2px var(--yellow-hl); }
+        .track-del { text-decoration: line-through; color: var(--red-del); }
+        .track-ins { text-decoration: underline; color: var(--blue-ins); font-weight: bold; }
+        
+        .sim-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 15px; }
+        .sim-table th, .sim-table td { border: 1px solid #000; padding: 10px; text-align: center; transition: 0.3s; }
+        .sim-table th { background: #faf9f8; font-weight: bold; }
+        .img-box { background: #f3f2f1; border: 1px dashed #a19f9d; display: inline-flex; align-items: center; justify-content: center; color: #666; font-family: sans-serif; font-size: 12px; transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+        /* --- 动画系统 --- */
+        .mock-context-menu { position: absolute; background: white; border: 1px solid #e1dfdd; box-shadow: var(--shadow-lg); width: 250px; z-index: 50; display: none; padding: 8px 0; font-family: "Microsoft YaHei", sans-serif; font-size: 14px; border-radius: 6px; transform-origin: top left; animation: scaleIn 0.2s cubic-bezier(0.1, 0.9, 0.2, 1); }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .mock-menu-item { padding: 10px 20px; display: flex; align-items: center; gap: 12px; color: #333; cursor: default; }
+        .mock-menu-item.sim-hover { background: #f3f2f1; }
+        .mock-menu-item.ai-item { color: var(--primary); font-weight: 600; }
+        .mock-separator { height: 1px; background: #edebe9; margin: 6px 0; }
+        .mock-cursor { position: absolute; width: 22px; height: 22px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2.9-3.2-7.4-4.4 4.7z" fill="white" stroke="%23333" stroke-width="1.5"/></svg>'); z-index: 100; display: none; pointer-events: none; transition: all 0.4s ease; }
+
+        .hta-dialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.98); backdrop-filter: blur(20px); border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 24px 48px rgba(0,0,0,0.15); width: 440px; max-width: 90%; padding: 30px; display: none; z-index: 60; border-radius: 12px; font-family: "Microsoft YaHei", sans-serif; }
+        .hta-title { color: var(--text-main); font-weight: 600; margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+        .hta-bar-bg { height: 6px; background: #edebe9; border-radius: 3px; overflow: hidden; position: relative; margin-bottom: 15px; }
+        .hta-bar { width: 30%; height: 100%; background: var(--primary); position: absolute; animation: htaBounce 1.5s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes htaBounce { 0% { left: -10%; width: 20%; } 100% { left: 90%; width: 40%; } }
+        .hta-msg { font-size: 13px; color: var(--text-muted); text-align: center; }
+
+        /* --- 说明书 Modal 弹窗 --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 9999; display: none; justify-content: center; align-items: center; opacity: 0; transition: 0.3s; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-content { background: white; width: 800px; max-width: 95%; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); transform: translateY(20px); transition: 0.3s; }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .modal-header { padding: 20px 30px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { margin: 0; color: var(--primary); font-size: 20px; }
+        .modal-close { background: none; border: none; font-size: 28px; color: #999; cursor: pointer; line-height: 1; }
+        .modal-close:hover { color: var(--red-del); }
+        .modal-body { padding: 30px; overflow-y: auto; font-size: 15px; line-height: 1.8; color: #444; }
+        .modal-body h3 { color: var(--text-main); border-left: 4px solid var(--primary); padding-left: 10px; margin-top: 25px; }
+
+        /* 响应式设计 */
+        @media (max-width: 850px) {
+            .mobile-header { display: flex; }
+            .sidebar { position: fixed; left: -100%; top: 60px; bottom: 0; width: 100%; box-shadow: none; z-index: 900; }
+            .sidebar.open { left: 0; }
+            .sidebar-header { display: none; }
+            .main-content { padding: 20px 15px; margin-top: 60px; }
+            .header-top-bar { display: none; }
+            .hero-banner { padding: 25px 20px; }
+            .hero-banner h1 { font-size: 24px; }
+            .word-canvas-wrapper { padding: 15px 5px; }
+            .word-canvas { padding: 25px 20px; font-size: 14px; min-height: 250px; }
+            .sim-footer { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .hta-dialog { width: 90%; padding: 20px; }
+            .sim-table { font-size: 12px; }
+            .sim-table th, .sim-table td { padding: 4px; }
+            .mock-context-menu { width: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-header">
+        <div class="logo">✦ AI 助手 V21.3</div>
+        <div style="display:flex; gap:15px; align-items:center;">
+            <button class="btn-manual" style="padding:4px 12px; font-size:12px; border:none; background:#eff6fc;" onclick="toggleManual()">📖 说明书</button>
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>注册文件AI助手</h2>
+            <p>浙江伽奈维质量中心 出品</p>
+        </div>
+        <ul class="nav-list" id="navList">
+            <li class="nav-item active" onclick="switchTab(0)">🌟 项目全局总览</li>
+            <li class="nav-item" onclick="switchTab(1)">1. AI 自由对话 (智能问答)</li>
+            <li class="nav-item" onclick="switchTab(2)">2. AI 扩写 (专业细节化)</li>
+            <li class="nav-item" onclick="switchTab(3)">3. AI 缩写 (提炼核心要求)</li>
+            <li class="nav-item" onclick="switchTab(4)">4. AI 润色 (说明书规范化)</li>
+            <li class="nav-item" onclick="switchTab(5)">5. AI 文本翻译 (外文撰写)</li>
+            <li class="nav-item" onclick="switchTab(6)">6. AI 表格翻译 (结构保留)</li>
+            <li class="nav-item" onclick="switchTab(7)">7. 表格内图片一键规范</li>
+            <li class="nav-item" onclick="switchTab(8)">8. 非表格散图一键统一</li>
+            <li class="nav-item" onclick="switchTab(9)">9. 智能选区仿写 (RAG套件)</li>
+            <li class="nav-item" onclick="switchTab(10)">10. 全文翻新撰写 (巅峰挂机)</li>
+            <li class="nav-item" onclick="switchTab(11)">11. 绑定质量中心知识库</li>
+        </ul>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        
+        <div class="header-top-bar">
+            <button class="btn-manual" onclick="toggleManual()">📖 查看完整使用说明书</button>
+        </div>
+
+        <div id="tab-0" class="section-container active">
+            <div class="hero-banner">
+                <h1>打造医疗器械注册领域的“最强大脑”</h1>
+                <p><b>注册文件AI助手 V21.3</b> 是一款专为医疗器械行业深度定制的生产力工具。它无缝潜伏于 Word/WPS 底层，将前沿的大语言模型与<b>浙江伽奈维质量中心私有知识库（RAG）</b>完美结合。无需代码基础，即可极大提升产品说明书、技术要求及临床评价报告的编制、翻新与排版效率。</p>
+            </div>
+            
+            <h2 class="header-title"><strong>三大核心</strong> 技术壁垒</h2>
+            <div class="feature-grid">
+                <div class="feat-card">
+                    <div class="feat-icon">🧠</div>
+                    <h3>RAG 私有知识库防幻觉</h3>
+                    <p>通过本地 FastAPI+ChromaDB 引擎构建向量知识网。</p>
+                    <ul style="padding-left:15px; margin-top:10px; color:#666; font-size:13px; line-height:1.8;">
+                        <li>支持按产品线挂载 PDF/Word 技术文档。</li>
+                        <li>自动提取真实参数、禁忌症，杜绝 AI 胡编乱造。</li>
+                        <li>数据绝不出本地网络，保障核心机密安全。</li>
+                    </ul>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">📐</div>
+                    <h3>100% 格式无损穿透技术</h3>
+                    <p>采用精密的 VBA 内存指针与 DOM 级隔离提取技术。</p>
+                    <ul style="padding-left:15px; margin-top:10px; color:#666; font-size:13px; line-height:1.8;">
+                        <li><b>无视表格复杂度</b>：合并单元格、复杂边框无损保留。</li>
+                        <li><b>标签智能免疫</b>：保护【产品名称】等专有名词。</li>
+                        <li>底层消除一切 Markdown 标记污染。</li>
+                    </ul>
+                </div>
+                <div class="feat-card">
+                    <div class="feat-icon">⚡</div>
+                    <h3>防假死挂机与智能排版</h3>
+                    <p>专为处理几万字超大注册文档量身定制的异步架构。</p>
+                    <ul style="padding-left:15px; margin-top:10px; color:#666; font-size:13px; line-height:1.8;">
+                        <li><b>HTA 异步通信</b>：长文档全自动扫荡，Word 绝不转圈假死。</li>
+                        <li><b>智能排版引擎</b>：一键统一表格内外图片尺寸，自适应对齐列宽，告别繁琐的手工调图。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-1" class="section-container">
+            <h2 class="header-title">1. AI 自由对话 <strong>(智能问答与指令)</strong></h2>
+            <p class="desc">针对选中的文字片段，直接唤出超大输入框向 AI 提问或下达任意处理指令。完美联动关联的知识库，为你提供极其专业的解答与文本处理结果。</p>
+            <div class="simulator" id="sim-1">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas">
+                    <p id="t1-p" class="para">本产品采用最新一代的陡脉冲技术，能够在极短时间内释放高压电场，有效穿透细胞膜。</p>
+                    <div class="mock-cursor" id="mc-1"></div>
+                    <div class="mock-context-menu" id="menu-1"><div class="mock-menu-item">复制 (C)</div><div class="mock-separator"></div><div class="mock-menu-item ai-item" id="mi-1">✨ AI 自由对话</div></div>
+                    
+                    <div class="hta-dialog" id="hta-1-input" style="width: 500px; max-width: 95%;">
+                        <div class="hta-title" style="margin-bottom:15px; border:none; padding:0;">AI 自由对话</div>
+                        <div style="font-size:13px; font-weight:600; margin-bottom:8px; color:#333;">请输入要求或问题： <span style="color:var(--secondary); font-weight:normal;">(已关联: 研发部知识库)</span></div>
+                        <textarea style="width:100%; height:130px; padding:12px; margin-bottom:15px; border:1px solid var(--border-light); border-radius:6px; resize:none; font-size:14px; background:#faf9f8; color:#444;" readonly>【参考内容】
+本产品采用最新一代的陡脉冲技术，能够在极短时间内释放高压电场，有效穿透细胞膜。
+
+【我的问题】
+请结合知识库，用一段话详细解释一下“陡脉冲技术”的作用机制。</textarea>
+                        <div style="text-align: right;">
+                            <button class="btn btn-reset" style="padding:8px 20px; display:inline-block; margin-right:10px;">取消</button>
+                            <button class="btn" id="btn-1-send" style="padding:8px 20px; display:inline-block;">发送给 AI</button>
+                        </div>
+                    </div>
+
+                    <div class="hta-dialog" id="hta-1-prog"><div class="hta-title">AI 正在思考中...</div><div class="hta-bar-bg"><div class="hta-bar"></div></div><div class="hta-msg">正在查阅本地知识库与大模型...</div></div>
+
+                    <div class="hta-dialog" id="hta-1-result" style="width: 500px; max-width: 95%;">
+                        <div class="hta-title" style="margin-bottom:15px;">AI 回复结果 (支持上下滚动)</div>
+                        <textarea style="width:100%; height:180px; padding:12px; margin-bottom:15px; border:1px solid var(--primary); border-radius:6px; resize:none; font-size:14px; background:white; color:#333; line-height: 1.6;" readonly>陡脉冲技术（Irreversible Electroporation, IRE）的作用机制主要是通过在电极之间释放微秒或纳秒级的超高压脉冲电场。这种强电场会跨越细胞膜，在细胞膜的脂质双分子层上形成纳米级的不可逆微孔。
+
+这些微孔会导致细胞内外离子大量失衡，破坏细胞内环境稳态，最终引发细胞的程序性凋亡。由于该技术属于非热能消融，因此能有效保护血管、神经及胆胰管等含胶原蛋白的结缔组织骨架不受热损伤。</textarea>
+                        <div style="text-align: right;">
+                            <button class="btn btn-reset" style="padding:8px 20px; display:inline-block; margin-right:10px;">关闭窗口</button>
+                            <button class="btn" id="btn-1-copy" style="padding:8px 20px; display:inline-block;">一键拷贝内容</button>
+                        </div>
+                    </div>
+
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-1" onclick="runSim1()">▶ 模拟执行：自由对话</button> <button class="btn btn-reset" onclick="resetSim1()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-2" class="section-container">
+            <h2 class="header-title">2. AI 扩写 <strong>(展开专业细节)</strong></h2>
+            <p class="desc">在编写临床报告或说明书时，若原文过于简略，AI 会根据医疗器械语境，按逻辑展开论述，丰富其安全机制或操作细节。支持 Word 原生修订模式展示。</p>
+            <div class="simulator" id="sim-2">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas">
+                    <p id="t2-p1" class="para"><b>【产品特点】</b></p>
+                    <p id="t2-p2" class="para">一次性使用陡脉冲扩张消融导管操作便捷，能有效降低手术风险。</p>
+                    <div class="mock-cursor" id="mc-2"></div>
+                    <div class="mock-context-menu" id="menu-2"><div class="mock-menu-item">复制 (C)</div><div class="mock-separator"></div><div class="mock-menu-item ai-item" id="mi-2">✨ AI 扩写</div></div>
+                    <div class="hta-dialog" id="hta-2"><div class="hta-title">AI 正在深度扩写...</div><div class="hta-bar-bg"><div class="hta-bar"></div></div><div class="hta-msg">正在补充临床操作规范与安全机制...</div></div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-2" onclick="runSim2()">▶ 模拟执行：扩写段落</button> <button class="btn btn-reset" onclick="resetSim2()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-3" class="section-container">
+            <h2 class="header-title">3. AI 缩写 <strong>(提炼核心要素)</strong></h2>
+            <p class="desc">用于技术要求摘要或说明书精简版。剔除冗长的修饰性废话，仅保留最核心的物理参数、事实数据和功能要点。</p>
+            <div class="simulator" id="sim-3">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas">
+                    <p id="t3-p" class="para">为了确保医疗设备在复杂的临床环境中能够保持绝对的可靠性，我们伽奈维质量中心的研发与测试团队耗时近三年，进行了包括高低温循环、剧烈震动、跌落以及持续高负荷运行等在内的数十项破坏性极端测试，最终证明该高频电刀设备在各种恶劣临床环境下都展现出了完全不会发生任何漏电、短路或输出功率衰减等安全事故的极高品质表现。</p>
+                    <div class="mock-cursor" id="mc-3"></div>
+                    <div class="mock-context-menu" id="menu-3"><div class="mock-menu-item ai-item" id="mi-3">✨ AI 缩写</div></div>
+                    <div class="hta-dialog" id="hta-3"><div class="hta-title">AI 提炼中...</div><div class="hta-bar-bg"><div class="hta-bar"></div></div><div class="hta-msg">正在提取技术核心指标...</div></div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-3" onclick="runSim3()">▶ 模拟执行：缩写</button> <button class="btn btn-reset" onclick="resetSim3()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-4" class="section-container">
+            <h2 class="header-title">4. AI 润色 <strong>(说明书规范化)</strong></h2>
+            <p class="desc">研发人员随手写的“大白话”操作指南，一键转化为符合国家药监局 (NMPA) 注册规范的严谨医疗说明书语境。</p>
+            <div class="simulator" id="sim-4">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas">
+                    <p id="t4-p" class="para">医生在做完手术后，需要按一下手柄上面的那个红色开关，然后机器里面就会自动喷出水来，把导管里面残留的那些血块和脏东西都给冲洗干净，防止下次用的时候堵住。</p>
+                    <div class="mock-cursor" id="mc-4"></div>
+                    <div class="mock-context-menu" id="menu-4"><div class="mock-menu-item ai-item" id="mi-4">✨ AI 润色</div></div>
+                    <div class="hta-dialog" id="hta-4"><div class="hta-title">AI 规范化转换中...</div><div class="hta-bar-bg"><div class="hta-bar"></div></div><div class="hta-msg">正在匹配医疗器械行业规范用语...</div></div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-4" onclick="runSim4()">▶ 模拟执行：专业润色</button> <button class="btn btn-reset" onclick="resetSim4()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-5" class="section-container">
+            <h2 class="header-title">5. AI 文本翻译 <strong>(精准多语言互译)</strong></h2>
+            <p class="desc">针对 CE 认证或 FDA 注册的外文文档，提供极具专业度的医疗术语级互译。支持下拉弹窗选择目标语言。</p>
+            <div class="simulator" id="sim-5">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas">
+                    <p id="t5-p1" class="para"><b>2. Contraindications</b></p>
+                    <p id="t5-p2" class="para">The pulsed field ablation system is contraindicated for use in patients with active systemic infections, severe coagulation disorders, or implanted cardiac pacemakers. Furthermore, safety and effectiveness in pregnant women have not been established.</p>
+                    
+                    <div class="mock-cursor" id="mc-5"></div>
+                    <div class="mock-context-menu" id="menu-5"><div class="mock-menu-item ai-item" id="mi-5">✨ AI 翻译</div></div>
+                    
+                    <div class="hta-dialog" id="hta-5-lang" style="width: 380px;">
+                        <div class="hta-title">AI 助手 - 选择翻译语言</div>
+                        <p style="font-size:13px; font-weight:600; margin-bottom:8px; color:#444;">目标语言 <span style="color:#888; font-weight:normal;">(下拉选择或直接输入)</span>：</p>
+                        <select id="sim-5-select" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid var(--border-light); border-radius:6px; font-size:14px; outline:none; transition: 0.3s;">
+                            <option value="">-- 点击展开常用语言 --</option><option value="中文">中文 (Chinese)</option><option value="日语">日语 (Japanese)</option>
+                        </select>
+                        <div style="text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+                            <button class="btn" id="btn-5-ok" style="padding:8px 20px; display:inline-block;">确定</button>
+                        </div>
+                    </div>
+                    <div class="hta-dialog" id="hta-5-prog"><div class="hta-title">智能翻译中...</div><div class="hta-bar-bg"><div class="hta-bar"></div></div><div class="hta-msg">正在校对医学术语词典...</div></div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-5" onclick="runSim5()">▶ 模拟执行：带语言选择的翻译</button> <button class="btn btn-reset" onclick="resetSim5()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-6" class="section-container">
+            <h2 class="header-title">6. AI 表格翻译 <strong>(底层拆解，结构保留)</strong></h2>
+            <p class="desc">极其强悍的表格解析能力。利用 <code>[SEP]</code> 标签在底层拆离矩阵，在翻译多语言后原样注回，绝不破坏任何合并单元格或背景底色。</p>
+            <div class="simulator" id="sim-6">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas">
+                    <table class="sim-table" id="t6-tbl">
+                        <tr><th id="t6-c1" colspan="2">零部件物料清单 (BOM)</th></tr>
+                        <tr><td id="t6-c2" style="background:#f9f9f9; font-weight:bold;">部件名称</td><td id="t6-c3" style="background:#f9f9f9; font-weight:bold;">材质与规格要求</td></tr>
+                        <tr><td id="t6-c4">穿刺针外鞘</td><td id="t6-c5">304 医用级不锈钢 (要求抗弯折)</td></tr>
+                        <tr><td id="t6-c6">高压绝缘涂层</td><td id="t6-c7">特氟龙 PTFE (耐压阈值 > 5000V)</td></tr>
+                    </table>
+                    <div class="mock-cursor" id="mc-6"></div>
+                    <div class="mock-context-menu" id="menu-6"><div class="mock-menu-item ai-item" id="mi-6">✨ AI 翻译</div></div>
+                    
+                    <div class="hta-dialog" id="hta-6-lang" style="width: 380px;">
+                        <div class="hta-title">AI 助手 - 选择翻译语言</div>
+                        <select id="sim-6-select" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid var(--border-light); border-radius:6px; font-size:14px; outline:none;">
+                            <option value="">-- 点击展开常用语言 --</option><option value="英语">英语 (English)</option>
+                        </select>
+                        <div style="text-align: right;"><button class="btn" id="btn-6-ok" style="padding:8px 20px; display:inline-block;">确定</button></div>
+                    </div>
+                    <div class="hta-dialog" id="hta-6-prog"><div class="hta-title">表格矩阵翻译中...</div><div class="hta-bar-bg"><div class="hta-bar"></div></div><div class="hta-msg" id="msg-6">正在分离表格 [SEP] 单元格...</div></div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-6" onclick="runSim6()">▶ 模拟执行：翻译表格</button> <button class="btn btn-reset" onclick="resetSim6()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-7" class="section-container">
+            <h2 class="header-title">7. 表格内图片 <strong>一键规范化</strong></h2>
+            <p class="desc">附表里插入的示意图大小不一乱撑列宽？光标置于表格内，一键强制统一为首图尺寸并全部居中适配。</p>
+            <div class="simulator" id="sim-7">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span style="color:var(--primary); font-weight:bold; border-bottom: 2px solid var(--primary); padding-bottom:8px;">加载项</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas">
+                    <div style="background: #f8f8f8; padding: 6px; border: 1px solid var(--border-light); border-radius:4px; margin-bottom: 15px; display: flex;">
+                        <div style="padding: 6px 12px; background: white; border:1px solid #ccc; font-size:12px; display:flex; align-items:center; gap:6px; border-radius:4px; cursor:pointer;" id="mi-7">
+                            <span style="color:var(--primary); font-size:14px;">🖼️</span> AI 图片一键调整
+                        </div>
+                    </div>
+                    <table class="sim-table" id="t7-tbl">
+                        <tr><th>导管头端</th><th>手柄组件</th><th>连接线缆</th></tr>
+                        <tr>
+                            <td id="t7-td1"><div class="img-box t7-img" style="width: 90px; height: 70px; background:#e6f7ff; border-color:#0066cc;">图1(基准 90x70)</div></td>
+                            <td id="t7-td2"><div class="img-box t7-img" style="width: 160px; height: 30px;">图2(畸形长图)</div></td>
+                            <td id="t7-td3"><div class="img-box t7-img" style="width: 50px; height: 110px;">图3(畸形竖图)</div></td>
+                        </tr>
+                    </table>
+                    <div class="mock-cursor" id="mc-7"></div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-7" onclick="runSim7()">▶ 模拟执行：规整表格图片</button> <button class="btn btn-reset" onclick="resetSim7()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-8" class="section-container">
+            <h2 class="header-title">8. 非表格散落图片 <strong>一键统一</strong></h2>
+            <p class="desc">无需表格辅助。手动框选文档里连续的多张产品实物图，按下快捷键 <code>Shift + P</code>，瞬间像阅兵一样整齐划一。</p>
+            <div class="simulator" id="sim-8">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>视图</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas" id="t8-area">
+                    <p style="margin:0 0 10px 0; color:#666;">以下为消融导管在不同手术视角下的形态特征：</p>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+                        <div class="img-box t8-img" style="width: 120px; height: 90px; background:#e6f7ff; border-color:#0066cc;">主视图(120x90)</div>
+                        <div class="img-box t8-img" style="width: 70px; height: 140px;">侧视图(待调整)</div>
+                        <div class="img-box t8-img" style="width: 200px; height: 60px;">俯视图(待调整)</div>
+                    </div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-8" onclick="runSim8()">▶ 模拟执行：按下 Shift + P</button> <button class="btn btn-reset" onclick="resetSim8()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-9" class="section-container">
+            <h2 class="header-title">9. 智能选区仿写 <strong>(RAG 零输入魔法)</strong></h2>
+            <p class="desc">质量中心的巅峰杀器。选中任意混合区域（标题+段落+表格），系统自动查阅说明书库，带着旧排版格式，精准套入新产品参数。<b>观察流水线动画：</b></p>
+            <div class="simulator" id="sim-9">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas">
+                    <p id="t9-p1" class="para" style="font-weight:bold; font-size:16px;">【产品名称】高频电刀</p>
+                    <p id="t9-p2" class="para">【适用范围】本产品与高频电刀主机配合使用，用于前列腺增生组织的切割与电凝止血。</p>
+                    <p id="t9-p3" class="para" style="font-weight:bold; margin-top:15px; font-size:16px;">【型号规格表】</p>
+                    <table class="sim-table" id="t9-tbl">
+                        <tr><th id="t9-c1">型号</th><th id="t9-c2">输出频率</th><th id="t9-c3">电极形式</th></tr>
+                        <tr><td id="t9-c4">TURP-100</td><td id="t9-c5">50 Hz</td><td id="t9-c6">环形电极</td></tr>
+                    </table>
+                    
+                    <div class="mock-cursor" id="mc-9"></div>
+                    <div class="mock-context-menu" id="menu-9"><div class="mock-menu-item ai-item" id="mi-9">✨ AI 选区仿写 (保留格式)</div></div>
+                    
+                    <div class="hta-dialog" id="hta-9-input" style="width: 440px;">
+                        <div class="hta-title" style="margin-bottom:15px; border:none; padding:0;">AI 智能综合仿写</div>
+                        <div style="font-size:13px; color:#444; line-height:1.7; margin-bottom:15px;">
+                            检测成分：[普通文本 + 表格矩阵]<br>
+                            挂载大脑：<b style="color:var(--primary);">【研发部技术要求文档库】</b><br><br>
+                            <span style="color:var(--secondary); font-weight:bold;">💡 因已连接最新知识库，下方框可直接留空！AI 将自动检索“陡脉冲消融导管”的核心参数完成无感替换。</span>
+                        </div>
+                        <input type="text" placeholder="（留空触发自动填充魔法）" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px; pointer-events:none; background:#f9f9f9;">
+                        <div style="text-align: right;"><button class="btn" style="padding:8px 20px; display:inline-block;">确认无感填充</button></div>
+                    </div>
+                    <div class="hta-dialog" id="hta-9-prog"><div class="hta-title">处理中，请勿关闭文档</div><div class="hta-bar-bg"><div class="hta-bar"></div></div><div class="hta-msg" id="msg-9">连接本地向量库...</div></div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-9" onclick="runSim9()">▶ 模拟执行：零输入智能套表</button> <button class="btn btn-reset" onclick="resetSim9()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-10" class="section-container">
+            <h2 class="header-title">10. 自动化全文翻新撰写 <strong>(挂机巅峰)</strong></h2>
+            <p class="desc">注册文件换版神器。输入核心产品要素，一键将几万字的老文件逐段挂机重写为新产品材料，完美防假死。</p>
+            <div class="simulator" id="sim-10">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas" style="font-size: 14px; line-height: 1.8;">
+                    <p id="t10-p1" class="para"><b>1. 概述</b>：老款高频电刀主要利用高频电流对组织进行切割，产热较高，周围组织热损伤明显。</p>
+                    <p id="t10-p2" class="para"><b>2. 警告及禁忌</b>：严禁在具有易燃易爆气体的环境下开启高频电刀设备。</p>
+                    <p id="t10-p3" class="para"><b>3. 操作说明</b>：手术准备就绪后，将电刀刀头直接接触目标增生组织，踩下脚踏开关输出高频能量。</p>
+                    
+                    <div class="mock-cursor" id="mc-10"></div>
+                    <div class="mock-context-menu" id="menu-10"><div class="mock-menu-item ai-item" id="mi-10">✨ AI 全文撰写 / 翻新</div></div>
+
+                    <div class="hta-dialog" id="hta-10-input" style="width: 480px; padding: 20px 30px;">
+                        <div class="hta-title" style="color:var(--red-del); border-color:#fce1e1;">【高能预警】全篇自动化撰写</div>
+                        <div style="font-size:13px; color:#555; margin-bottom:15px; padding:10px; background:#fff8df; border-left:4px solid #ffb900; border-radius:4px;">您即将对当前长篇文档进行逐段大重写！请确保已保存备份。</div>
+                        <div style="font-size:13px; font-weight:600; margin-bottom:8px;">请输入全篇智能仿写的核心要求/主题：</div>
+                        <textarea id="sim-10-textarea" style="width:100%; height:70px; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px; resize:none; font-size:13px;" placeholder="在此输入..."></textarea>
+                        <div style="text-align: right;"><button class="btn" id="btn-10-ok" style="padding:8px 20px; display:inline-block;">确定开始挂机</button></div>
+                    </div>
+
+                    <div class="hta-dialog" id="hta-10-prog"><div class="hta-title">全局防假死扫描撰写中...</div><div class="hta-bar-bg"><div class="hta-bar"></div></div><div class="hta-msg" id="msg-10">准备启动...</div></div>
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-10" onclick="runSim10()">▶ 模拟执行：输入参数全文重撰</button> <button class="btn btn-reset" onclick="resetSim10()">🔄 重置</button></div>
+            </div>
+        </div>
+
+        <div id="tab-11" class="section-container">
+            <h2 class="header-title">11. 绑定本地质量知识库 <strong>(核心引擎)</strong></h2>
+            <p class="desc">采用纯原生 VBA 读取技术，避开所有安全卫士拦截。支持按大类文件夹关联，或精确到单一 PDF 文件的极速匹配。</p>
+            <div class="simulator" id="sim-11">
+                <div class="sim-toolbar"><span>文件</span><span>开始</span><span>插入</span><span>AI助手</span></div>
+                <div class="word-canvas-wrapper"><div class="word-canvas" style="display:flex; justify-content:center; align-items:center; background:#faf9f8; min-height: 400px; padding:0;">
+                    
+                    <div class="mock-cursor" id="mc-11"></div>
+                    <div class="mock-context-menu" id="menu-11" style="top:20px; left:20px;">
+                        <div class="mock-menu-item ai-item">✨ AI 图片调整</div>
+                        <div class="mock-separator"></div>
+                        <div class="mock-menu-item ai-item" id="mi-11">📚 AI 关联本地知识库</div>
+                    </div>
+
+                    <div class="hta-dialog" id="hta-11" style="width: 480px; text-align:left; border-top: 5px solid var(--primary); box-shadow: var(--shadow-lg);">
+                        <h3 style="margin:0 0 20px 0; color: var(--primary); font-size:18px;">AI 关联本地知识库</h3>
+                        <p style="font-size:13px; font-weight:600; margin-bottom:8px; color:#444;">1. 选择质量体系知识域：</p>
+                        <select style="width:100%; padding:12px; margin-bottom:20px; background:#eff6fc; border:1px solid #91d5ff; font-weight:bold; color:var(--primary); outline:none; font-size:14px; border-radius:6px;">
+                            <option>📚 知识库: 研发部_图纸与技术要求库</option><option>📚 知识库: 临床部_评价报告库</option>
+                        </select>
+                        <p style="font-size:13px; font-weight:600; margin-bottom:8px; color:#444;">2. 精确锁定目标规范文件 (可选)：</p>
+                        <select style="width:100%; padding:12px; margin-bottom:25px; border:1px solid #ccc; outline:none; font-size:14px; border-radius:6px;">
+                            <option>📄 脉冲消融导管_使用说明书(草案).pdf</option><option>📄 综合搜索该知识域下所有文档</option>
+                        </select>
+                        <div style="text-align: right; border-top:1px solid #eee; padding-top:15px;">
+                            <button class="btn btn-reset" style="padding: 8px 20px; display:inline-block; margin-right:10px;">取消</button>
+                            <button class="btn" style="padding: 8px 20px; display:inline-block;" id="btn-11-ok">写入本地配置</button>
+                        </div>
+                    </div>
+
+                    <div class="hta-dialog" id="msgbox-11" style="width: 320px; text-align:center;">
+                        <div style="font-size: 50px; margin-bottom:5px; color:var(--secondary);">✓</div>
+                        <div style="font-size: 18px; font-weight:bold; margin-bottom:10px; color:#333;">全局挂载成功</div>
+                        <div style="font-size: 13px; color:#666; margin-bottom:25px; line-height:1.6;">已成功关联大脑：<br><b style="color:var(--primary);">【研发部_图纸与技术要求库】</b><br>精确文件：脉冲消融导管说明书</div>
+                        <button class="btn" style="margin:0 auto; padding:8px 30px;">完成</button>
+                    </div>
+
+                </div></div>
+                <div class="sim-footer"><button class="btn" id="btn-11" onclick="runSim11()">▶ 模拟执行：挂载知识库</button> <button class="btn btn-reset" onclick="resetSim11()">🔄 重置</button></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="manual-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📖 注册文件AI助手 V21.3 官方手册</h2>
+                <button class="modal-close" onclick="toggleManual()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>欢迎使用浙江伽奈维质量中心专属的 AI 生产力工具。本系统已完美融入您的 Word/WPS 右键菜单与工具栏中。</p>
+                
+                <h3>一、 AI 文字合规处理功能</h3>
+                <p>在 Word 中框选任意文本后，<b>点击鼠标右键</b>，在弹出的菜单中选择功能：</p>
+                <ul>
+                    <li><b>1. 自由对话：</b> 针对选中的文字片段，直接唤出超大输入框向 AI 提问或下达处理指令，完美联动本地知识库获取解答。</li>
+                    <li><b>2. AI 扩写：</b> 结合医疗语境，在保留原意的基础上丰富操作细节，延长篇幅，自动进入修订模式追踪修改痕迹。</li>
+                    <li><b>3. AI 缩写：</b> 提取核心参数、事实和数据，极简输出，适合技术要求摘要。</li>
+                    <li><b>4. AI 润色：</b> 纠正语病，优化为高度专业、严谨的医疗注册文件/公文风格。</li>
+                    <li><b>5. AI 翻译：</b> 自动记忆目标语言。若是表格，会在底层拆解并<b>无损保持表格边框与底色</b>完成精准翻译。</li>
+                </ul>
+
+                <h3>二、 AI 智能版面调整功能</h3>
+                <p><b>触发方式：</b>光标置于表格内，或框选多张散图后，点击顶部菜单栏的【加载项 - AI 图片一键调整】，或直接按下全局快捷键 <code>Shift + P</code>。</p>
+                <ul>
+                    <li><b>◆ 表格图片调整：</b> 自动寻找表格内第一张图片的尺寸，将该表内所有图片强行统一为该尺寸，并自动居中、智能缩窄列宽。</li>
+                    <li><b>◆ 散落图片统一：</b> 手动框选文档里不连续的多张图片后触发，程序将以选区内首图为基准，瞬间统一后续所有框选图片的宽与高。</li>
+                </ul>
+
+                <h3>三、 RAG 智能仿写与挂机翻新 (巅峰功能)</h3>
+                <p>利用本地服务器中的 PDF 知识库，杜绝大模型编造假数据。</p>
+                <ul>
+                    <li><b>◆ 关联本地大脑：</b> 右键选择【AI 关联本地知识库】，选择质量中心的特定文件夹或精确的 PDF 说明书进行挂载。</li>
+                    <li><b>◆ 智能选区仿写：</b> 框选包含标题、段落和复杂表格的混合区域。在弹窗中<b>留空不填</b>直接确认，AI 将根据挂载的说明书，自动剥离模板格式，注入新产品的参数，实现零代码自动化套表。</li>
+                    <li><b>◆ 全文自动化撰写：</b> 右键触发，输入产品名称，AI 将挂机逐段向下重写数万字的长卷文档。</li>
+                </ul>
+                <br>
+                <p style="color:var(--text-muted); font-size: 13px;"><i>注：本系统数据处理全程在本地服务器运转，符合企业信息安全要求。如有卡顿，请检查 Python 挂机端是否正常运行。</i></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 移动端菜单控制
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function closeSidebar() { if(window.innerWidth <= 850) document.getElementById('sidebar').classList.remove('open'); }
+        
+        function switchTab(index) {
+            document.querySelectorAll('.nav-item').forEach((el, i) => { el.className = i === index ? 'nav-item active' : 'nav-item'; });
+            document.querySelectorAll('.section-container').forEach((el, i) => { el.className = i === index ? 'section-container active' : 'section-container'; });
+            closeSidebar();
+            document.getElementById('mainContent').scrollTop = 0;
+        }
+
+        // 说明书弹窗控制
+        function toggleManual() {
+            const modal = document.getElementById('manual-modal');
+            if(modal.classList.contains('show')) modal.classList.remove('show');
+            else modal.classList.add('show');
+        }
+
+        const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        // 通用虚拟操作引擎
+        async function runVirtualOperation(config) {
+            const { btnId, elementsToSelect, cursorId, menuId, menuItemId, htaId, htaMsgId, htaMsgs, executeLogic, skipHtaDisplay } = config;
+            const btn = document.getElementById(btnId);
+            btn.disabled = true;
+
+            if(elementsToSelect) elementsToSelect.forEach(id => document.getElementById(id).classList.add('sim-selection'));
+            await wait(600);
+
+            if(cursorId && menuId && menuItemId) {
+                const cursor = document.getElementById(cursorId), menu = document.getElementById(menuId), menuItem = document.getElementById(menuItemId);
+                let targetEl = elementsToSelect ? document.getElementById(elementsToSelect[0]) : document.getElementById(cursorId).parentElement;
+                
+                const rect = targetEl.getBoundingClientRect();
+                const parentRect = targetEl.parentElement.getBoundingClientRect();
+                
+                cursor.style.display = 'block';
+                cursor.style.top = (rect.top - parentRect.top + rect.height/2 + 10) + 'px';
+                cursor.style.left = (rect.left - parentRect.left + rect.width/2 + 30) + 'px';
+                await wait(400);
+                
+                menu.style.display = 'block';
+                menu.style.top = (rect.top - parentRect.top + rect.height/2 + 20) + 'px';
+                menu.style.left = (rect.left - parentRect.left + rect.width/2 + 40) + 'px';
+                await wait(600);
+
+                const itemRect = menuItem.getBoundingClientRect();
+                const menuRect = menu.getBoundingClientRect();
+                cursor.style.top = (itemRect.top - menuRect.top + (rect.top - parentRect.top + rect.height/2) + 30) + 'px';
+                cursor.style.left = (rect.left - parentRect.left + rect.width/2 + 80) + 'px';
+                menuItem.classList.add('sim-hover');
+                await wait(500);
+
+                menu.style.display = 'none'; cursor.style.display = 'none'; menuItem.classList.remove('sim-hover');
+            }
+
+            if(elementsToSelect) {
+                elementsToSelect.forEach(id => {
+                    const el = document.getElementById(id);
+                    el.classList.remove('sim-selection');
+                    el.classList.add('hl-yellow');
+                });
+            }
+
+            if(htaId && !skipHtaDisplay) document.getElementById(htaId).style.display = 'block';
+            if(htaMsgId && htaMsgs) {
+                for(let msg of htaMsgs) { document.getElementById(htaMsgId).innerText = msg; await wait(1200); }
+            } else if(htaId && !skipHtaDisplay) { await wait(1500); }
+
+            if(htaId && !skipHtaDisplay) document.getElementById(htaId).style.display = 'none';
+            if(elementsToSelect) elementsToSelect.forEach(id => document.getElementById(id).classList.remove('hl-yellow'));
+            
+            if(executeLogic) await executeLogic();
+            btn.innerText = "✅ 演示完毕";
+        }
+
+        const originalStates = {};
+        function saveState(ids) { ids.forEach(id => { if(!originalStates[id]) originalStates[id] = document.getElementById(id).innerHTML; }); }
+        function restoreState(ids, btnId, btnText) { 
+            ids.forEach(id => { document.getElementById(id).innerHTML = originalStates[id]; });
+            const btn = document.getElementById(btnId); btn.disabled = false; btn.innerText = btnText || "▶ 开始模拟操作";
+        }
+
+        // ================= 功能 1-11 具体实现 =================
+
+        // 1. AI 自由对话 (新增)
+        const ids1 = ['t1-p']; saveState(ids1);
+        async function runSim1() {
+            runVirtualOperation({ btnId: 'btn-1', elementsToSelect: ids1, cursorId: 'mc-1', menuId: 'menu-1', menuItemId: 'mi-1', skipHtaDisplay: true,
+                executeLogic: async () => {
+                    const inputBx = document.getElementById('hta-1-input'); inputBx.style.display = 'block'; await wait(2000);
+                    document.getElementById('btn-1-send').style.background = "#004c99"; await wait(200); document.getElementById('btn-1-send').style.background = "";
+                    inputBx.style.display = 'none';
+
+                    document.getElementById('hta-1-prog').style.display = 'block'; await wait(2500);
+                    document.getElementById('hta-1-prog').style.display = 'none';
+
+                    const resBx = document.getElementById('hta-1-result'); resBx.style.display = 'block'; await wait(2500);
+                    document.getElementById('btn-1-copy').style.background = "#004c99"; document.getElementById('btn-1-copy').innerText = "已成功拷贝！"; await wait(800);
+                    document.getElementById('btn-1-copy').style.background = ""; document.getElementById('btn-1-copy').innerText = "一键拷贝内容"; await wait(500);
+                    resBx.style.display = 'none';
+                }
+            });
+        }
+        function resetSim1() { restoreState(ids1, 'btn-1', '▶ 模拟执行：自由对话'); }
+
+        // 2. 扩写
+        const ids2 = ['t2-p2']; saveState(ids2);
+        function runSim2() {
+            runVirtualOperation({ btnId: 'btn-2', elementsToSelect: ids2, cursorId: 'mc-2', menuId: 'menu-2', menuItemId: 'mi-2', htaId: 'hta-2',
+                executeLogic: () => { document.getElementById('t2-p2').innerHTML = `<span class="track-del">一次性使用陡脉冲扩张消融导管操作便捷，能有效降低手术风险。</span><br><br><span class="track-ins">一次性使用陡脉冲扩张消融导管在设计上充分遵循了极简人体工学原则，不仅确保了临床术中操作流程的顺畅与便捷，更内置了防过载保护及温度实时监测双重安全机制，在多项严苛临床测试中均被证实能极大地降低热损伤及穿孔等潜在手术并发症风险。</span>`; }
+            });
+        }
+        function resetSim2() { restoreState(ids2, 'btn-2', '▶ 模拟执行：扩写段落'); }
+
+        // 3. 缩写
+        const ids3 = ['t3-p']; saveState(ids3);
+        function runSim3() {
+            runVirtualOperation({ btnId: 'btn-3', elementsToSelect: ids3, cursorId: 'mc-3', menuId: 'menu-3', menuItemId: 'mi-3', htaId: 'hta-3',
+                executeLogic: () => { document.getElementById('t3-p').innerHTML = `<span class="track-del">为了确保医疗设备...极高品质表现。</span><br><br><span class="track-ins">该高频电刀经伽奈维质量中心三年严苛测试，在各种极端临床环境下均无漏电、短路或功率衰减风险，品质高度可靠。</span>`; }
+            });
+        }
+        function resetSim3() { restoreState(ids3, 'btn-3', '▶ 模拟执行：缩写'); }
+
+        // 4. 润色
+        const ids4 = ['t4-p']; saveState(ids4);
+        function runSim4() {
+            runVirtualOperation({ btnId: 'btn-4', elementsToSelect: ids4, cursorId: 'mc-4', menuId: 'menu-4', menuItemId: 'mi-4', htaId: 'hta-4',
+                executeLogic: () => { document.getElementById('t4-p').innerHTML = `<span class="track-del">医生在做完手术后，需要按一下手柄上面的那个红色开关，然后机器里面就会自动喷出水来，把导管里面残留的那些血块和脏东西都给冲洗干净，防止下次用的时候堵住。</span><br><br><span class="track-ins">术后，操作者需按下手柄上的红色冲洗控制键，设备将自动启动高压水流灌注程序，对导管内腔进行深度清洁，有效清除残留血凝块及组织碎屑，严防管路阻塞。</span>`; }
+            });
+        }
+        function resetSim4() { restoreState(ids4, 'btn-4', '▶ 模拟执行：专业润色'); }
+
+        // 5. 文本翻译
+        const ids5 = ['t5-p2']; saveState(ids5);
+        async function runSim5() {
+            runVirtualOperation({ btnId: 'btn-5', elementsToSelect: ids5, cursorId: 'mc-5', menuId: 'menu-5', menuItemId: 'mi-5', skipHtaDisplay: true,
+                executeLogic: async () => {
+                    const langBox = document.getElementById('hta-5-lang'); langBox.style.display = 'block'; await wait(800);
+                    document.getElementById('sim-5-select').value = "中文"; document.getElementById('sim-5-select').style.background = "#e6f7ff"; await wait(800);
+                    document.getElementById('btn-5-ok').style.background = "#004c99"; await wait(200); document.getElementById('btn-5-ok').style.background = ""; langBox.style.display = 'none';
+
+                    document.getElementById('t5-p2').classList.add('hl-yellow'); document.getElementById('hta-5-prog').style.display = 'block'; await wait(2000);
+                    document.getElementById('hta-5-prog').style.display = 'none'; document.getElementById('t5-p2').classList.remove('hl-yellow');
+
+                    document.getElementById('t5-p2').innerHTML = `<span class="track-del">The pulsed field ablation system is contraindicated for use in patients with active systemic infections, severe coagulation disorders, or implanted cardiac pacemakers...</span><br><br><span class="track-ins">脉冲电场消融系统禁用于患有活动性全身感染、严重凝血功能障碍或已植入心脏起搏器的患者。此外，该设备在孕妇群体中的安全性和有效性尚未得到证实。</span>`; 
+                }
+            });
+        }
+        function resetSim5() { document.getElementById('sim-5-select').value = ""; document.getElementById('sim-5-select').style.background = ""; restoreState(ids5, 'btn-5', '▶ 模拟执行：带语言选择的翻译'); }
+
+        // 6. 表格翻译
+        const ids6 = ['t6-tbl']; const ids6c = ['t6-c1','t6-c2','t6-c3','t6-c4','t6-c5','t6-c6','t6-c7']; saveState(ids6c);
+        async function runSim6() {
+            runVirtualOperation({ btnId: 'btn-6', elementsToSelect: ids6, cursorId: 'mc-6', menuId: 'menu-6', menuItemId: 'mi-6', skipHtaDisplay: true,
+                executeLogic: async () => {
+                    const langBox = document.getElementById('hta-6-lang'); langBox.style.display = 'block'; await wait(800);
+                    document.getElementById('sim-6-select').value = "英语"; document.getElementById('sim-6-select').style.background = "#e6f7ff"; await wait(800);
+                    document.getElementById('btn-6-ok').style.background = "#004c99"; await wait(200); document.getElementById('btn-6-ok').style.background = ""; langBox.style.display = 'none';
+
+                    document.getElementById('t6-tbl').classList.add('hl-yellow'); document.getElementById('hta-6-prog').style.display = 'block';
+                    document.getElementById('msg-6').innerText = "正在分离表格 [SEP] 单元格..."; await wait(1200);
+                    document.getElementById('msg-6').innerText = "正在进行专业医疗英语互译..."; await wait(1200);
+                    document.getElementById('msg-6').innerText = "正在回填重构表格矩阵..."; await wait(1200);
+                    document.getElementById('hta-6-prog').style.display = 'none'; document.getElementById('t6-tbl').classList.remove('hl-yellow');
+
+                    const nt = ['Bill of Materials (BOM)', 'Component Name', 'Material & Spec', 'Needle Sheath', '304 Medical Steel (Kink-resistant)', 'Insulation Coating', 'PTFE (Voltage > 5000V)'];
+                    ids6c.forEach((id, i) => { const old = document.getElementById(id).innerText; document.getElementById(id).innerHTML = `<span class="track-del" style="font-size:12px;">${old}</span><br><span class="track-ins">${nt[i]}</span>`; });
+                }
+            });
+        }
+        function resetSim6() { document.getElementById('sim-6-select').value = ""; document.getElementById('sim-6-select').style.background = ""; restoreState(ids6c, 'btn-6', '▶ 模拟执行：翻译表格'); }
+
+        // 7. 表格图片
+        const ids7 = ['t7-td1','t7-td2','t7-td3'];
+        async function runSim7() {
+            const btn = document.getElementById('btn-7'); btn.disabled = true;
+            const cursor = document.getElementById('mc-7'), mi = document.getElementById('mi-7');
+            cursor.style.display = 'block'; 
+            const parRect = document.getElementById('t7-tbl').parentElement.getBoundingClientRect();
+            const miRect = mi.getBoundingClientRect();
+            cursor.style.top = '150px'; cursor.style.left = '50%'; await wait(400);
+            cursor.style.top = (miRect.top - parRect.top + 10) + 'px'; cursor.style.left = (miRect.left - parRect.left + 50) + 'px'; await wait(400);
+            mi.style.background = '#e1dfdd'; await wait(200); mi.style.background = 'white'; cursor.style.display = 'none';
+
+            ids7.forEach(id => document.getElementById(id).classList.add('hl-yellow')); await wait(1000);
+            document.querySelectorAll('.t7-img').forEach(img => { img.style.width = '90px'; img.style.height = '70px'; img.style.background = 'var(--primary)'; img.style.color = 'white'; img.innerText = '已对齐'; });
+            ids7.forEach(id => document.getElementById(id).classList.remove('hl-yellow')); btn.innerText = "✅ 规整完成";
+        }
+        function resetSim7() {
+            document.querySelectorAll('.t7-img')[1].style.width = '160px'; document.querySelectorAll('.t7-img')[1].style.height = '30px';
+            document.querySelectorAll('.t7-img')[2].style.width = '50px'; document.querySelectorAll('.t7-img')[2].style.height = '110px';
+            document.querySelectorAll('.t7-img').forEach((img, i) => { if(i>0){ img.style.background = '#f3f2f1'; img.style.color = '#666'; img.innerText = '畸形图'; }});
+            const btn = document.getElementById('btn-7'); btn.disabled = false; btn.innerText = "▶ 模拟执行：规整表格图片";
+        }
+
+        // 8. 散图
+        async function runSim8() {
+            const btn = document.getElementById('btn-8'); btn.disabled = true;
+            document.getElementById('t8-area').classList.add('sim-selection'); await wait(600); document.getElementById('t8-area').classList.remove('sim-selection');
+            document.querySelectorAll('.t8-img').forEach(img => img.classList.add('hl-yellow')); await wait(800);
+            document.querySelectorAll('.t8-img').forEach(img => { img.classList.remove('hl-yellow'); img.style.width = '120px'; img.style.height = '90px'; img.style.background = 'var(--primary)'; img.style.color = 'white'; img.innerText = '统一 120x90'; });
+            btn.innerText = "✅ 处理完成";
+        }
+        function resetSim8() {
+            document.querySelectorAll('.t8-img')[1].style.width = '70px'; document.querySelectorAll('.t8-img')[1].style.height = '140px';
+            document.querySelectorAll('.t8-img')[2].style.width = '200px'; document.querySelectorAll('.t8-img')[2].style.height = '60px';
+            document.querySelectorAll('.t8-img').forEach((img, i) => { if(i>0){ img.style.background = '#f3f2f1'; img.style.color = '#666'; img.innerText = '待调整'; }});
+            const btn = document.getElementById('btn-8'); btn.disabled = false; btn.innerText = "▶ 模拟执行：按下 Shift + P";
+        }
+
+        // 9. RAG 选区仿写
+        const ids9 = ['t9-p1','t9-p2','t9-p3','t9-tbl']; const ids9c = ['t9-p1','t9-p2','t9-p3','t9-c1','t9-c2','t9-c3','t9-c4','t9-c5','t9-c6']; saveState(ids9c);
+        async function runSim9() {
+            runVirtualOperation({ btnId: 'btn-9', elementsToSelect: ids9, cursorId: 'mc-9', menuId: 'menu-9', menuItemId: 'mi-9', skipHtaDisplay: true,
+                executeLogic: async () => {
+                    const inputBx = document.getElementById('hta-9-input'); inputBx.style.display = 'block'; await wait(2500); inputBx.style.display = 'none';
+                    ids9.forEach(id => { document.getElementById(id).classList.remove('sim-selection'); document.getElementById(id).classList.add('hl-yellow'); });
+                    
+                    document.getElementById('hta-9-prog').style.display = 'block'; const msg = document.getElementById('msg-9');
+                    msg.innerText = "【库匹配成功】正在重写标题段落..."; await wait(1500);
+                    document.getElementById('t9-p1').classList.remove('hl-yellow'); document.getElementById('t9-p1').innerHTML = `<span class="track-ins">【产品名称】一次性使用陡脉冲扩张消融导管</span>`;
+
+                    msg.innerText = "正在提取适用范围特征参数..."; await wait(1500);
+                    document.getElementById('t9-p2').classList.remove('hl-yellow'); document.getElementById('t9-p2').innerHTML = `<span class="track-ins">【适用范围】本产品在医疗机构中，与本公司生产的陡脉冲治疗设备配合使用，用于消化道肿瘤的消融治疗。</span>`;
+
+                    msg.innerText = "进入表格矩阵深度分离与映射..."; await wait(1200); document.getElementById('t9-p3').classList.remove('hl-yellow');
+                    msg.innerText = "正在填充表格参数..."; await wait(1800);
+                    document.getElementById('t9-tbl').classList.remove('hl-yellow');
+                    
+                    const nt = ['产品型号','电场强度','脉冲宽度','PEF-2024A','20-40 kV/cm','100-900 ns'];
+                    ['t9-c1','t9-c2','t9-c3','t9-c4','t9-c5','t9-c6'].forEach((id, i) => { document.getElementById(id).innerHTML = `<span class="track-ins">${nt[i]}</span>`; });
+
+                    document.getElementById('hta-9-prog').style.display = 'none';
+                }
+            });
+        }
+        function resetSim9() { restoreState(ids9c, 'btn-9', '▶ 模拟执行：零输入智能套表'); }
+
+        // 10. 全文挂机撰写
+        const ids10 = ['t10-p1','t10-p2','t10-p3']; saveState(ids10);
+        async function runSim10() {
+            const btn = document.getElementById('btn-10'); btn.disabled = true;
+            
+            const cursor = document.getElementById('mc-10'), menu = document.getElementById('menu-10');
+            const parRect = document.getElementById('t10-p1').parentElement.getBoundingClientRect();
+            cursor.style.display = 'block'; cursor.style.top = '30px'; cursor.style.left = '30%'; await wait(400);
+            menu.style.display = 'block'; menu.style.top = '40px'; menu.style.left = '35%'; await wait(600);
+            cursor.style.top = '70px'; cursor.style.left = '40%'; document.getElementById('mi-10').classList.add('sim-hover'); await wait(500);
+            menu.style.display = 'none'; cursor.style.display = 'none'; document.getElementById('mi-10').classList.remove('sim-hover');
+
+            const inputBox = document.getElementById('hta-10-input'); inputBox.style.display = 'block'; await wait(800);
+
+            const textArea = document.getElementById('sim-10-textarea');
+            const textToType = "产品：一次性使用陡脉冲消融导管。适应症：消化道肿瘤。";
+            for(let i=0; i<=textToType.length; i++) { textArea.value = textToType.substring(0, i); await wait(50); }
+            await wait(600);
+            
+            document.getElementById('btn-10-ok').style.background = "#004c99"; await wait(200); document.getElementById('btn-10-ok').style.background = ""; inputBox.style.display = 'none';
+
+            document.getElementById('hta-10-prog').style.display = 'block'; const msg = document.getElementById('msg-10');
+            ids10.forEach(id => document.getElementById(id).classList.add('hl-yellow'));
+
+            const newContents = [
+                `<span class="track-ins"><b>1. 概述</b>：一次性使用陡脉冲扩张消融导管利用不可逆电穿孔技术，针对消化道肿瘤进行精准消融，无热损伤效应。</span>`,
+                `<span class="track-ins"><b>2. 警告及禁忌</b>：严禁在具有活动性全身感染或严重凝血功能障碍的消化道肿瘤患者中使用本消融导管。</span>`,
+                `<span class="track-ins"><b>3. 操作说明</b>：在影像学引导下将消融导管送达消化道肿瘤靶区，设定高压脉冲参数后启动消融程序。</span>`
+            ];
+
+            for(let i=0; i<ids10.length; i++) {
+                msg.innerText = `根据输入的【陡脉冲】特征重写中：第 ${i+1} / 3 段...`; await wait(1800);
+                document.getElementById(ids10[i]).classList.remove('hl-yellow');
+                document.getElementById(ids10[i]).innerHTML = `<span class="track-del" style="font-size:12px;">${originalStates[ids10[i]]}</span><br>${newContents[i]}`;
+            }
+            document.getElementById('hta-10-prog').style.display = 'none'; btn.innerText = "✅ 全文深度重撰完毕";
+        }
+        function resetSim10() { document.getElementById('sim-10-textarea').value = ""; restoreState(ids10, 'btn-10', '▶ 模拟执行：输入参数全文重撰'); }
+
+        // 11. 绑定知识库
+        async function runSim11() {
+            const btn = document.getElementById('btn-11'); btn.disabled = true;
+            const cursor = document.getElementById('mc-11'), menu = document.getElementById('menu-11');
+            cursor.style.display = 'block'; cursor.style.top = '100px'; cursor.style.left = '30%'; await wait(400);
+            menu.style.display = 'block'; menu.style.top = '110px'; menu.style.left = '35%'; await wait(600);
+            cursor.style.top = '165px'; cursor.style.left = '40%'; document.getElementById('mi-11').classList.add('sim-hover'); await wait(500);
+            menu.style.display = 'none'; cursor.style.display = 'none'; document.getElementById('mi-11').classList.remove('sim-hover');
+
+            document.getElementById('hta-11').style.display = 'block';
+            document.getElementById('btn-11-ok').onclick = async () => {
+                document.getElementById('btn-11-ok').innerText = "写入配置中..."; await wait(800);
+                document.getElementById('hta-11').style.display = 'none'; document.getElementById('btn-11-ok').innerText = "写入本地配置";
+                document.getElementById('msgbox-11').style.display = 'block';
+            }
+            document.querySelector('#msgbox-11 .btn').onclick = () => {
+                document.getElementById('msgbox-11').style.display = 'none'; btn.innerText = "✅ 挂载成功";
+                setTimeout(() => { btn.disabled = false; btn.innerText = "▶ 模拟执行：挂载知识库"; }, 2000);
+            }
+        }
+        function resetSim11() {}
+
+    </script>
+</body>
+</html>

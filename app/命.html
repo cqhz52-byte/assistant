@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>✨ 星轨契合度 | 八字全景开运局 V6.0</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#ff6b6b', secondary: '#4ecdc4', accent: '#ffe66d', dark: '#2d3436' },
+                    boxShadow: { 'soft': '0 15px 35px -5px rgba(255, 107, 107, 0.15)' }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
+    
+    <style>
+        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #fff0f0 0%, #f0f8ff 50%, #fff9e6 100%); background-attachment: fixed; color: #2d3436; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: #ffb8b8; border-radius: 10px; }
+
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 2px solid #fff; box-shadow: 0 15px 35px -5px rgba(255, 107, 107, 0.1), inset 0 0 0 1px rgba(255,255,255,0.5); border-radius: 28px; transition: transform 0.3s ease; }
+        .select-pop { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 16px; padding: 12px 10px; font-weight: 600; color: #495057; transition: all 0.3s ease; }
+        .select-pop:focus { outline: none; border-color: #ff6b6b; box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.15); background-color: #fff; }
+        optgroup { font-weight: 900; color: #ff6b6b; font-style: normal; }
+
+        .bazi-pillar { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid #f1f2f6; border-radius: 16px; padding: 16px 12px; width: 70px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); position: relative;}
+        .bazi-gan { font-size: 1.8rem; font-weight: 900; color: #ff6b6b; margin-bottom: 4px; }
+        .bazi-zhi { font-size: 1.8rem; font-weight: 900; color: #2d3436; }
+        .bazi-label { font-size: 0.75rem; color: #a4b0be; margin-top: 10px; font-weight: bold; }
+        .bazi-highlight { border: 2px solid #ff6b6b; background: #fff5f5; transform: scale(1.05); z-index: 10;} 
+
+        .totem-icon { width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: white; border: 4px solid rgba(255,255,255,0.9); animation: float 3s ease-in-out infinite; transition: transform 0.3s; }
+        .totem-icon:hover { transform: scale(1.1) rotate(5deg); animation-play-state: paused; }
+        .t-jin { background: linear-gradient(135deg, #feca57, #ff9f43); box-shadow: 0 0 30px rgba(254, 202, 87, 0.6); } .t-mu { background: linear-gradient(135deg, #1dd1a1, #10ac84); box-shadow: 0 0 30px rgba(29, 209, 161, 0.6); } .t-shui { background: linear-gradient(135deg, #48dbfb, #0abde3); box-shadow: 0 0 30px rgba(72, 219, 251, 0.6); } .t-huo { background: linear-gradient(135deg, #ff6b6b, #ee5253); box-shadow: 0 0 30px rgba(255, 107, 107, 0.6); } .t-tu { background: linear-gradient(135deg, #c8d6e5, #8395a7); box-shadow: 0 0 30px rgba(200, 214, 229, 0.6); }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+
+        .ai-gradient-bg { background: linear-gradient(135deg, #ac57ff, #ff6b6b); }
+        .ai-gradient-text { background: linear-gradient(to right, #ac57ff, #ff6b6b); -webkit-background-clip: text; color: transparent; }
+        
+        .bounce-loader { display: flex; gap: 8px; justify-content: center; }
+        .bounce-loader div { width: 12px; height: 12px; border-radius: 50%; animation: bounce 0.6s infinite alternate; }
+        .bounce-loader div:nth-child(1) { background: #ac57ff; } .bounce-loader div:nth-child(2) { background: #ff6b6b; animation-delay: 0.2s; } .bounce-loader div:nth-child(3) { background: #ffe66d; animation-delay: 0.4s; }
+        @keyframes bounce { to { transform: translateY(-10px); } }
+
+        .pdf-page-break { page-break-inside: avoid; }
+        .ai-rich-text p { margin-bottom: 1rem; line-height: 1.8; }
+        .ai-rich-text h3, .ai-rich-text h4 { font-weight: 900; color: #ac57ff; margin-top: 1.5rem; margin-bottom: 0.5rem;}
+        .ai-rich-text ul { list-style-type: none; padding-left: 0; }
+        .ai-rich-text li { position: relative; padding-left: 1.5em; margin-bottom: 0.5rem; }
+        .ai-rich-text li::before { content: "✨"; position: absolute; left: 0; font-size: 0.8em; top: 0.2em; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <nav class="w-full max-w-4xl flex justify-between items-center mb-6 px-2">
+        <h1 class="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary tracking-wide">
+            ✨时空司命<span class="text-xs text-gray-400 ml-2">V6.0 全景版</span>
+        </h1>
+        <button id="settingsBtn" class="bg-white/80 p-2 md:px-4 md:py-2 rounded-full shadow-sm hover:shadow-md transition-all text-gray-500 hover:text-primary font-bold text-sm">
+            ⚙️ <span class="hidden md:inline">引擎设置</span>
+        </button>
+    </nav>
+
+    <div class="w-full max-w-4xl space-y-6">
+        
+        <div class="glass-card p-6 md:p-8 relative">
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-500 mb-2">🔮 选择测算方向</label>
+                <select id="analysis-type" class="w-full select-pop text-lg bg-white">
+                    <option value="career">🚀 个人八字精批 (排盘/事业/全方位开运)</option>
+                    <option value="marriage" selected>💕 双人八字合婚 (需双方生辰)</option>
+                </select>
+            </div>
+
+            <template id="provinces-template">
+                <optgroup label="▶ 华北 (水/土)"><option value="北京">📍北京</option><option value="天津">📍天津</option><option value="河北">📍河北</option><option value="山西">📍山西</option><option value="内蒙古">📍内蒙古</option></optgroup>
+                <optgroup label="▶ 东北 (水/木)"><option value="辽宁">📍辽宁</option><option value="吉林">📍吉林</option><option value="黑龙江">📍黑龙江</option></optgroup>
+                <optgroup label="▶ 华东 (木)"><option value="上海" selected>📍上海</option><option value="江苏">📍江苏</option><option value="浙江">📍浙江</option><option value="安徽">📍安徽</option><option value="福建">📍福建</option><option value="江西">📍江西</option><option value="山东">📍山东</option></optgroup>
+                <optgroup label="▶ 华中 (土/火)"><option value="河南">📍河南</option><option value="湖北">📍湖北</option><option value="湖南">📍湖南</option></optgroup>
+                <optgroup label="▶ 华南 (火)"><option value="广东">📍广东</option><option value="广西">📍广西</option><option value="海南">📍海南</option></optgroup>
+                <optgroup label="▶ 西南 (金/木)"><option value="重庆">📍重庆</option><option value="四川">📍四川</option><option value="贵州">📍贵州</option><option value="云南">📍云南</option><option value="西藏">📍西藏</option></optgroup>
+                <optgroup label="▶ 西北 (金/土)"><option value="陕西">📍陕西</option><option value="甘肃">📍甘肃</option><option value="青海">📍青海</option><option value="宁夏">📍宁夏</option><option value="新疆">📍新疆</option></optgroup>
+            </template>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/50 p-4 md:p-6 rounded-3xl border border-gray-100">
+                <div class="space-y-4">
+                    <h3 class="font-black text-primary flex items-center gap-2"><span>👱‍♂️</span> 命主信息</h3>
+                    <div class="flex gap-2">
+                        <select id="gender-a" class="select-pop w-1/3"><option value="男">男</option><option value="女">女</option></select>
+                        <select id="city-a" class="select-pop w-2/3 text-sm"></select>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="date" id="date-a" class="select-pop w-3/5" value="1996-08-15">
+                        <select id="time-a" class="select-pop w-2/5 text-sm">
+                            <option value="子时">子时</option><option value="丑时">丑时</option><option value="寅时">寅时</option><option value="卯时">卯时</option><option value="辰时" selected>辰时</option><option value="巳时">巳时</option><option value="午时">午时</option><option value="未时">未时</option><option value="申时">申时</option><option value="酉时">酉时</option><option value="戌时">戌时</option><option value="亥时">亥时</option><option value="未知">不详</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="partner-section" class="space-y-4">
+                    <h3 class="font-black text-secondary flex items-center gap-2"><span>👩</span> 伴侣信息</h3>
+                    <div class="flex gap-2">
+                        <select id="gender-b" class="select-pop w-1/3"><option value="女">女</option><option value="男">男</option></select>
+                        <select id="city-b" class="select-pop w-2/3 text-sm"></select>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="date" id="date-b" class="select-pop w-3/5" value="1998-04-20">
+                        <select id="time-b" class="select-pop w-2/5 text-sm">
+                            <option value="子时">子时</option><option value="丑时">丑时</option><option value="寅时">寅时</option><option value="卯时">卯时</option><option value="辰时">辰时</option><option value="巳时">巳时</option><option value="午时">午时</option><option value="未时">未时</option><option value="申时">申时</option><option value="酉时" selected>酉时</option><option value="戌时">戌时</option><option value="亥时">亥时</option><option value="未知">不详</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button id="generate-basic-btn" class="mt-8 w-full bg-gradient-to-r from-primary to-orange-400 hover:from-primary hover:to-pink-500 text-white font-black text-lg py-4 rounded-2xl shadow-soft transition-all active:scale-95">
+                ☯️ 生成排盘与全方位开运指南
+            </button>
+        </div>
+
+        <div id="action-bar" class="hidden w-full flex justify-end px-2">
+            <button id="export-pdf-btn" class="flex items-center gap-2 text-sm font-bold text-primary bg-white border-2 border-primary/20 hover:border-primary px-5 py-2.5 rounded-xl transition-all shadow-sm">
+                🖨️ 保存/打印 PDF 报告
+            </button>
+        </div>
+
+        <div id="report-container" class="hidden space-y-6 pb-20">
+            
+            <div class="glass-card p-6 md:p-10 relative overflow-hidden bg-white/80">
+                <div class="absolute top-4 left-6 text-sm font-black text-gray-400 tracking-widest uppercase">☯️ 先天四柱排盘</div>
+                <div id="bazi-container" class="mt-10 w-full flex flex-col md:flex-row gap-8 md:gap-12 justify-center items-center"></div>
+            </div>
+
+            <div class="glass-card p-6 md:p-8 border-2 border-orange-50 bg-orange-50/30 pdf-page-break">
+                <h3 class="text-xl font-black text-orange-600 tracking-widest mb-2 flex items-center gap-2"><span>🧭</span> 专属全景开运罗盘</h3>
+                <p id="advice-subtitle" class="text-sm text-gray-500 mb-6 font-bold"></p>
+                <div id="all-around-advice-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+            </div>
+
+            <div class="glass-card p-6 md:p-8 border-2 border-blue-50 bg-blue-50/20 pdf-page-break">
+                <h3 class="text-lg font-black text-blue-600 tracking-widest mb-6 flex items-center gap-2"><span>🎯</span> 命局三宫核心</h3>
+                <div id="bazi-advice-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6 flex flex-col items-center pdf-page-break">
+                    <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest w-full text-left" id="score-title">五行平衡度</h3>
+                    <div id="gaugeChart" class="w-full h-56 -mt-4"></div>
+                    <p id="gauge-desc" class="text-primary font-black text-lg text-center mt-2 bg-red-50 px-4 py-1 rounded-full"></p>
+                </div>
+                <div class="glass-card p-6 flex-1 pdf-page-break">
+                    <h3 class="text-sm font-black text-gray-400 tracking-widest mb-4">💬 命理综合断言</h3>
+                    <div id="basic-summary" class="text-gray-700 text-sm leading-relaxed font-medium bg-gray-50/50 p-4 rounded-2xl border border-gray-100 h-full"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6 pdf-page-break"><h3 class="text-sm font-black text-gray-400 mb-2">📊 能量分布槽</h3><div id="barChart" class="w-full h-64"></div></div>
+                <div class="glass-card p-6 pdf-page-break"><h3 class="text-sm font-black text-gray-400 mb-2">🌌 命局属性雷达</h3><div id="radarChart" class="w-full h-64"></div></div>
+            </div>
+
+            <div class="glass-card p-8 text-center border-4 border-purple-100 relative mt-8 print:hidden">
+                <h3 class="text-2xl font-black ai-gradient-text mb-2">需要针对性的流年运程指导？</h3>
+                <p class="text-gray-500 font-bold mb-6">召唤 AI 命理师，根据您的完整八字，为您生成千字精准流年解盘！</p>
+                <button id="unlock-ai-btn" class="ai-gradient-bg text-white font-black text-lg py-4 px-10 rounded-full transition-all hover:scale-105 active:scale-95 mx-auto">
+                    🔮 召唤 AI 大师深度解盘
+                </button>
+                <div id="ai-loading" class="hidden flex-col items-center mt-6">
+                    <div class="bounce-loader mb-2"><div></div><div></div><div></div></div>
+                    <span class="text-purple-500 font-bold text-sm">AI 正在深度推演星轨，请稍候...</span>
+                </div>
+                <div id="ai-result-box" class="hidden mt-8 text-left bg-purple-50/50 p-6 rounded-2xl border border-purple-200">
+                    <div id="ai-content" class="ai-rich-text text-gray-800 text-sm font-medium leading-loose"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="fixed inset-0 bg-dark/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl max-w-sm w-full shadow-2xl relative">
+            <button class="close-modal absolute top-4 right-5 text-gray-400 hover:text-primary text-3xl font-black">&times;</button>
+            <h2 class="text-xl font-black text-dark mb-4">⚙️ AI 引擎设置</h2>
+            <input type="password" id="apiKey" placeholder="DeepSeek API Key (sk-...)" class="w-full select-pop text-sm mb-4">
+            <button id="saveKeyBtn" class="w-full bg-primary text-white py-3 rounded-xl font-black">💾 保存</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('city-a').innerHTML = document.getElementById('provinces-template').innerHTML;
+        document.getElementById('city-b').innerHTML = document.getElementById('provinces-template').innerHTML;
+
+        const modal = document.getElementById("myModal");
+        if(localStorage.getItem('deepseek_api_key')) document.getElementById("apiKey").value = localStorage.getItem('deepseek_api_key');
+        document.getElementById("settingsBtn").onclick = () => modal.classList.remove("hidden");
+        document.querySelector(".close-modal").onclick = () => modal.classList.add("hidden");
+        document.getElementById("saveKeyBtn").onclick = () => {
+            localStorage.setItem('deepseek_api_key', document.getElementById("apiKey").value.trim());
+            modal.classList.add("hidden"); alert("API Key 已保存");
+        };
+
+        const typeSelect = document.getElementById('analysis-type');
+        typeSelect.addEventListener('change', (e) => { document.getElementById('partner-section').style.display = e.target.value === 'marriage' ? 'block' : 'none'; });
+
+        let gaugeChart, radarChart, barChart;
+        function initCharts() {
+            if(!gaugeChart) gaugeChart = echarts.init(document.getElementById('gaugeChart'));
+            if(!radarChart) radarChart = echarts.init(document.getElementById('radarChart'));
+            if(!barChart) barChart = echarts.init(document.getElementById('barChart'));
+        }
+
+        const geoBuff = { 
+            '北京':{el:'水',val:10}, '天津':{el:'水',val:10}, '河北':{el:'水',val:10}, '山西':{el:'土',val:15}, '内蒙古':{el:'土',val:15},
+            '辽宁':{el:'水',val:15}, '吉林':{el:'水',val:15}, '黑龙江':{el:'水',val:20},
+            '上海':{el:'木',val:15}, '江苏':{el:'木',val:15}, '浙江':{el:'木',val:15}, '安徽':{el:'木',val:10}, '福建':{el:'木',val:15}, '江西':{el:'木',val:10}, '山东':{el:'木',val:10}, '台湾':{el:'木',val:15},
+            '河南':{el:'土',val:20}, '湖北':{el:'土',val:15}, '湖南':{el:'火',val:10},
+            '广东':{el:'火',val:20}, '广西':{el:'火',val:15}, '海南':{el:'火',val:20}, '香港':{el:'火',val:20}, '澳门':{el:'火',val:20},
+            '重庆':{el:'火',val:10}, '四川':{el:'木',val:10}, '贵州':{el:'金',val:10}, '云南':{el:'木',val:10}, '西藏':{el:'金',val:20},
+            '陕西':{el:'土',val:15}, '甘肃':{el:'金',val:15}, '青海':{el:'金',val:15}, '宁夏':{el:'金',val:15}, '新疆':{el:'金',val:20},
+            '其他':{el:'无',val:0} 
+        };
+
+        const baziDict = {
+            gan: {
+                '甲': '参天大树，具备极强的领导力与开拓精神，不屈不挠，适合管理、创业、政企机构。',
+                '乙': '柔韧藤蔓，适应力极强，人际交往能力出色，适合公关、艺术、教育、外交。',
+                '丙': '太阳之火，热情奔放，充满感染力，适合演艺、传媒、新能源、公众人物。',
+                '丁': '星光烛火，心思细腻，极具洞察力，适合研究、心理学、精密科技、幕后策划。',
+                '戊': '泰山之土，沉稳包容，信用极佳，适合房地产、金融、大企业高管。',
+                '己': '田园之土，滋养万物，踏实稳重，适合行政、后勤、农业、咨询服务。',
+                '庚': '刀剑之金，杀伐果断，执行力极强，适合军警、法律、机械制造、外科医疗。',
+                '辛': '首饰之金，追求完美，气质高雅，适合珠宝、奢侈品、高端设计。',
+                '壬': '江河之水，奔流不息，聪明机智，适合互联网、物流、国际贸易、旅游。',
+                '癸': '雨露之水，润物细无声，极具同理心，适合服务业、艺术创作、教育。'
+            },
+            zhi: {
+                '子': '夫妻宫坐桃花。伴侣通常颜值较高，聪明幽默，异性缘好。',
+                '丑': '夫妻宫坐库。伴侣踏实顾家，较为节俭，感情细水长流。',
+                '寅': '夫妻宫坐驿马。伴侣可能有外地背景或事业心重，感情充满活力。',
+                '卯': '夫妻宫坐桃花。伴侣温柔体贴，心思细腻，注重浪漫与仪式感。',
+                '辰': '夫妻宫坐水库。伴侣包容力强，能力出众，能实质性助你事业。',
+                '巳': '夫妻宫坐驿马。伴侣热情主动，做事干练，脾气可能稍急。',
+                '午': '夫妻宫坐桃花。伴侣阳光开朗，注重仪表，人缘极好。',
+                '未': '夫妻宫坐木库。伴侣性格温和，内心倔强，家庭观念极重。',
+                '申': '夫妻宫坐驿马。伴侣执行力强，聪明果断，在感情中较为主动。',
+                '酉': '夫妻宫坐桃花。伴侣气质清秀，追求完美，可能对生活品质略微挑剔。',
+                '戌': '夫妻宫坐火库。伴侣忠诚可靠，有责任心，保护欲强。',
+                '亥': '夫妻宫坐驿马。伴侣随和包容，善解人意，可能异性缘较好。'
+            }
+        };
+
+        const travelDict = {
+            '金': '西方为大吉。宜前往成都、欧洲等偏西方向。城市气质要求现代、金融、规则明确。',
+            '木': '东方为大吉。宜前往江浙沪、日韩等偏东方向。城市气质要求生机勃勃、文化气息重。',
+            '水': '北方为大吉。宜前往北京、俄罗斯等偏北方向。利于思维开拓、贸易流通与休养生息。',
+            '火': '南方为大吉。宜前往广深、东南亚等偏南方向。利于名气提升、激情碰撞与创造。',
+            '土': '中原及本地为大吉。宜留在家乡或前往武汉、西安等内陆核心枢纽城市。求稳为上。'
+        };
+
+        // 🌟 扩充版：全方位开运指南字典 (衣食住行言婚事友)
+        const allAroundAdvice = {
+            '金': {
+                '衣': '多穿白色、金色、银色系衣物。款式宜挺括、利落、有质感，可多佩戴金属质感的饰品或高档腕表。',
+                '食': '宜多食白萝卜、银耳、雪梨等白色润肺食物，口味可适当偏辛辣（如葱姜蒜）以激发气机。',
+                '住': '居家宜坐西朝东，装修风格宜现代极简、冷色调，多用金属、玻璃材质，保持室内整洁无杂物。',
+                '行': '出行利西方。自驾、乘坐高铁为佳，常去繁华都市的CBD或现代化建筑区域走动能吸收好运。',
+                '言': '言辞须果断、掷地有声，重承诺、守契约。切忌优柔寡断或过于毒舌伤人。',
+                '婚': '感情中需明确边界与底线，适合寻找有契约精神、能力互补的伴侣，切忌在消耗型关系中纠缠。',
+                '事': '利于金融、法律、军警、机械制造、企业管理等属性强硬、讲究规则与执行力的行业。',
+                '友': '多结交厚重稳健（土）或聪明灵活（水）的朋友。土能生金，水能洗金，皆为您生命中的贵人。'
+            },
+            '木': {
+                '衣': '多穿青色、绿色、翠色系衣物。材质以纯棉、亚麻为佳，带有花草、树木图案的服饰能大幅提升磁场。',
+                '食': '宜多食绿叶蔬菜、绿豆、猕猴桃等，口味可适度带酸，以养肝护胆，保持生机。',
+                '住': '居家宜坐东朝西，装修多用原木材质，阳台或客厅务必多摆放绿植盆栽，靠近公园或林区最佳。',
+                '行': '出行利东方。宜多散步、骑行，假期多去森林、植物园、大自然中踏青采气。',
+                '言': '言辞宜温和、鼓励、充满生机。多夸赞他人，切忌固执己见或钻牛角尖。',
+                '婚': '适合寻找愿意与你共同成长、互相滋养的伴侣，注重灵魂的契合与情绪价值的提供。',
+                '事': '利于教育培训、文化出版、医疗养生、设计策划、园林环保等充满生机与创造力的行业。',
+                '友': '多结交智慧灵动（水）或热情积极（火）的朋友。水能生木，火能泄木之秀，是您的良师益友。'
+            },
+            '水': {
+                '衣': '多穿黑色、深蓝色、灰色系衣物。款式宜宽松、飘逸、带有波浪纹理，材质以丝绸、雪纺为佳。',
+                '食': '宜多食海鲜、黑豆、黑芝麻、木耳等黑色食物，口味可适度偏咸，以滋养肾气。',
+                '住': '居家宜坐北朝南，装修宜采用流水线条、流线型家具，临江、临湖、临海而居最能催旺运势。',
+                '行': '出行利北方。适合乘船、游轮，旅游多选择海岛、湖泊、水乡等有水的地方。',
+                '言': '言辞宜圆融、灵活、善于倾听。以柔克刚，切忌背后过度算计或言语阴沉。',
+                '婚': '感情中追求心灵的深度交融与自由度。适合寻找包容力强、能理解你百变想法的伴侣。',
+                '事': '利于互联网、物流贸易、旅游、传媒、酒水餐饮等流动性强、需要极高智慧与灵活度的行业。',
+                '友': '多结交决断力强（金）或生机勃勃（木）的朋友。金能生水，木能引水，助你开拓格局。'
+            },
+            '火': {
+                '衣': '多穿红色、紫色、粉色、橙色系衣物。款式宜时尚、前卫、吸睛，不可过于沉闷暗淡。',
+                '食': '宜多食红豆、番茄、红枣等红色食物，可适度饮用咖啡、茶（苦味入心），养护心血管。',
+                '住': '居家宜坐南朝北，采光必须充足，阳光明媚。家里多用暖色调灯光，靠近繁华商圈为佳。',
+                '行': '出行利南方。适合乘坐飞机，旅游宜选择阳光热烈、气候温暖的南方城市或热带海岛。',
+                '言': '言辞宜热情、极具感染力、正能量。切忌口无遮拦、脾气暴躁引发口舌之争。',
+                '婚': '感情需要高温与激情，讨厌冷暴力。适合寻找能与你热烈回应、真诚坦率的伴侣。',
+                '事': '利于科技电子、新能源、餐饮、演艺娱乐、美容美妆等热情奔放、发光发热的行业。',
+                '友': '多结交温柔包容（木）或沉稳踏实（土）的朋友。木能生火，土能聚火，为你提供持续的能量后盾。'
+            },
+            '土': {
+                '衣': '多穿黄色、咖色、棕色、卡其色系衣物。款式宜经典、舒适、大方，不追求浮夸，注重实用。',
+                '食': '宜多食土豆、山药、南瓜等根茎类食物，口味可偏甜，以调理脾胃，厚实气血。',
+                '住': '居家宜居中正之位，户型务必方正。多采用陶瓷、石材、大理石装饰，接地气的老城区或低楼层较好。',
+                '行': '出行利本地或中原地区。适合徒步、登山、房车旅行，多接触名山大川以吸取地气。',
+                '言': '言辞宜诚恳、实在、一诺千金。切忌过于木讷固执，或因反应慢而错失良机。',
+                '婚': '婚姻是你人生的基石，极为看重忠诚与稳定。适合寻找顾家、踏实、能共同积累财富的伴侣。',
+                '事': '利于房地产、农业、建筑工程、传统实体店、仓储等厚重、稳定、注重承载与积累的行业。',
+                '友': '多结交热情积极（火）或果断坚韧（金）的朋友。火能生土，金能疏导，让你不再沉闷。'
+            }
+        };
+
+        function getHour(zhiStr) {
+            const zhiMap = { '子时':0,'丑时':2,'寅时':4,'卯时':6,'辰时':8,'巳时':10,'午时':12,'未时':14,'申时':16,'酉时':18,'戌时':20,'亥时':22,'未知':12 };
+            return zhiMap[zhiStr] || 12;
+        }
+
+        function calcBazi(dateStr, timeStr, city) {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const solar = Solar.fromYmdHms(y, m, d, getHour(timeStr), 0, 0);
+            const lunar = solar.getLunar();
+            const baZi = lunar.getEightChar();
+            
+            const pillars = [
+                { gan: baZi.getYearGan(), zhi: baZi.getYearZhi(), label: '年柱 (祖业)' },
+                { gan: baZi.getMonthGan(), zhi: baZi.getMonthZhi(), label: '月柱 (父母)' },
+                { gan: baZi.getDayGan(), zhi: baZi.getDayZhi(), label: '日柱 (自身)', highlight: true },
+                { gan: baZi.getTimeGan(), zhi: baZi.getTimeZhi(), label: '时柱 (晚年)' }
+            ];
+
+            const wxStr = baZi.getYearWuXing() + baZi.getMonthWuXing() + baZi.getDayWuXing() + baZi.getTimeWuXing();
+            const elements = { '金': 0, '木': 0, '水': 0, '火': 0, '土': 0 };
+            for (let char of wxStr) { if(elements[char] !== undefined) elements[char] += 10; }
+            if (geoBuff[city] && geoBuff[city].element !== '无') elements[geoBuff[city].element] += geoBuff[city].val;
+
+            let maxWx = '土', minWx = '土', maxVal = -1, minVal = 100, missing = [];
+            for (let key in elements) {
+                if(elements[key] > maxVal) { maxVal = elements[key]; maxWx = key; }
+                if(elements[key] < minVal) { minVal = elements[key]; minWx = key; }
+                if(elements[key] === 0) missing.push(key);
+            }
+
+            const usefulGod = missing.length > 0 ? missing[0] : minWx;
+            let balanceScore = 90 - (maxVal - 15) * 0.7 - (missing.length * 6);
+
+            return {
+                pillars, elements, maxWx, missing, usefulGod, dayGan: baZi.getDayGan(), dayZhi: baZi.getDayZhi(),
+                score: Math.max(60, Math.min(99, Math.floor(balanceScore))),
+                wxUI: { '金':'t-jin','木':'t-mu','水':'t-shui','火':'t-huo','土':'t-tu' }[maxWx],
+                emoji: { '金':'⚔️','木':'🌲','水':'🌊','火':'🔥','土':'⛰️' }[maxWx]
+            };
+        }
+
+        function renderBaziGrid(baziData, roleName) {
+            let html = `<div class="flex flex-col items-center"><div class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-widest">${roleName}</div><div class="flex gap-2">`;
+            baziData.pillars.forEach(p => {
+                const hCls = p.highlight ? 'bazi-highlight shadow-md' : '';
+                html += `<div class="bazi-pillar ${hCls}"><div class="bazi-gan">${p.gan}</div><div class="bazi-zhi">${p.zhi}</div><div class="bazi-label">${p.label}</div></div>`;
+            });
+            html += `</div>
+                <div class="mt-6 flex items-center justify-center gap-5 w-full bg-white/50 rounded-2xl p-3 border border-gray-100">
+                    <div class="totem-icon ${baziData.wxUI} !w-16 !h-16 !font-normal !text-2xl">${baziData.emoji}</div>
+                    <div class="text-sm text-left">本局最旺: <strong class="text-primary text-lg">${baziData.maxWx}</strong><br>喜用神: <strong class="text-secondary text-lg">${baziData.usefulGod}</strong></div>
+                </div></div>`;
+            return html;
+        }
+
+        // 渲染全方位开运网格
+        function renderAllAroundAdvice(godElement) {
+            const adv = allAroundAdvice[godElement];
+            const iconMap = {'衣':'👕', '食':'🍲', '住':'🏠', '行':'🚗', '言':'💬', '婚':'💍', '事':'💼', '友':'🤝'};
+            const titleMap = {'衣':'衣着穿搭', '食':'饮食调养', '住':'居家风水', '行':'出行方位', '言':'言行举止', '婚':'婚恋感情', '事':'事业发展', '友':'交友贵人'};
+            
+            let html = '';
+            for (let key in adv) {
+                html += `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xl">${iconMap[key]}</span>
+                            <h4 class="font-bold text-orange-600">${titleMap[key]}</h4>
+                        </div>
+                        <p class="text-xs text-gray-600 leading-relaxed">${adv[key]}</p>
+                    </div>
+                `;
+            }
+            return html;
+        }
+
+        let currentBaziInfo = {};
+
+        document.getElementById('generate-basic-btn').addEventListener('click', () => {
+            const isMarriage = document.getElementById('analysis-type').value === 'marriage';
+            const dateA = document.getElementById('date-a').value;
+            const dateB = document.getElementById('date-b').value;
+            
+            if (!dateA || (isMarriage && !dateB)) return alert('请完整选择出生日期');
+
+            document.getElementById('report-container').classList.remove('hidden');
+            document.getElementById('action-bar').classList.remove('hidden');
+            document.getElementById('action-bar').classList.add('flex');
+            
+            document.getElementById('ai-result-box').classList.add('hidden');
+            document.getElementById('unlock-ai-btn').classList.remove('hidden');
+            document.getElementById('ai-content').innerHTML = '';
+
+            const dataA = calcBazi(dateA, document.getElementById('time-a').value, document.getElementById('city-a').value);
+            let baziHtml = renderBaziGrid(dataA, '主角 八字真身排盘');
+            let overallScore = dataA.score;
+            
+            if(isMarriage) {
+                const dataB = calcBazi(dateB, document.getElementById('time-b').value, document.getElementById('city-b').value);
+                baziHtml += `<div class="text-3xl text-gray-200 font-light mx-2">⚔️</div>` + renderBaziGrid(dataB, '伴侣 八字真身排盘');
+                overallScore = Math.floor((dataA.score + dataB.score)/2);
+                if(dataB.missing.includes(dataA.maxWx)) overallScore += 5; 
+                currentBaziInfo = { isMarriage, a: dataA, b: dataB };
+                renderCharts(isMarriage, overallScore, dataA, dataB);
+                
+                // 婚姻模式下，开运指南基于主角的喜用神
+                document.getElementById('advice-subtitle').innerHTML = `根据主角的喜用神【<strong>${dataA.usefulGod}</strong>】，系统为您生成八大维度的专属指导：`;
+                document.getElementById('all-around-advice-grid').innerHTML = renderAllAroundAdvice(dataA.usefulGod);
+            } else {
+                currentBaziInfo = { isMarriage, a: dataA };
+                renderCharts(false, overallScore, dataA, null);
+                
+                // 单人模式下，开运指南基于个人的喜用神
+                document.getElementById('advice-subtitle').innerHTML = `根据您命局最缺的喜用神【<strong>${dataA.usefulGod}</strong>】，系统为您生成八大维度的专属后天补运法则：`;
+                document.getElementById('all-around-advice-grid').innerHTML = renderAllAroundAdvice(dataA.usefulGod);
+            }
+            document.getElementById('bazi-container').innerHTML = baziHtml;
+
+            // 渲染三宫匹配
+            const aGan = dataA.dayGan; const aZhi = dataA.dayZhi; const aGod = dataA.usefulGod;
+            document.getElementById('bazi-advice-grid').innerHTML = `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-blue-100">
+                    <div class="text-3xl mb-3">💼</div><h4 class="font-black text-blue-800 mb-2">事业格局 (日干：${aGan})</h4>
+                    <p class="text-xs text-gray-600 leading-relaxed">${baziDict.gan[aGan]}</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-blue-100">
+                    <div class="text-3xl mb-3">💕</div><h4 class="font-black text-pink-600 mb-2">婚嫁宫位 (日支：${aZhi})</h4>
+                    <p class="text-xs text-gray-600 leading-relaxed">${baziDict.zhi[aZhi]}</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-blue-100">
+                    <div class="text-3xl mb-3">✈️</div><h4 class="font-black text-teal-600 mb-2">出行方位 (喜用：${aGod})</h4>
+                    <p class="text-xs text-gray-600 leading-relaxed">${travelDict[aGod]}</p>
+                </div>
+            `;
+
+            document.getElementById('score-title').innerText = isMarriage ? '双人综合五行契合度' : '先天命局五行平衡度';
+            document.getElementById('gauge-desc').innerText = overallScore > 85 ? "完美均衡 / 极佳" : (overallScore > 75 ? "运势向好 / 良好" : "略有偏枯 / 需调补");
+            
+            document.getElementById('basic-summary').innerHTML = isMarriage ? 
+                `经精确排盘比对，双方五行气场${overallScore>80?'极其契合，互为贵人。':'存在落差，需要在生活中多加包容。'} 详情参考上方的全景开运罗盘，或召唤 AI 大师进行流年吉凶推演。` : 
+                `您命局中【${dataA.maxWx}】气极旺。结合出生地气场，您一生最需补充的能量是【${dataA.usefulGod}】。请严格遵循上方的“全景开运罗盘”进行后天调理。`;
+
+            setTimeout(() => { document.getElementById('report-container').scrollIntoView({ behavior: 'smooth' }); }, 100);
+        });
+
+        function renderCharts(isMarriage, score, dataA, dataB) {
+            initCharts();
+            gaugeChart.setOption({ series: [{ type: 'gauge', startAngle: 210, endAngle: -30, min: 0, max: 100, axisLine: { lineStyle: { width: 14, color: [[1, '#f1f2f6']] } }, progress: { show: true, width: 14, roundCap: true, itemStyle: { color: '#ff6b6b' } }, pointer: { show: false }, axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false }, detail: { formatter: '{value}分', color: '#ff6b6b', fontSize: 32, fontWeight: 'black', offsetCenter: [0, '0%'] }, data: [{ value: score }] }], animation: false });
+
+            const eCat = ['金', '木', '水', '火', '土'], colors = ['#feca57', '#1dd1a1', '#48dbfb', '#ff6b6b', '#c8d6e5'];
+            let barSeries = [{ name: isMarriage ? '主角' : '能量得分', type: 'bar', barWidth: '15px', data: eCat.map((k, i) => ({ value: dataA.elements[k], itemStyle: { color: colors[i], borderRadius: [0,6,6,0] } })), label: {show: true, position: 'right'} }];
+            if(isMarriage) {
+                barSeries[0].itemStyle = { color: '#ff6b6b', borderRadius: [0,4,4,0] }; barSeries[0].data = eCat.map(k => dataA.elements[k]);
+                barSeries.push({ name: '伴侣', type: 'bar', barWidth: '15px', itemStyle: { color: '#4ecdc4', borderRadius: [0,4,4,0] }, data: eCat.map(k => dataB.elements[k]), label: {show: true, position: 'right'} });
+            }
+            barChart.setOption({ legend: { show: isMarriage, bottom: 0 }, grid: { top: '5%', left: '3%', right: '15%', bottom: isMarriage?'15%':'5%', containLabel: true }, xAxis: { type: 'value', max: 60, splitLine: { lineStyle: { type: 'dashed' } } }, yAxis: { type: 'category', data: eCat, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#2d3436', fontWeight: 'bold' } }, series: barSeries }, true);
+
+            const rA = [dataA.elements['火']*1.5+20, dataA.elements['土']*1.5+20, dataA.elements['水']*1.5+20, dataA.elements['木']*1.5+20, dataA.elements['金']*1.5+20];
+            let rSer = [{ value: rA, name: isMarriage?'主角':'自身', itemStyle: { color: '#ff6b6b' }, areaStyle: { color: 'rgba(255, 107, 107, 0.4)' } }];
+            if(isMarriage) rSer.push({ value: [dataB.elements['火']*1.5+20, dataB.elements['土']*1.5+20, dataB.elements['水']*1.5+20, dataB.elements['木']*1.5+20, dataB.elements['金']*1.5+20], name: '伴侣', itemStyle: { color: '#4ecdc4' }, areaStyle: { color: 'rgba(78, 205, 196, 0.4)' } });
+            radarChart.setOption({ radar: { indicator: [{name:'炎上张力',max:100},{name:'厚德承载',max:100},{name:'灵动智慧',max:100},{name:'生机包容',max:100},{name:'锐意决断',max:100}], radius: '60%', axisName: { color: '#2d3436', fontWeight: 'bold', fontSize: window.innerWidth < 768 ? 10 : 12 } }, series: [{ type: 'radar', symbol: 'circle', symbolSize: 6, lineStyle: { width: 3 }, data: rSer }] }, true);
+        }
+
+        document.getElementById('unlock-ai-btn').addEventListener('click', async () => {
+            const apiKey = localStorage.getItem('deepseek_api_key');
+            if (!apiKey) { alert('请先配置 API Key！'); document.getElementById('myModal').classList.remove('hidden'); return; }
+
+            document.getElementById('unlock-ai-btn').classList.add('hidden');
+            document.getElementById('ai-loading').classList.remove('hidden'); document.getElementById('ai-loading').classList.add('flex');
+
+            const a = currentBaziInfo.a;
+            let uPrm = `命主A八字：${a.pillars.map(p=>p.gan+p.zhi).join(' ')}。最旺五行【${a.maxWx}】，喜用神【${a.usefulGod}】。`;
+            if (currentBaziInfo.isMarriage) {
+                const b = currentBaziInfo.b;
+                uPrm += `\n命主B八字：${b.pillars.map(p=>p.gan+p.zhi).join(' ')}。最旺五行【${b.maxWx}】，喜用神【${b.usefulGod}】。请深度分析两人的姻缘契合度。`;
+            } else { uPrm += `\n请深度分析该命主的事业、姻缘和未来流年大运。`; }
+
+            try {
+                const res = await fetch('https://api.deepseek.com/chat/completions', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: [
+                            { role: 'system', content: `你是精通八字命理的高人。请根据四柱八字深度解盘。不使用Markdown，直接输出包含 <p><br><strong> 和 Emoji 的排版优美的 HTML 文本。` },
+                            { role: 'user', content: uPrm }
+                        ], temperature: 0.7
+                    })
+                });
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                
+                document.getElementById('ai-loading').classList.remove('flex'); document.getElementById('ai-loading').classList.add('hidden');
+                document.getElementById('ai-content').innerHTML = data.choices[0].message.content;
+                document.getElementById('ai-result-box').classList.remove('hidden');
+                document.getElementById('ai-result-box').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert('网络异常或 API Key 不正确，请检查。');
+                document.getElementById('unlock-ai-btn').classList.remove('hidden');
+                document.getElementById('ai-loading').classList.remove('flex'); document.getElementById('ai-loading').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('export-pdf-btn').addEventListener('click', () => {
+            const el = document.getElementById('report-container');
+            const btn = document.getElementById('export-pdf-btn'); btn.innerHTML = '⏳ 生成中...'; btn.disabled = true;
+            html2pdf().set({ margin: [15, 10, 15, 10], filename: '八字开运报告.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save().then(() => {
+                btn.innerHTML = '🖨️ 保存/打印 PDF 报告'; btn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

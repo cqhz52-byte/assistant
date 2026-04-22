@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>伽奈维医疗 | 终极版AI面试系统 (六大部门)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' },
+                        medical: '#10B981',
+                        ai: '#8B5CF6'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    },
+                    animation: { 
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fadeIn': 'fadeIn 0.5s ease-out forwards'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 移动端横向滚动优化，确保能看出可以滑动 */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; scroll-snap-type: x mandatory; padding-right: 20px;}
+        .scroll-item { scroll-snap-align: start; }
+        
+        html { scroll-behavior: smooth; }
+        body { -webkit-tap-highlight-color: transparent; }
+        @media print { 
+            .no-print { display: none !important; } 
+            .print-area { width: 100% !important; padding: 0 !important; }
+            .page-break { page-break-inside: avoid; margin-bottom: 24px; border: 1px solid #e2e8f0; }
+            .print-shadow-none { box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-900 font-sans antialiased overflow-x-hidden">
+
+<div id="app" class="flex flex-col md:flex-row h-screen">
+
+    <aside class="hidden md:flex w-[280px] bg-white border-r border-slate-200 flex-col no-print shadow-2xl z-20">
+        <div class="p-8 border-b border-slate-100 bg-gradient-to-b from-slate-50 to-white">
+            <h1 class="text-2xl font-black tracking-tight text-brand-900 leading-tight mb-2">浙江伽奈维医疗</h1>
+            <p class="text-xs font-bold uppercase tracking-widest text-purple-600 flex items-center gap-1">
+                <i class="ph-fill ph-sparkle"></i> 六大核心部门 AI 版
+            </p>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
+            <div v-for="(data, dept) in departments" :key="dept" @click="selectDepartment(dept)" :class="['group flex items-center px-5 py-4 rounded-2xl cursor-pointer transition-all duration-300', currentDept === dept ? 'bg-gradient-to-r from-brand-50 to-white text-brand-700 font-bold shadow-sm border-l-4 border-brand-500' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800']">
+                <i :class="['ph', data.icon, 'text-2xl mr-4', currentDept === dept ? 'text-brand-600' : 'text-slate-400 group-hover:text-brand-400 transition-colors']"></i>
+                <span class="text-base font-semibold">{{ dept }}</span>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-[#F8FAFC]">
+        
+        <header class="hidden md:flex bg-white/90 backdrop-blur-md border-b border-slate-200 px-8 py-4 justify-between items-center sticky top-0 z-30 shadow-sm no-print">
+            <div>
+                <h2 class="text-xl font-black text-slate-800"><span class="text-brand-600 mr-2">/</span>{{ currentDept }} - 智能测评导航</h2>
+            </div>
+            <div class="flex gap-4">
+                <button @click="showApiModal = true" class="px-4 py-2 bg-purple-50 text-purple-700 border border-purple-200 rounded-xl text-sm font-bold hover:bg-purple-100 transition flex items-center gap-2">
+                    <i class="ph-fill ph-gear"></i> DeepSeek 配置
+                </button>
+                <button @click="generateReport" class="px-5 py-2 bg-brand-600 text-white rounded-xl text-sm font-bold shadow-md hover:bg-brand-700 transition flex items-center gap-2">
+                    <i class="ph-fill ph-file-pdf"></i> 生成报告
+                </button>
+            </div>
+        </header>
+
+        <div class="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center sticky top-0 z-30 no-print">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white shadow-md"><i class="ph-fill ph-cross text-lg"></i></div>
+                <h1 class="text-[15px] font-black text-slate-800">伽奈维医疗</h1>
+            </div>
+            <div class="flex gap-2">
+                <button @click="showApiModal = true" class="w-8 h-8 flex items-center justify-center bg-purple-50 text-purple-600 rounded-lg shadow-sm"><i class="ph-fill ph-gear"></i></button>
+                <button @click="generateReport" class="px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-md">导出</button>
+            </div>
+        </div>
+        
+        <div class="md:hidden bg-white border-b border-slate-100 py-2 relative sticky top-[53px] z-20 shadow-sm">
+             <div class="flex overflow-x-auto hide-scrollbar px-3 gap-2 relative z-10 snap-x">
+                <button v-for="(data, dept) in departments" :key="dept" @click="selectDepartment(dept)" :class="['scroll-item px-5 py-2.5 rounded-full text-sm flex items-center gap-2 transition-all whitespace-nowrap font-bold flex-shrink-0', currentDept === dept ? 'bg-brand-600 text-white shadow-md shadow-brand-200' : 'bg-slate-100 text-slate-500 border border-slate-200']">
+                    <i :class="['ph', data.icon, 'text-lg']"></i>{{ dept }}
+                </button>
+            </div>
+            <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-20"></div>
+        </div>
+
+        <div v-if="showApiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl max-w-md w-full animate-fadeIn">
+                <h3 class="text-xl font-black mb-2 text-slate-800 flex items-center gap-2"><i class="ph-fill ph-key text-purple-600"></i> DeepSeek API 设置</h3>
+                <p class="text-xs text-slate-500 mb-6">密钥仅保存在您的浏览器本地缓存中，绝对安全。</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-600 block mb-1">您的 API Key</label>
+                        <input type="password" v-model="apiKeyInput" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="sk-xxxxxxxxxxxxxxxxxxx">
+                    </div>
+                    <div class="flex gap-3 justify-end mt-6">
+                        <button @click="showApiModal = false" class="px-4 py-2 text-slate-500 font-bold hover:bg-slate-50 rounded-lg">取消</button>
+                        <button @click="saveApiKey" class="px-6 py-2 bg-purple-600 text-white font-bold rounded-lg shadow-md hover:bg-purple-700">保存并启用 AI</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-10 print-area pb-24 md:pb-12">
+            <div class="max-w-5xl mx-auto space-y-8">
+                
+                <div v-if="!hasApiKey" class="bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-xl flex items-start gap-3 text-sm no-print">
+                    <i class="ph-fill ph-warning-circle text-xl mt-0.5 flex-shrink-0"></i>
+                    <p><strong>注意：</strong> 您还未配置 DeepSeek API Key，AI 智能评估副驾驶功能处于禁用状态。请点击右上角进行配置开启智能面试。</p>
+                </div>
+
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
+                    <div class="md:col-span-2 bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-1">
+                                <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">候选人姓名 Candidate</label>
+                                <input type="text" v-model="form.name" class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-brand-500 outline-none transition text-base font-bold text-slate-800 placeholder-slate-300" placeholder="请输入姓名...">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">应聘职级 Level</label>
+                                <select v-model="form.level" class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-brand-500 outline-none transition text-base font-bold text-slate-800 appearance-none">
+                                    <option>初级 / 专员 (Junior)</option>
+                                    <option>中级 / 资深 (Senior)</option>
+                                    <option>主管 / 经理 (Manager)</option>
+                                    <option>总监 / 负责人 (Director)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center justify-center min-h-[240px]">
+                        <canvas id="abilityChart" class="w-full max-w-[240px]"></canvas>
+                    </div>
+                </section>
+
+                <div class="no-print border-t border-slate-200 pt-8 mt-4">
+                    <h3 class="text-sm font-black text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="ph-fill ph-stack text-brand-600 text-xl"></i> 请选择面试题库组 (共5组)
+                    </h3>
+                    <div class="flex overflow-x-auto gap-3 pb-4 hide-scrollbar snap-x relative pr-8">
+                        <button v-for="(set, sIdx) in currentData.questionSets" :key="sIdx" @click="selectSet(sIdx)" :class="['scroll-item px-6 py-3.5 rounded-2xl text-sm font-black transition-all whitespace-nowrap border-2 flex-shrink-0', currentSetIndex === sIdx ? 'bg-brand-600 text-white border-brand-600 shadow-xl md:scale-105' : 'bg-white text-slate-500 border-slate-100 hover:border-brand-200 hover:text-brand-600']">
+                            {{ set.setName }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div v-for="(q, idx) in currentQuestions" :key="idx" class="relative bg-white p-6 md:p-10 rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 overflow-hidden page-break print-shadow-none">
+                        <i class="ph-fill ph-quotes text-[120px] md:text-[180px] absolute -top-4 -right-4 md:-top-10 md:-right-10 text-slate-50 opacity-60 pointer-events-none rotate-12"></i>
+                        
+                        <div class="relative z-10">
+                            <div class="flex flex-wrap items-center gap-4 mb-6">
+                                <div class="bg-gradient-to-br from-brand-500 to-brand-700 text-white w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black text-lg md:text-xl shadow-lg">Q{{ idx + 1 }}</div>
+                                <span class="bg-slate-100 text-slate-600 text-xs px-4 py-1.5 rounded-full font-black uppercase tracking-widest border border-slate-200">{{ q.category }}</span>
+                            </div>
+                            
+                            <h4 class="text-xl md:text-[22px] font-black text-slate-800 mb-5 leading-snug tracking-tight">{{ q.title }}</h4>
+                            <p class="text-base md:text-lg text-slate-600 leading-relaxed font-bold mb-6 md:mb-8 bg-slate-50/50 p-5 md:p-6 rounded-2xl border border-slate-50">
+                                “{{ q.text }}”
+                            </p>
+                            
+                            <div class="bg-gradient-to-r from-amber-50 to-white border-l-8 border-amber-400 p-5 rounded-r-2xl mb-8 shadow-sm">
+                                <div class="flex items-start gap-3">
+                                    <i class="ph-fill ph-lightbulb-filament text-amber-500 text-2xl mt-0.5 flex-shrink-0"></i>
+                                    <span class="text-sm md:text-base text-amber-900 leading-relaxed font-medium whitespace-pre-line">
+                                        <strong class="font-black text-amber-700 tracking-wide uppercase mr-1 block mb-2">【金牌面试官·深挖指引】</strong>{{ q.tip }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-50/40 border border-purple-100 rounded-2xl p-4 md:p-6 mb-8 no-print transition-all">
+                                <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-3">
+                                    <div class="flex items-center gap-2 text-purple-700 font-bold text-sm md:text-base">
+                                        <i class="ph-fill ph-waveform text-xl"></i> AI 语音拾取与评估引擎
+                                    </div>
+                                    <button @click="toggleRecording(idx)" :disabled="isAnalyzing[getQKey(idx)]" :class="['w-full md:w-auto px-5 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm', isRecording[getQKey(idx)] ? 'bg-red-500 text-white animate-pulse-fast' : (isAnalyzing[getQKey(idx)] ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-700')]">
+                                        <i :class="['ph-fill', isRecording[getQKey(idx)] ? 'ph-stop-circle' : (isAnalyzing[getQKey(idx)] ? 'ph-spinner animate-spin' : 'ph-microphone')]"></i>
+                                        {{ isRecording[getQKey(idx)] ? '结束录音并发送给 AI' : (isAnalyzing[getQKey(idx)] ? 'DeepSeek 正在撰写报告...' : '开始录音作答') }}
+                                    </button>
+                                </div>
+                                
+                                <textarea v-model="transcripts[getQKey(idx)]" placeholder="点击开始录音，将调用浏览器麦克风实时转写文字。录音结束后自动发送给 DeepSeek 进行结构化打分..." class="w-full bg-white border border-purple-200 rounded-xl p-4 text-sm text-slate-700 focus:ring-2 focus:ring-purple-400 outline-none resize-none leading-relaxed" rows="4"></textarea>
+                                
+                                <div v-if="aiEvaluations[getQKey(idx)]" class="mt-5 bg-white rounded-2xl p-5 md:p-6 border-2 border-purple-200 shadow-md animate-fadeIn">
+                                    <h5 class="text-sm font-black text-purple-800 mb-4 flex items-center gap-2"><i class="ph-fill ph-robot text-lg"></i> DeepSeek 评估结论</h5>
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                        <div class="md:col-span-3 space-y-4 text-sm">
+                                            <div class="bg-green-50/50 p-3 md:p-4 rounded-xl border border-green-100">
+                                                <span class="font-black text-green-700 block mb-1">✅ 核心亮点</span>
+                                                <span class="text-slate-700">{{ aiEvaluations[getQKey(idx)].highlight }}</span>
+                                            </div>
+                                            <div class="bg-red-50/50 p-3 md:p-4 rounded-xl border border-red-100">
+                                                <span class="font-black text-red-600 block mb-1">⚠️ 风险与漏洞</span>
+                                                <span class="text-slate-700">{{ aiEvaluations[getQKey(idx)].risk }}</span>
+                                            </div>
+                                            <div class="bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-100">
+                                                <span class="font-black text-slate-600 block mb-1">💡 面试官决议参考</span>
+                                                <span class="text-slate-600 italic">{{ aiEvaluations[getQKey(idx)].reason }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col items-center justify-center bg-purple-50 rounded-xl p-4 border border-purple-200">
+                                            <span class="text-xs font-black text-purple-400 mb-2 uppercase text-center">AI 建议得分</span>
+                                            <span class="text-5xl font-black text-purple-600">{{ aiEvaluations[getQKey(idx)].score }}</span>
+                                            <button @click="applyAiScore(idx, aiEvaluations[getQKey(idx)].score)" class="mt-4 text-xs bg-purple-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-purple-700 transition w-full shadow-sm">一键采纳打分</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border-t-2 border-slate-50 pt-6">
+                                <div class="flex justify-between items-end mb-4">
+                                    <label class="text-xs font-black text-slate-400 uppercase tracking-widest">最终决议得分 (1-5)</label>
+                                    <span class="text-3xl font-black text-brand-600">{{ getScore(idx) || '-' }}<span class="text-sm text-slate-400 font-bold ml-1">分</span></span>
+                                </div>
+                                <input type="range" min="1" max="5" step="1" :value="getScore(idx)" @input="setScore(idx, $event.target.value)" class="w-full h-3 bg-slate-100 rounded-full appearance-none cursor-pointer accent-brand-600 hover:accent-brand-500 transition">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <section class="bg-white p-6 md:p-10 rounded-[2rem] border-2 border-brand-100 shadow-xl space-y-8 page-break mt-12 print-shadow-none">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="bg-brand-100 p-2 rounded-xl text-brand-600"><i class="ph-fill ph-scales text-2xl"></i></div>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800">最终录用评估决议</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="text-xs font-black text-slate-400 mb-3 block uppercase tracking-widest pl-1">综合评语与事实记录</label>
+                            <textarea v-model="form.notes" rows="6" class="w-full bg-slate-50 border-none rounded-2xl p-5 focus:ring-2 focus:ring-brand-500 outline-none text-base font-medium text-slate-700 leading-relaxed placeholder-slate-300 resize-none" placeholder="记录候选人在应对深挖追问时的真实表现、逻辑漏洞或高光时刻..."></textarea>
+                        </div>
+                        <div class="flex flex-col justify-between">
+                            <div>
+                                <label class="text-xs font-black text-slate-400 mb-3 block uppercase tracking-widest pl-1">HR及业务部决议</label>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <button @click="form.decision = '建议录用 (Hire)'" :class="['py-4 rounded-2xl text-base font-black transition-all border-2', form.decision === '建议录用 (Hire)' ? 'bg-medical text-white border-medical shadow-lg md:scale-[1.02]' : 'bg-white text-slate-600 hover:border-slate-300']">建议录用 (Hire)</button>
+                                    <button @click="form.decision = '待定/复试 (Hold)'" :class="['py-4 rounded-2xl text-base font-black transition-all border-2', form.decision === '待定/复试 (Hold)' ? 'bg-amber-500 text-white border-amber-500 shadow-lg md:scale-[1.02]' : 'bg-white text-slate-600 hover:border-slate-300']">待定/复试 (Hold)</button>
+                                    <button @click="form.decision = '不予考虑 (Reject)'" :class="['py-4 rounded-2xl text-base font-black transition-all border-2', form.decision === '不予考虑 (Reject)' ? 'bg-red-500 text-white border-red-500 shadow-lg md:scale-[1.02]' : 'bg-white text-slate-600 hover:border-slate-300']">不予考虑 (Reject)</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <div class="text-center pt-8 pb-12">
+                    <p class="text-[10px] md:text-xs font-bold text-slate-300 tracking-widest uppercase">© Zhejiang Ganaive Medical Technology Co., Ltd.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const { createApp, ref, computed, onMounted, nextTick } = Vue;
+
+    createApp({
+        setup() {
+            // 六大部门题库数据 (新增采购部)
+            const departments = {
+                '注册法规部': {
+                    icon: 'ph-scroll',
+                    questionSets: [
+                        { setName: '第1组：初级注册实操 (基础与漏洞)', questions: [
+                            { category: '流程把控', title: 'NMPA注册全流程及异常处理', text: '请完整描述一款二类无源医疗器械从立项到取得NMPA注册证的核心里程碑节点。', tip: '【核心考察】注册全生命周期的里程碑概念。\n【深挖追问】\n1. 如果检验中心排队严重，预计延期3个月，您如何通过沟通或合理合规途径加速进程？\n2. 若在临床评价阶段发现原定的同品种产品刚刚被注销注册证，您接下来的应对策略是什么？' },
+                            { category: '文档撰写', title: '技术要求(PTR)编写陷阱', text: '在编写产品技术要求（PTR）时，引用国标/行标时最容易犯什么错误？您如何避免？', tip: '【核心考察】国标、行标及年代号适用性掌控。\n【深挖追问】\n1. 如果企业标准(企标)中的某项性能指标低于现行行标，但研发坚称临床够用且修改成本巨大，发补时专家质疑，您如何写答辩状？' },
+                            { category: '政府公关', title: '检验与审评沟通进度', text: '产品在医疗器械检验所或审评中心排队时间过长，甚至被审评员误解技术原理，您通常怎么推进？', tip: '【核心考察】应对官方机构的主观能动性与沟通柔性。\n【深挖追问】\n1. 审评老师在发补沟通会上明确表示不接受你们的试验数据，你在会议桌上该怎么回应？' },
+                            { category: '资料审核', title: '宣传及说明书的合规审查', text: '研发或市场提交的说明书草案中，包含了夸大疗效的词汇，对方拒绝修改，您如何处理？', tip: '【核心考察】合规红线把控与内部博弈。\n【深挖追问】\n1. 老板把你叫进办公室让你“灵活一点”，你怎么办？' }
+                        ]},
+                        { setName: '第2组：高级发补与临床策略', questions: [
+                            { category: '发补应对', title: '官方发补的极致拆解', text: '分享一次最让您头疼的发补通知。审评老师核心疑点是什么？您如何说服老师的？', tip: '【核心考察】技术解析与抗压答辩逻辑。\n【深挖追问】\n1. 当要求补充1年动物实验，但资金链只能撑半年，您如何找证据链豁免？' },
+                            { category: '临床评价', title: 'CER对比产品的选择', text: '在做同品种比对(CER)时，如果找不到完全一致的器械，差异性论证上有何策略？', tip: '【核心考察】SE(实质等同)论证。\n【深挖追问】\n1. 核心差异点专家要求必须做临床，如何利用台架试验避开人体临床？' },
+                            { category: '变更管理', title: '重大与非重大界定', text: '关键原材料供应商变更，您如何界定是做“许可事项变更”还是内部记录？', tip: '【核心考察】注册变更风险防飞检。\n【深挖追问】\n1. 生产部私自换料生产了10批才告诉你，你要求报废还是隐瞒发货？' },
+                            { category: '创新通道', title: '创新申报(绿通)', text: '申请“创新医疗器械特别审查程序”的核心难点是什么？', tip: '【核心考察】政策红利利用。\n【深挖追问】\n1. 专利未授权如何说服专家给予立项支持？' }
+                        ]},
+                        { setName: '第3组：MDR与海外注册', questions: [
+                            { category: 'MDR升级', title: 'MDD向MDR的过渡', text: '对比MDD，CE MDR对企业影响最大的合规痛点在哪里？如何应对？', tip: '【核心考察】对PMS及CER要求提高的认知。\n【深挖追问】\n1. 销售额小不足以支撑昂贵PMCF，如何低成本收集RWD真实世界数据？' },
+                            { category: 'FDA认证', title: 'FDA 510(k) 避坑', text: 'FDA 510(k)申报中网络安全或人因工程部分，有哪些避坑经验？', tip: '【核心考察】FDA关注热点。\n【深挖追问】\n1. Reviewer质疑网络安全，但你们设备不联网，如何证明风险极低？' },
+                            { category: '体系融合', title: '多国体系整合', text: '如何将13485、FDA 820和中国GMP的要求融合为一套体系？', tip: '【核心考察】体系宏观架构搭建。\n【深挖追问】\n1. 中美记录要求矛盾(纸质红头与21CFR11电子系统)，SOP如何设计？' },
+                            { category: '海外沟通', title: '应对NB机构刁难', text: '当公告机构(NB)审核员提出严苛的不符合项时，您如何处理？', tip: '【核心考察】专业英语辩论。\n【深挖追问】\n1. 审核员明显误解了中国供应商的报告且态度傲慢，你如何“打脸”撤销NC？' }
+                        ]},
+                        { setName: '第4组：跨部门协同与内控', questions: [
+                            { category: '研发协同', title: '法规前置的阻力', text: '您如何将法规要求前置到研发设计的立项阶段（Design Input）？', tip: '【核心考察】赋能业务意识。\n【深挖追问】\n1. 研发总监抱怨你来泼冷水，拿什么工具证明你的审查能帮他省半年时间？' },
+                            { category: '变更阻击', title: '未报批的擦边球', text: '生产部门为降废品率私自改了非关键参数，您第一时间怎么做？', tip: '【核心考察】风险评估的果断性。\n【深挖追问】\n1. 厂长保证不影响性能且急发货，你按停还是事后补文件？' },
+                            { category: '内部宣贯', title: '法规转化为行动', text: '面对新法规，如何给一线员工做培训确保他们听得懂做得到？', tip: '【核心考察】知识降维输出。\n【深挖追问】\n1. 培训时销售在玩手机，你如何设计带“切肤之痛”的模拟题唤醒合规意识？' },
+                            { category: '销售博弈', title: '应对虚假宣传压力', text: '学术会PPT产品适应症超出了注册证范围，您如何干预？', tip: '【核心考察】合规守护与政治手腕。\n【深挖追问】\n1. 销售副总说不出事他担着，你如何利用罚则反向“恐吓”达成修改？' }
+                        ]},
+                        { setName: '第5组：飞行检查与抗压测试', questions: [
+                            { category: '飞检应对', title: '药监局突击飞检30分', text: '药监局未通知飞检。作为迎检核心，您最初30分钟做哪些安排？', tip: '【核心考察】应急指挥体系。\n【深挖追问】\n1. 审核员直奔刚堆了不合格品的退货区，你路上如何想好合理解释？' },
+                            { category: '不良事件', title: 'SAE的上报决断', text: '临床反馈疑似致死但在24小时内无法确认缺陷，是否立即上报？', tip: '【核心考察】法规时限绝对敏感度。\n【深挖追问】\n1. 老板要求冷处理，你在法律责任和指令间如何抉择？' },
+                            { category: '召回决策', title: '主动召回的决断', text: '产品有潜在隐患但未造成伤害，召回损失百万，不召回有雷，您的建议？', tip: '【核心考察】健康风险评估(HHA)。\n【深挖追问】\n1. 如果隐患概率仅十万分之一，你坚持全面召回还是秘密替换？' },
+                            { category: '抗压管理', title: '多项目资源崩塌', text: '3个项目发补最后期限，核心骨干突提离职。您如何保障交付？', tip: '【核心考察】危机项目管理。\n【深挖追问】\n1. 申请借调被拒，如何砍掉非必要流程或求助外包确保按时提交？' }
+                        ]}
+                    ]
+                },
+                '研发部': {
+                    icon: 'ph-microscope',
+                    questionSets: [
+                        { setName: '第1组：设计控制(Design Control)', questions: [ 
+                            { category: '需求转换', title: '模糊临床需求参数化', text: '医生说“导管要足够软但要有支撑力”，您是如何将这种感性描述转化为可验证的设计输入指标的？', tip: '【核心考察】工程转化思维。\n【深挖追问】\n1. 设定参数后医生仍不满意，如何设计对比实验捕捉“手感盲区”？' }, 
+                            { category: '验证确认', title: 'V&V的区别与执行', text: 'Design Verification和Validation的本质区别是什么？举例“验证通过但确认失败”的案例。', tip: '【核心考察】合规基础。\n【深挖追问】\n1. 台架寿命通过但动物实验断裂，如何重新追溯修改早期Design Input？' }, 
+                            { category: '变更控制', title: '设计变更(DCN)的控制', text: '产品定型后发现模具公差问题。描述发起变更直到归档DHF的过程。', tip: '【核心考察】文档严谨性。\n【深挖追问】\n1. 模具厂私放公差且测试合格，你放行修改图纸迎合还是强制重开模？' }, 
+                            { category: '文档规范', title: 'DHF的复现性与防雷', text: '新同事仅凭您的DHF能否完全复现产品？', tip: '【核心考察】工程操守。\n【深挖追问】\n1. 核心工艺在老工程师脑子里，如何通过体系手段逼出来写进DHF？' } ] },
+                        { setName: '第2组：技术创新与攻坚', questions: [ 
+                            { category: '技术瓶颈', title: '突破核心技术死局', text: '描述您在项目中遇到的最棘手技术壁垒。是如何找到突破口的？', tip: '【核心考察】逻辑拆解与第一性原理。\n【深挖追问】\n1. DOE所有组合失败且只剩一周，如何跳出框架破局？' }, 
+                            { category: '专利布局', title: 'FTO与专利规避', text: '启动竞品已成熟的项目时，如何进行FTO审查并规避侵权？', tip: '【核心考察】防御性研发意识。\n【深挖追问】\n1. 竞品申请了流氓专利挡路，你放弃项目、绕道设计还是发起无效宣告？' }, 
+                            { category: '前沿视野', title: '新材料/工艺的评估', text: '如何评估新出现的材料在现有产品管线中应用的可行性和风险？', tip: '【核心考察】风险意识。\n【深挖追问】\n1. 新材料缺长期生物相容性数据，前期论证如何低成本排雷？' }, 
+                            { category: '可用性', title: '对抗反人类的UI', text: '结合IEC 62366，如何开展形成性评价降低用户使用错误？', tip: '【核心考察】以人为本的设计。\n【深挖追问】\n1. 护士反馈界面误触停机，研发认为护士太笨，你作为工程师怎么处理客诉？' } ] },
+                        { setName: '第3组：可制造性与转产(DFM)', questions: [ 
+                            { category: 'DFM思维', title: '面向制造的设计博弈', text: '研发样品良率100%但转产极低。您如何在早期引入DFM原则？', tip: '【核心考察】量产思维。\n【深挖追问】\n1. 研发和生产互相扯皮，你如何用CPK或公差分析终结扯皮？' }, 
+                            { category: '工装夹具', title: '防呆治具同步设计', text: '在产品设计同时，是否主导过生产工装治具开发？关注什么？', tip: '【核心考察】配套工艺交付。\n【深挖追问】\n1. 治具效率太低员工私自拆防呆保护，你如何重构治具兼顾安全与效率？' }, 
+                            { category: '工艺验证', title: 'OQ/PQ中的挑战测试', text: '在工艺验证PQ中研发扮演什么角色？如何界定OQ工艺窗口？', tip: '【核心考察】量产极限条件掌控。\n【深挖追问】\n1. 热封OQ合格但在PQ大批量时中间温度降导致虚封，如何重设验证方案？' }, 
+                            { category: 'BOM管理', title: 'EBOM到MBOM灾难', text: 'EBOM向MBOM转换极易错漏，如何防范？', tip: '【核心考察】版本控制红线。\n【深挖追问】\n1. 图纸升版ERP未同步导致买错呆滞料，如何设计审批流彻底封死漏洞？' } ] },
+                        { setName: '第4组：风险管理实操(ISO 14971)', questions: [ 
+                            { category: 'FMEA', title: 'DFMEA的实战价值', text: '主导DFMEA时，如何准确评估严重度S和发生度O，避免填表游戏？', tip: '【核心考察】风险分析工具实战价值。\n【深挖追问】\n1. 市场部为顺利发布要求把致命缺陷严重度从5降到3，你拒绝的论据是什么？' }, 
+                            { category: '控制层级', title: '风险控制的铁律', text: '不可接受风险首选控制措施是什么？(固有设计vs警告)', tip: '【核心考察】防错设计优于警告的底层逻辑。\n【深挖追问】\n1. 改模具耗时2个月，贴贴纸明天能发货。面临上市压力你如何决断？' }, 
+                            { category: '风险收益', title: '剩余风险与临床收益', text: '剩余风险仍较高但临床收益巨大。如何撰写报告说服评审委？', tip: '【核心考察】系统性论证能力。\n【深挖追问】\n1. 能否结合医学文献阐述高风险产品相比传统疗法依然具有优势？' }, 
+                            { category: '生命周期', title: '上市后风险反噬', text: '客诉出现未预料的失效模式，您如何更新风险文档RMF并行动？', tip: '【核心考察】全生命周期闭环。\n【深挖追问】\n1. 遗漏了极端体位下的导管扭结风险，除了改FMEA是否主动对已售产品发起CAPA？' } ] },
+                        { setName: '第5组：行为与抗压(STAR)', questions: [ 
+                            { category: '项目延期', title: '进度失控的拯救', text: 'Deadline迫在眉睫但核心件测试连续失败。如何挽救并向上汇报？', tip: '【核心考察】危机项目管理。\n【深挖追问】\n1. 老板会上大发雷霆，你如何清晰列出阻碍并要他拍板协调资源？' }, 
+                            { category: '部门冲突', title: '应对销售“瞎指挥”', text: '销售总监强求增加花哨功能破坏系统稳定性，您如何拒绝并给替代方案？', tip: '【核心考察】技术底线与业务斡旋。\n【深挖追问】\n1. 销售威胁丢标你负责，如何用敏捷迭代思路保质量又安抚预期？' }, 
+                            { category: '团队协作', title: '辅导拖后腿成员', text: '新工程师出错拖慢进度，您作为骨干如何帮助并确保进度？', tip: '【核心考察】领导力。\n【深挖追问】\n1. 指导1个月依然无法胜任，你继续擦屁股还是果断申请踢出项目组？' }, 
+                            { category: '复盘能力', title: '烂尾项目复盘', text: '分享一个彻底失败被砍掉的研发项目。最大教训是什么？', tip: '【核心考察】直面失败与反思。\n【深挖追问】\n1. 穿越回立项第一天，会在哪个决策节点喊停？为什么？' } ] }
+                    ]
+                },
+                '生产部': {
+                    icon: 'ph-factory',
+                    questionSets: [
+                        { setName: '第1组：GMP与现场管控', questions: [ 
+                            { category: '清场防混淆', title: 'Line Clearance生死狙击', text: '车间品种切换，如何亲自确认清场彻底完成，防范混淆事故？', tip: '【核心考察】防混淆绝对敬畏。\n【深挖追问】\n1. 发现上一班蓝色废料，这批刚做的红色管判返工还是报废？怎么处理上一班长？' }, 
+                            { category: '记录造假', title: '批记录DHR的猫鼠游戏', text: '员工常“回忆式”补填批记录。采取什么长效机制根治？', tip: '【核心考察】管理颗粒度。\n【深挖追问】\n1. 戴无菌手套写字不便，除了罚款能否从精益角度(如电子终端)解决痛点？' }, 
+                            { category: '环境受控', title: '洁净区的细节魔鬼', text: '十万级洁净区人员行为难管控（如口罩不规范）。平时如何抓细节？', tip: '【核心考察】巡线敏锐度。\n【深挖追问】\n1. 监控显示半夜拉下口罩聊天，早会如何通报杀鸡儆猴且不引发抗议？' }, 
+                            { category: '设备状态', title: '校验标识防错', text: '如何确保车间成百上千仪器不超期校验服役？', tip: '【核心考察】系统防错。\n【深挖追问】\n1. 员工辩称过期的卡尺只是量包装纸板不影响质量，你认同吗？怎么堵漏洞？' } ] },
+                        { setName: '第2组：异常指挥与防错', questions: [ 
+                            { category: '突发异常', title: '良率突降紧急停线', text: '良率从98%掉到80%，明早发货大客户。接报后真实处置步骤？', tip: '【核心考察】停线决断力。\n【深挖追问】\n1. 排查3小时未果且明早必须发货，你硬着头皮做挑良品还是坚持停线？' }, 
+                            { category: '隔离控制', title: '不合格品铁腕封锁', text: '发现疑似不合格在制品，如何物理隔离防止流入下道工序？', tip: '【核心考察】异常物料闭环。\n【深挖追问】\n1. 实习生把红标废品混进良品车，最终包装前什么机制能精准拦截？' }, 
+                            { category: '防错技术', title: 'Poka-Yoke精益应用', text: '分享实施“防呆防错”设计彻底消除人为失误的案例。', tip: '【核心考察】系统工程思维。\n【深挖追问】\n1. 员工频漏装微小密封圈，除了增加QA首末件，能想出两种硬件工装防呆吗？' }, 
+                            { category: '根因调查', title: '深挖真因拒绝背锅', text: 'QA调查操作失误，如何用5Why深挖管理系统原因不简单结案？', tip: '【核心考察】护犊子但不护短。\n【深挖追问】\n1. QA调查说员工疲劳扣绩效，你挖出是频闪致视觉盲区，怎么交涉修改结论？' } ] },
+                        { setName: '第3组：设备与工艺验证', questions: [ 
+                            { category: '新设备', title: '跨越FAT与SAT', text: '主导进口自动设备工厂验收(SAT)最关注哪三点？', tip: '【核心考察】设备风险识别。\n【深挖追问】\n1. 供应商FAT良率99%但在你们厂SAT良率85%，供应商怪你们物料不好，如何自证逼迫整改？' }, 
+                            { category: '工艺验证', title: 'OQ/PQ挑战极限', text: '热封机OQ和PQ区别？如何界定封口温度挑战极限？', tip: '【核心考察】验证参数设定逻辑。\n【深挖追问】\n1. OQ合格但大批量PQ模具散热不及虚封，如何重新设计验证方案？' }, 
+                            { category: '再验证', title: '触发再验证直觉', text: '大修或换关键原料后，如何评估是否启动再验证？', tip: '【核心考察】微小变更警觉。\n【深挖追问】\n1. 换同型号不同批次加热圈，维修工说不用验证。潜藏风险在哪？补什么数据才开机？' }, 
+                            { category: '预防维护', title: 'TPM全员设备管理', text: '如何推动一线操作工参与日常点检和一级保养？', tip: '【核心考察】制造理念落地。\n【深挖追问】\n1. 操作工抱怨点检影响计件工资，如何在薪酬上微调让他们心甘情愿保养机器？' } ] },
+                        { setName: '第4组：精益制造与降本', questions: [ 
+                            { category: '消除浪费', title: '识别隐蔽浪费', text: '最易发现医疗组装过程哪两种浪费？如何调布局消除？', tip: '【核心考察】精益眼光。\n【深挖追问】\n1. 包装机移到U型线末端产生纸屑污染风险，效率与合规如何折中？' }, 
+                            { category: '标准化', title: 'SOP优化降维', text: 'SOP繁琐不看，有主导图片化、视频化或动作分解经验吗？', tip: '【核心考察】有效标准的制定。\n【深挖追问】\n1. 制作剥线SOP时，如何利用动作经济原则将8秒工时压缩到5秒？' }, 
+                            { category: '产能爬坡', title: '不加人的极限扩能', text: '销售大标要求下月产能翻倍，不增设备如何提升UPH？', tip: '【核心考察】瓶颈突破能力。\n【深挖追问】\n1. 焊接是瓶颈只有80%产能，买不到新机怎么通过优化治具或动作剥离打破瓶颈？' }, 
+                            { category: '物料管理', title: '昂贵耗材损耗战', text: '高值耗材报废率从3%降到1%是如何建立物料管控模型的？', tip: '【核心考察】精细化降本追踪。\n【深挖追问】\n1. 员工隐瞒报废冲入厕所下水道，怎么设计班后“物料对账”让其无处遁形？' } ] },
+                        { setName: '第5组：班组管理与抗压', questions: [ 
+                            { category: '交期压力', title: '交付与GMP死结', text: '催货但批记录瑕疵需走偏差。老板施压先发，你发还是扣？', tip: '【核心考察】质量永远大于交付。\n【深挖追问】\n1. 老板怒斥发货导致违约你赔吗？坚守底线同时提出什么缓兵之计？' }, 
+                            { category: '刺头管理', title: '对付不可替代刺头', text: '老员工技术好但不服规范，如何恩威并施让他守纪律？', tip: '【核心考察】基层管理与人才备份。\n【深挖追问】\n1. 开罚单后他罢工导致核心工序瘫痪，新主管你怎么收拾烂摊子？' }, 
+                            { category: '团队激励', title: '枯燥流水线的留人', text: '洁净室不能带手机枯燥乏味，如何降流失率保持士气？', tip: '【核心考察】非物质激励。\n【深挖追问】\n1. 隔壁电子厂底薪高500元挖人，预算不批怎么用薪资外招数稳住军心？' }, 
+                            { category: '安全生产', title: '工伤危化品午夜报警', text: '夜班机械夹伤或泄漏报警，到场前三个指令是什么？', tip: '【核心考察】EHS应急指挥。\n【深挖追问】\n1. 家属拉横幅且该机器上月有安监局整改隐患，面对记者第一句话怎么说？' } ] }
+                    ]
+                },
+                '质量部': {
+                    icon: 'ph-shield-check',
+                    questionSets: [
+                        { setName: '第1组：过程检验与控制', questions: [ 
+                            { category: '抽样方案', title: 'AQL(GB/T 2828.1)应用', text: '在IQC/OQC中，如何根据风险级别科学选择检验水平和AQL值？', tip: '【核心考察】错判和漏判风险理解。\n【深挖追问】\n1. 关键物料连三批抽样不合格，供应商老板说偶发急用，退货还是启动加严抽样？' }, 
+                            { category: '首件确认', title: '首件检验(FAI)防雷', text: '如何监督IPQC严执首件三方签名，拦截批量不良？', tip: '【核心考察】“预防为主”推行。\n【深挖追问】\n1. 领班觉得偏差小边做边调产了200件，你去现场制止时这200件怎么定性？' }, 
+                            { category: '测量系统', title: 'MSA量测系统分析', text: '外观瑕疵判定标准不一，如何通过样板或培训统一尺度？', tip: '【核心考察】标准化判定减少争议。\n【深挖追问】\n1. 销售反映新样板要求太高良率大降交不出货，怎么证明现在标准刚好？' }, 
+                            { category: '放行权力', title: '成品放行(Release)底线', text: '作为最后签字人，发现某常规测试漏做但货车已在等发车，敢签字吗？', tip: '【核心考察】判官的铁面无私。\n【深挖追问】\n1. 总经理说出问题他顶着让你签，怎么告诉他放行终身追溯连总经理也顶不住？' } ] },
+                        { setName: '第2组：CAPA与系统改进', questions: [ 
+                            { category: '偏差管理', title: 'Deviation调查深度', text: '遇轻微偏差如何评估是否升级为重大偏差启动CAPA？', tip: '【核心考察】风险分级评估不滥用资源。\n【深挖追问】\n1. 发现温湿度超标时段有一批极度湿敏物料暴露，你的立即纠正措施和调查重点？' }, 
+                            { category: '根因分析', title: 'Root Cause(5Why/鱼骨图)', text: '举例疑难客诉，如何用工具剥茧抽丝找到真因而非员工粗心？', tip: '【核心考察】深度溯源拒绝无效对策。\n【深挖追问】\n1. 生产经理不配合一口咬定是操作工夜班打瞌睡，如何用连续三晚设备数据打脸他？' }, 
+                            { category: '纠正预防', title: 'CAPA有效性验证闭环', text: '如何证明一个CAPA真正有效？设置多长观察期和什么指标？', tip: '【核心考察】防止质量事故复发。\n【深挖追问】\n1. 包装漏气CAPA关闭三月后再次爆发，上次对策仅增加保养频次。这次从哪个更深维度开案？' }, 
+                            { category: '数据分析', title: '质量月报杀伤力', text: '撰写质量分析报告最看重哪三指标？如何驱动高层决策？', tip: '【核心考察】向上管理与质量成本(COQ)。\n【深挖追问】\n1. 想让老板花50万买高精度检测仪，月报里列举哪些量测误差浪费的数据算清这笔账？' } ] },
+                        { setName: '第3组：供应商与供应链(SQE)', questions: [ 
+                            { category: '现场审计', title: '供方审计火眼金睛', text: '去供应商(注塑厂)现场审核，必看哪三个“造假重灾区”？', tip: '【核心考察】实战经验看透本质。\n【深挖追问】\n1. 批记录完美但你在废料区发现大量不良标记定制件。末次会议如何发难？' }, 
+                            { category: '变更管控', title: '私自变更(PCN)防控', text: '供应商最易私自换料。QAA和日常管控中用什么硬核手段防范？', tip: '【核心考察】供应链延伸风险阻断。\n【深挖追问】\n1. 独家芯片商未通知停产老型号并声称新型号100%兼容，已经装机怎么应对这场灾难？' }, 
+                            { category: '质量辅导', title: '扶持劣势独家供应商', text: '技术独家但体系极差的小作坊，SQE如何辅导建立13485认知？', tip: '【核心考察】不仅是警察更是教练。\n【深挖追问】\n1. 老板嫌搞体系成本高不干了，为不断货如何退而求其次帮他建关键工序控制点卡片？' }, 
+                            { category: '年度考核', title: '供应商评估的博弈', text: '大供应商年度质量评分不合格，如何平衡采购保供压力和淘汰机制？', tip: '【核心考察】跨部门供应链优化手腕。\n【深挖追问】\n1. 采购总监说明年成本涨20%QA背锅吗？你如何用该供应商多次停工的隐形成本反击？' } ] },
+                        { setName: '第4组：体系与特殊过程审核', questions: [ 
+                            { category: '外部审核', title: '应对药监/NB外审太极', text: '面对审核员提出的明显不合理NC，陪审代表如何有理有节申诉？', tip: '【核心考察】高情商沟通与体系自信。\n【深挖追问】\n1. 审核员发现某人培训日期在入职前认定全面造假。查出是HR笔误，如何拿辅证让他撤销严重缺陷？' }, 
+                            { category: '内部审计', title: '真实内审破冰', text: '内审常走过场，主导内审如何真正挖出跨部门系统性毒瘤？', tip: '【核心考察】内审独立性与魄力。\n【深挖追问】\n1. 查出研发验证数据大量造假，研发总监(老板亲信)暗示抹平，你的内审报告怎么写？' }, 
+                            { category: '特殊过程', title: '灭菌放行核心审查', text: '审核EO灭菌批记录重点核对哪些核心物理参数和BI结果？', tip: '【核心考察】高风险工序专业度。\n【深挖追问】\n1. BI培养阴性但解析期间库温低于下限，两百万货判合格还是重新解析？依据什么？' }, 
+                            { category: '稳定性', title: '加速老化数据支撑', text: '利用加速老化和实时老化数据，支撑或展期产品效期？', tip: '【核心考察】稳定性研究理解。\n【深挖追问】\n1. 加速做3年合格，但实时做第2年剥离强度不达标。市上产品立刻召回还是重新评估验收标准？' } ] },
+                        { setName: '第5组：质量红线与终极抗压', questions: [ 
+                            { category: '特采博弈', title: '让步放行(UAI)四面楚歌', text: '年底冲业绩总经理销售厂长三方施压特采边缘瑕疵货。签还是不签？', tip: '【核心考察】最高负责人风骨红线。\n【深挖追问】\n1. 坚决不签老板拍桌让你明天不用来，交签字笔前会要求开评审会留书面反对纪要吗？如何自保？' }, 
+                            { category: '研发制衡', title: '卡住不成熟的研发', text: '项目逾期研发草草转产，发现设计验证没做全。QA如何顶住老板压力踩刹车？', tip: '【核心考察】DQA底气与论证。\n【深挖追问】\n1. 老板说小批先卖有问题迭代，如何用血淋淋上市致死召回案例打消他互联网思维念头？' }, 
+                            { category: '客诉危机', title: '应对医院不理智索赔', text: '医生称断裂致医疗事故天价赔偿，现场发现是医生违规暴力操作。怎么处理？', tip: '【核心考察】危机公关现场取证。\n【深挖追问】\n1. 医生威胁曝光媒体抵制产品，录音取证、申请医疗鉴定、安抚家属先后顺序怎么排？' }, 
+                            { category: '廉政道德', title: '直面巨额回扣诱惑', text: '供应商邮寄5万购物卡希望年审高抬贵手。标准处理流程？', tip: '【核心考察】职业操守底线。\n【深挖追问】\n1. 不收且上报致恼羞成怒断供产线停工，老板怪你不通人情世故。委屈怎么消化并重塑反腐文化？' } ] }
+                    ]
+                },
+                '销售部': {
+                    icon: 'ph-presentation-chart',
+                    questionSets: [
+                        { setName: '第1组：区域开拓与客户破冰', questions: [ 
+                            { category: '市场调研', title: '空白省份30天拓荒计划', text: '派您开拓空白且竞品盘踞的省份。抵达首月最关键3项行动？', tip: '【核心考察】计划逻辑与执行力。\n【深挖追问】\n1. 前俩月跑断腿未开单花费超标被怀疑摸鱼，第三个月如何改变打法(如包围城市)拿首单自证？' }, 
+                            { category: '客户画像', title: '解剖医院决策树', text: '开发三甲，如何分辨主任、设备科长、院长各自权重及核心利益点？', tip: '【核心考察】To-B销售漏斗洞察。\n【深挖追问】\n1. 主任极认可打了申购报告，但被设备科长卡住说价格高，准备调动什么资源帮批报告？' }, 
+                            { category: '冷拜访', title: '面对闭门羹与冷眼', text: '拜访核心主任对方极度冷淡说“用习惯竞品不想换”。差异化破局？', tip: '【核心考察】抗挫折与创造性。\n【深挖追问】\n1. 走廊堵到他只给电梯下楼30秒，用哪句话(如直击他最新论文或某术式)瞬间抓好奇心？' }, 
+                            { category: '渠道开发', title: '寻找草莽黑马代理', text: '在已被大国代垄断的区域，如何挖掘扶持有特殊临床关系的潜力经销商？', tip: '【核心考察】招商与资源整合。\n【深挖追问】\n1. 小代理跟院长关系铁但资金紧要求先铺50万货，如何在财务制度下促成合作控制风险？' } ] },
+                        { setName: '第2组：学术营销与KOL运营', questions: [ 
+                            { category: '学术演讲', title: '震撼全场科室会幻灯', text: '明早给心内科全体博士做10分钟产品演示。PPT核心逻辑是什么？', tip: '【核心考察】学术提炼卫生经济学。\n【深挖追问】\n1. 讲到一半资深副主任当众提极尖锐刁难的并发症学术问题且你确实不懂，台上如何化解保专业形象？' }, 
+                            { category: 'KOL管理', title: '转化产品代言人', text: '如何长期维护省级主委(KOL)关系，使他们愿意在年会上分享我们临床数据？', tip: '【核心考察】高维学术客情运营。\n【深挖追问】\n1. 大会前一天KOL反悔因竞品赞助翻三倍。连夜赶到酒店用什么不涉金钱话术或长期价值挽回？' }, 
+                            { category: '竞品转化', title: '攻克绝对忠诚用户', text: '主任用了进口竞品10年极顺手排斥国产。通过什么痛点让他愿试用第一台设备？', tip: '【核心考察】痛点转化打法。\n【深挖追问】\n1. 试用首日因护士装配失误报警，主任勃然大怒“国产垃圾”。现场如何力挽狂澜化灾难为展现服务契机？' }, 
+                            { category: '跟台支持', title: '手术室内价值传递', text: '进手术室跟台指导医生使用新器械，最应注意的礼仪红线和沟通技巧？', tip: '【核心考察】临床一线专业情商。\n【深挖追问】\n1. 主刀手法错致大出血风险，他好面子，几十个进修生看着，如何在旁边巧妙纠正不让他下不来台？' } ] },
+                        { setName: '第3组：招投标与物价应对', questions: [ 
+                            { category: '集采策略', title: 'VBP下的利润保卫战', text: '耗材在某省集采价格腰斩。指导代理商调整盈利模式，通过以量换价保利润？', tip: '【核心考察】宏观政策研判与算账。\n【深挖追问】\n1. 代理商没利润想解散团队，如何推演DRG大势并用高毛利创新组合拳重燃信心？' }, 
+                            { category: '标书控盘', title: '合法合规技术参数洗标', text: '医院招标前，如何提前布局将独家参数巧妙写入招标文件排他竞品？', tip: '【核心考察】合法控标洗标实战。\n【深挖追问】\n1. 标书发现被对手暗箱控标写满竞品独家参数，离标仅3天，如何通过质疑函等合法手段废标？' }, 
+                            { category: 'DRG应对', title: '医保控费大闸下宣讲', text: '院长只关心DRG不要超支。单价贵30%，如何用卫生经济学账本说服他？', tip: '【核心考察】卖临床综合解决方案视野。\n【深挖追问】\n1. 算账后医保办反驳“耗材占比超标卫健委会考核我”。用什么政策数据逻辑化解耗占比死局？' }, 
+                            { category: '物价申报', title: '从零申请新增收费编码', text: '全新创新医疗器械如何协助医院申请新增收费编码？难点在哪？', tip: '【核心考察】高端器械准入壁垒。\n【深挖追问】\n1. 需临床经济学报告但产品太新无历史数据，如何联合临床KOL撰写极具说服力专家共识去闯关？' } ] },
+                        { setName: '第4组：渠道霸权与防窜货', questions: [ 
+                            { category: '防窜货', title: '恶意低价窜货的镇压', text: 'A省大代为返利低价恶意窜货B省致罢工。如何处理？', tip: '【核心考察】铁腕治军契约精神。\n【深挖追问】\n1. A代占大区60%业绩，处罚则倒戈竞品，不处罚价格体系崩溃。妥协还是挥泪斩马谡？怎么操盘减损？' }, 
+                            { category: '渠道库存', title: '戒除年终疯狂压货毒瘾', text: '季度末为业绩强行压货。如何帮扶代理终端消耗保库存良性周转？', tip: '【核心考察】销售Sell-in与销核Sell-out。\n【深挖追问】\n1. 压了500万快过期货避不见拒接新线，下到市场用哪三板斧帮他把库存从库房推进手术室？' }, 
+                            { category: '代理汰换', title: '剥离占坑老代理', text: '占据核心坑位已躺平不产出的老代理，什么策略平稳剥离不丢终端？', tip: '【核心考察】博弈与交接手腕。\n【深挖追问】\n1. 黑白通吃扬言“敢换我就让机器天天报修”，如何提前与设备科主任打预防针扶持新代接管？' }, 
+                            { category: '账期催收', title: '百万死账的极限追逃', text: '强势代理商恶意拖欠百万超半年。不流失客户前提下有什么催款绝招？', tip: '【核心考察】收钱风险控制。\n【深挖追问】\n1. 老板两手摊说医院没结账但他全款买保时捷老赖行为。发律师函蹲点还是更巧妙卡脖子战术(扣发秘钥)？' } ] },
+                        { setName: '第5组：合规底线与极致抗压', questions: [ 
+                            { category: '合规红线', title: '商业贿赂诱惑与拒绝', text: '竞品给回扣伽奈维严守合规。劣币驱逐良币如何通过合法途径赢订单？', tip: '【核心考察】医疗反腐高压下的合规营销策略。\n【深挖追问】\n1. 关键客户露骨暗示“意思一下”，拒绝同时如何用合法阳光收入(讲课费/科研赞助)满足诉求？' }, 
+                            { category: '公关危机', title: '术中致死事故午夜凶铃', text: '器械术中突发断裂患者大出血抢救。接报第一件事做什么？', tip: '【核心考察】危机响应取证综合统筹。\n【深挖追问】\n1. 赶到时家属闹事医生指着你骂杀人凶器。如何现场稳住阵脚收集证据引导走向医疗鉴定程序？' }, 
+                            { category: '职业操守', title: '带走前东家客户名单？', text: '假设离职，上家公司曾要求带走客户名单。如何看待把公司资源变个人资源？', tip: '【核心考察】忠诚底线背调。\n【深挖追问】\n1. 面试官逼问“不带资源为什么要给你高底薪产出靠什么保证”，如何用方法论霸气回应？' }, 
+                            { category: '压力面试', title: '连续两季业绩挂零拷问', text: '入职半年努力跑但业绩0。最大原因可能是什么？如何调整？', tip: '【核心考察】深度内省不习惯归因于外。\n【深挖追问】\n1. 面试官逼问“是你狼性不够再三个月依然是零是不是该主动辞职”，面对极限否定施压作何反应？' } ] }
+                    ]
+                },
+                // ===== 新增：采购部 (Procurement / Sourcing) =====
+                '采购部': {
+                    icon: 'ph-shopping-cart',
+                    questionSets: [
+                        { setName: '第1组：寻源与供应商开发', questions: [ 
+                            { category: '寻源策略', title: '打破独家垄断供应', text: '某核心医疗级原材料目前全球只有一家供应商，价格连年上涨且经常断货。您如何规划破局策略？', tip: '【核心考察】战略寻源与替代品开发思维。\n【深挖追问】\n1. 如果研发以“重新验证周期太长、有风险”为由拒绝测试您找来的国产替代材料，您如何跨部门推动这个降本项目？' }, 
+                            { category: '资质审核', title: '合规准入排雷', text: '在引入一家新供应商时，除了常规的营业执照和ISO9001，在医疗器械行业您还会重点审核哪些“隐形资质”？', tip: '【核心考察】医疗器械供应链的合规敏锐度。\n【深挖追问】\n1. 供应商报价极低，但您发现其环评资质过期，且近期有被环保局处罚的记录。您是选择其作为备供，还是直接淘汰？为什么？' }, 
+                            { category: '尽职调查', title: '穿透式背景调查', text: '如何防止新引入的供应商其实是内部研发或高管的“裙带关联公司”？', tip: '【核心考察】廉洁风控与尽调能力。\n【深挖追问】\n1. 企查查上没有任何股权关联，但您在实地拜访时发现了哪些蛛丝马迹让您生疑并最终识破？' }, 
+                            { category: '供应商画像', title: '评估代工厂(OEM/ODM)实力', text: '在寻找PCBA或注塑件代工厂时，如果对方规模很大但医疗客户很少，和规模很小但全是医疗客户，您倾向哪家？', tip: '【核心考察】门当户对与行业特殊性理解。\n【深挖追问】\n1. 大厂产能足但配合度差，小厂配合度高但质量体系薄弱。您如何设计一套“扶持与考核”并行的导入方案？' } ] },
+                        { setName: '第2组：成本核算与极限谈判', questions: [ 
+                            { category: '成本模型', title: '撕开报价单的水分 (Should Cost)', text: '供应商发来一张总价报价单，拒绝提供明细。您是如何通过“成本拆解模型”估算出其真实底价的？', tip: '【核心考察】硬核成本分析能力（材料、人工、制费拆解）。\n【深挖追问】\n1. 您算出的底价是100元，对方死咬120元不放，声称医疗行业风险高利润必须厚。您用什么话术或数据反驳他？' }, 
+                            { category: '降本谈判', title: '强势物料的年度降本', text: '面临公司下达的整体降本10%KPI，而铜/塑料等大宗商品原物料正在疯涨，您如何与供应商谈判实现降本？', tip: '【核心考察】非纯压价的谈判策略（如VAVE、账期置换、规模效应）。\n【深挖追问】\n1. 供应商说“不涨价已经是帮忙了，降本绝对不可能”。您抛出了什么“联合降本/优化工艺”的筹码让他最终妥协？' }, 
+                            { category: '博弈心理', title: '应对“停供”威胁', text: '谈判陷入僵局，供应商突然声称“做不了，下个月停止交货”。而您目前没有可立刻顶上的二供。您如何破局？', tip: '【核心考察】极限施压下的心理素质与谈判斡旋。\n【深挖追问】\n1. 在安抚对方的同时，您在接下来的48小时内紧急采取了哪三项止损备选动作？' }, 
+                            { category: '合同条款', title: '价格与账期的隐性博弈', text: '“月结90天单价100元”与“现款现货单价95元”，您如何结合公司的资金成本(WACC)来选择最有利的条款？', tip: '【核心考察】财务视角的采购思维。\n【深挖追问】\n1. 老板要求既要95元又要月结90天，您去怎么跟供应商画饼（如后续包销承诺）来达成这个不平等条约？' } ] },
+                        { setName: '第3组：供应链交付与风险抗压', questions: [ 
+                            { category: '交期管理', title: '应对突发的“爆单”', text: '销售突然接了个大标，导致某种进口长交期物料的缺口高达50%。远水解不了近渴，您如何调拨资源保障生产？', tip: '【核心考察】供应链韧性(Resilience)与应急调度能力。\n【深挖追问】\n1. 找遍了现货市场只有一家代理商有货，但坐地起价要求加价300%。您如何通过高层施压、原厂协调或寻找平替来解决？' }, 
+                            { category: '预测管理', title: '牛鞭效应下的库存灾难', text: '销售的Forecast（预测）永远不准。采购按预测备货导致库存积压，不备货又被投诉断料。您如何建立破局的S&OP机制？', tip: '【核心考察】跨部门供应链协同与库存控制。\n【深挖追问】\n1. 您是否主导过VMI（供应商管理库存）或寄售模式？在推行过程中，供应商最担心的“呆滞风险”您是怎么在协议中化解的？' }, 
+                            { category: '异常处置', title: '物料质量事故索赔', text: '供应商的物料存在隐蔽缺陷，导致我方生产线上报废了价值10万的成品。供应商只同意赔偿物料本身（1万元），您如何追索全额损失？', tip: '【核心考察】索赔谈判与质量协议(QAA)执行力度。\n【深挖追问】\n1. 供应商态度强硬：“要赔10万以后就不合作了”。您如何联合法务、QA甚至高层，软硬兼施拿到赔偿？' }, 
+                            { category: '全球供应链', title: '地缘政治与关税应对', text: '核心芯片被美国列入出口管制实体清单，或加征高额关税。作为采购总监，您的中长期供应链安全预案是什么？', tip: '【核心考察】宏观风险预判与全球化寻源格局。\n【深挖追问】\n1. 在推动“芯片国产替代”进程中，国内厂家技术不成熟导致频频炸机，您如何在研发抱怨和供应链安全之间做平衡？' } ] },
+                        { setName: '第4组：供应商关系与生命周期管理', questions: [ 
+                            { category: '绩效考核', title: '有牙齿的年度评估(SRM)', text: '公司每年都做供应商考评，但大多流于形式。您如何设计考评指标，并让“不合格的供应商”真正感受到痛？', tip: '【核心考察】SRM供应商关系管理体系的落地能力。\n【深挖追问】\n1. 对于考评连续垫底但又是独家的供应商，除了罚款，您会实施怎样的“整改升级辅导（Supplier Development）”计划？' }, 
+                            { category: '战略合作', title: '从买卖关系到战略联盟', text: '如何判断一家供应商值得培养为“战略合作伙伴”？您给予战略供应商的排他性权益通常有哪些？', tip: '【核心考察】供应链生态圈建设能力。\n【深挖追问】\n1. 战略供应商借着“唯一指定”的地位开始温水煮青蛙，服务变差价格变高。您如何引入“鲶鱼效应”敲打他？' }, 
+                            { category: '淘汰退出', title: '老供方的平稳剥离', text: '某老供应商跟着公司起步，但现在技术和管理已跟不上公司发展。您如何体面且不引发断供风险地将其淘汰？', tip: '【核心考察】风险控制与人情世故的平衡。\n【深挖追问】\n1. 这个老供应商的老板和你们公司董事长是结拜兄弟，董事长让他来找你通融。你作为采购负责人，这事怎么处理？' }, 
+                            { category: '早期介入', title: 'EPI（早期采购参与）推行', text: '在研发设计图纸还没定型的阶段，您作为采购人员提前介入(EPI/EVI)的核心目的是什么？', tip: '【核心考察】前端防范呆滞物料与定制件成本失控的意识。\n【深挖追问】\n1. 研发嫌你外行指导内行，不愿意让你看图纸。你如何用“选型通用化能降低一半采购周期”的数据打动他？' } ] },
+                        { setName: '第5组：职业操守与合规红线 (高压防腐)', questions: [ 
+                            { category: '阳光采购', title: '直面巨额回扣的诱惑', text: '采购预算5000万的设备招投标。某落后厂家私下向您承诺，只要帮他中标，给您个人5个点的“咨询费”。您怎么做？', tip: '【核心考察】采购岗位的终极底线与廉政操守。\n【深挖追问】\n1. 如果你不收，对方甚至反咬一口写匿名信诬告你收了竞品的钱。面对老板的猜疑和审计部的调查，你如何自证清白？' }, 
+                            { category: '利益冲突', title: '应对“关系户”供应商', text: '销售总监强行推荐他小舅子开的包装厂，报价比现有供应商高5%，但销售总监承诺“用了他，我今年业绩多做2000万”。您怎么批？', tip: '【核心考察】跨部门利益冲突下的原则性与高情商处理。\n【深挖追问】\n1. 你坚持按规矩走招投标，小舅子落标。销售总监年底业绩没达标，在年会上公开把锅甩给你说“采购部不支持前端业务”。你怎么回应？' }, 
+                            { category: '请客送礼', title: '中秋节的购物卡', text: '过节时，长期合作的供应商寄来两箱大闸蟹，里面夹着一张2000元的超市卡。您的标准处理流程是什么？', tip: '【核心考察】企业合规制度(Compliance)的执行细节。\n【深挖追问】\n1. 卡退回去了，但供应商老板亲自上门，说这只是私人感情绝对不求回报，如果你不收就是看不起他。你如何妥善处理这人情世故？' }, 
+                            { category: '内审应对', title: '解释异常的高价采购', text: '财务内审时发现，您上个月采购的一批紧急电子元器件，单价比历史最高价还贵了20%。您拿什么证据向内审解释这不是利益输送？', tip: '【核心考察】采购全过程留痕与合规自证能力。\n【深挖追问】\n1. 如果当时情况紧急是老板口头拍板同意高价买的，现在内审追责，老板却说“我只是让你想办法买到，没让你买这么贵”。你手里没有书面审批，这个哑巴亏你怎么吃或者怎么破？' } ] }
+                    ]
+                }
+            };
+
+            const currentDept = ref('注册法规部');
+            const currentSetIndex = ref(0);
+            
+            const scoresStore = ref({});
+            const form = ref({ name: '', level: '中级 / 资深 (Senior)', notes: '', decision: '' });
+            
+            const getQKey = (idx) => `${currentDept.value}_${currentSetIndex.value}_${idx}`;
+            
+            const isRecording = ref({});
+            const isAnalyzing = ref({});
+            const transcripts = ref({});
+            const aiEvaluations = ref({});
+
+            const currentData = computed(() => departments[currentDept.value]);
+            const currentQuestions = computed(() => currentData.value.questionSets[currentSetIndex.value].questions);
+
+            const showApiModal = ref(false);
+            const apiKeyInput = ref('');
+            const hasApiKey = ref(false);
+            let recognition = null;
+            let chart = null;
+
+            onMounted(() => {
+                const savedKey = localStorage.getItem('deepseek_api_key');
+                if (savedKey) {
+                    apiKeyInput.value = savedKey;
+                    hasApiKey.value = true;
+                }
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (SpeechRecognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = true; 
+                    recognition.interimResults = true; 
+                    recognition.lang = 'zh-CN';
+
+                    recognition.onresult = (event) => {
+                        let finalTranscript = '';
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                            if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+                        }
+                        const currentActiveKey = Object.keys(isRecording.value).find(key => isRecording.value[key]);
+                        if (finalTranscript && currentActiveKey) {
+                            if (!transcripts.value[currentActiveKey]) transcripts.value[currentActiveKey] = '';
+                            transcripts.value[currentActiveKey] += finalTranscript + '，';
+                        }
+                    };
+                    recognition.onerror = (e) => {
+                        console.error("语音识别底层报错:", e.error);
+                        Object.keys(isRecording.value).forEach(k => isRecording.value[k] = false);
+                        
+                        // 增强版错误提示
+                        if(e.error === 'not-allowed') {
+                            alert("麦克风权限被拒绝！请点击浏览器地址栏的锁图标开启麦克风。");
+                        } else if (e.error === 'network') {
+                            alert("网络连接失败！\n原因：如果您使用 Chrome，其底层 Google 语音服务在国内受限。\n建议：请改用 Microsoft Edge 浏览器打开本页面！");
+                        } else if (e.error === 'no-speech') {
+                            alert("未能检测到声音，请检查麦克风设备是否正常。");
+                        } else {
+                            alert("语音识别发生错误: " + e.error);
+                        }
+                    };
+                    recognition.onend = () => {
+                        const currentActiveKey = Object.keys(isRecording.value).find(key => isRecording.value[key]);
+                        if(currentActiveKey) {
+                             try { recognition.start(); } catch(e){}
+                        }
+                    };
+                }
+                
+                nextTick(() => updateChart());
+            });
+
+            const saveApiKey = () => {
+                if (apiKeyInput.value.trim().length < 10) return alert('请输入有效的 API Key');
+                localStorage.setItem('deepseek_api_key', apiKeyInput.value.trim());
+                hasApiKey.value = true;
+                showApiModal.value = false;
+            };
+
+            const selectDepartment = (dept) => {
+                currentDept.value = dept; currentSetIndex.value = 0;
+                nextTick(() => {
+                    updateChart();
+                    // 使移动端顶部横向导航平滑滚动到当前点击的位置
+                    const scrollContainer = document.querySelector('.hide-scrollbar');
+                    if (scrollContainer) {
+                        const activeBtn = scrollContainer.querySelector('.bg-brand-600');
+                        if (activeBtn) {
+                            scrollContainer.scrollTo({
+                                left: activeBtn.offsetLeft - 20,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            };
+            
+            const selectSet = (index) => {
+                currentSetIndex.value = index;
+                nextTick(() => updateChart());
+            };
+
+            const getScore = (idx) => scoresStore.value[getQKey(idx)] || 0;
+            const setScore = (idx, val) => {
+                scoresStore.value[getQKey(idx)] = parseInt(val);
+                updateChart();
+            };
+
+            const toggleRecording = async (idx) => {
+                if (!hasApiKey.value) return showApiModal.value = true;
+                if (!recognition) return alert("您的浏览器不支持 Web Speech API，请使用 Chrome 或 Edge。");
+
+                const key = getQKey(idx);
+                
+                if (isRecording.value[key]) {
+                    isRecording.value[key] = false;
+                    recognition.stop();
+                    
+                    if (!transcripts.value[key] || transcripts.value[key].trim().length < 5) {
+                        alert("录音文本太短，AI无法进行有效分析，请重新录制。");
+                        return;
+                    }
+                    await callDeepSeekAPI(idx, key);
+                } else {
+                    Object.keys(isRecording.value).forEach(k => isRecording.value[k] = false);
+                    isRecording.value[key] = true;
+                    transcripts.value[key] = ''; 
+                    aiEvaluations.value[key] = null; 
+                    try { recognition.start(); } catch(e) {}
+                }
+            };
+
+            const callDeepSeekAPI = async (idx, key) => {
+                isAnalyzing.value[key] = true;
+                const apiKey = localStorage.getItem('deepseek_api_key');
+                const questionData = currentQuestions.value[idx];
+                
+                const systemPrompt = `你是一个严厉且专业的医疗器械行业面试官(金牌面试官)。
+你的任务是根据候选人的语音转写回答，对其表现进行结构化打分评估。
+评判标准：重点考察医疗器械合规红线(ISO13485/GMP/NMPA等)、跨部门统筹能力、追问细节的破绽。
+必须返回严格的JSON格式数据，不可包含其他文字。
+{
+  "highlight": "一句话指出的核心亮点",
+  "risk": "一句话指出的专业漏洞或风险隐患",
+  "reason": "综合评估理由(50字内)",
+  "score": 3 
+}
+* score必须是1到5的整数。`;
+
+                const userPrompt = `面试考题：${questionData.title}\n题目背景：${questionData.text}\n面试官深挖指引：${questionData.tip}\n---\n候选人回答实录：${transcripts.value[key]}`;
+
+                try {
+                    const response = await fetch('https://api.deepseek.com/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                        body: JSON.stringify({
+                            model: 'deepseek-chat',
+                            messages: [
+                                { role: 'system', content: systemPrompt },
+                                { role: 'user', content: userPrompt }
+                            ],
+                            temperature: 0.1,
+                            response_format: { type: 'json_object' }
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('API 调用失败');
+                    const data = await response.json();
+                    let content = data.choices[0].message.content;
+                    content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+                    aiEvaluations.value[key] = JSON.parse(content);
+
+                } catch (error) {
+                    console.error(error);
+                    alert("AI 分析失败，请检查网络或您的 API Key 额度。");
+                } finally {
+                    isAnalyzing.value[key] = false;
+                }
+            };
+
+            const applyAiScore = (idx, score) => setScore(idx, score);
+
+            const updateChart = () => {
+                const ctx = document.getElementById('abilityChart');
+                if(!ctx) return;
+                
+                const labels = currentQuestions.value.map(q => q.category);
+                const dataValues = currentQuestions.value.map((_, i) => getScore(i));
+
+                if (chart) chart.destroy();
+                let gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(14, 165, 233, 0.4)'); gradient.addColorStop(1, 'rgba(2, 132, 199, 0.1)');
+
+                chart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: '深度评估得分', data: dataValues, backgroundColor: gradient,
+                            borderColor: '#0ea5e9', pointBackgroundColor: '#0284c7', pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#0ea5e9',
+                            pointRadius: 4, pointHoverRadius: 6, borderWidth: 2
+                        }]
+                    },
+                    options: { 
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { 
+                            r: { 
+                                min: 0, max: 5, ticks: { stepSize: 1, display: false },
+                                pointLabels: { font: { size: 10, weight: 'bold' }, color: '#475569' },
+                                grid: { color: '#f1f5f9' }, angleLines: { color: '#f1f5f9' }
+                            } 
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            };
+
+            const generateReport = () => { window.print(); };
+
+            return { 
+                departments, currentDept, currentData, currentSetIndex, currentQuestions, getQKey,
+                selectDepartment, selectSet, getScore, setScore, form, generateReport,
+                showApiModal, apiKeyInput, hasApiKey, saveApiKey,
+                isRecording, transcripts, isAnalyzing, aiEvaluations, toggleRecording, applyAiScore
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>

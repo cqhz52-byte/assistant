@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>伽奈维医疗 - 核心人才测评系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        body { -webkit-font-smoothing: antialiased; background-color: #e5e7eb; margin: 0; padding: 0; font-family: sans-serif; overflow-x: hidden; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+        th, td { border: 1px solid #d1d5db; padding: 6px; text-align: center; font-size: 11px; }
+        th { background-color: #f3f4f6; font-weight: bold; color: #111827; }
+
+        .pdf-page {
+            width: 794px !important;    
+            height: 1123px !important;  
+            max-width: 794px !important;
+            min-width: 794px !important;
+            background-color: white;
+            padding: 35px 40px;         
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .sec-title { font-size: 15px; font-weight: bold; color: #000; margin-bottom: 6px; border-left: 3px solid #1D4ED8; padding-left: 6px; }
+        .sec-sub { font-size: 10px; color: #6b7280; font-weight: normal; margin-left: 6px; }
+        
+        .exporting-mode { position: absolute !important; top: 0 !important; left: 0 !important; z-index: 9999 !important; background-color: #e5e7eb; }
+    </style>
+</head>
+<body class="text-gray-900 min-h-screen flex flex-col no-scrollbar">
+
+    <header id="top-header" class="bg-blue-800 text-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-lg md:text-xl font-bold tracking-wider">伽奈维医疗 | 核心人才测评</h1>
+        <div id="user-info-display" class="hidden text-xs md:text-sm font-medium bg-blue-900 px-3 py-1 rounded-full"></div>
+    </header>
+
+    <main class="flex-grow w-full flex flex-col items-center pt-6 pb-10">
+        
+        <section id="view-intro" class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md mx-4">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">基本信息填写</h2>
+            </div>
+            <div class="space-y-4">
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">姓名</label><input type="text" id="input-name" class="w-full border p-3 rounded outline-none" placeholder="请输入真实姓名"></div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">所属部门</label>
+                    <select id="input-dept" class="w-full border p-3 rounded outline-none">
+                        <option value="研发部">研发部</option>
+                        <option value="财务部">财务部</option>
+                        <option value="人事部">人事部</option>
+                        <option value="采购部">采购部</option>
+                        <option value="市场/销售部">市场/销售部</option>
+                        <option value="管理层">管理层</option>
+                        <option value="其他部门">其他部门</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1">性别</label><select id="input-gender" class="w-full border p-3 rounded outline-none"><option value="男">男</option><option value="女">女</option></select></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1">年龄</label><input type="number" id="input-age" class="w-full border p-3 rounded outline-none" placeholder="年龄"></div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">学历</label>
+                    <select id="input-edu" class="w-full border p-3 rounded outline-none">
+                        <option value="大学专科">大学专科</option><option value="大学本科" selected>大学本科</option><option value="硕士研究生">硕士研究生</option><option value="博士及以上">博士及以上</option>
+                    </select>
+                </div>
+                <button onclick="startTest()" class="w-full bg-blue-700 text-white p-3 rounded font-bold text-lg hover:bg-blue-800 mt-6 shadow transition-all">开始测评</button>
+                <button onclick="clearCache()" class="w-full text-gray-400 text-xs underline mt-2 hover:text-gray-600 transition-all">清除本地缓存</button>
+                
+
+            </div>
+        </section>
+
+        <section id="view-quiz" class="hidden bg-white p-6 md:p-10 rounded-xl shadow-lg w-full max-w-2xl mx-4">
+            <div class="mb-6">
+                <div class="flex justify-between text-sm font-bold text-gray-600 mb-2"><span id="step-indicator">第一阶段: 选出最符合项</span><span id="progress-text">1 / 67</span></div>
+                <div class="w-full bg-gray-200 h-2 rounded"><div id="progress-bar" class="bg-blue-700 h-2 rounded transition-all duration-300" style="width: 0%"></div></div>
+            </div>
+            <h3 id="question-prompt" class="text-xl md:text-2xl font-bold mb-6 text-gray-900 text-center leading-snug">以下哪项陈述最符合您？</h3>
+            <div id="options-container" class="space-y-4"></div>
+        </section>
+
+        <div id="view-result" class="hidden w-full relative pt-4 pb-10 overflow-hidden">
+            <div class="max-w-[794px] mx-auto px-4 relative z-50 flex gap-4">
+                <button id="export-btn" onclick="exportPDF()" class="flex-1 bg-red-600 text-white px-5 py-3 rounded shadow-xl font-bold hover:bg-red-700 text-sm tracking-widest mb-6 flex items-center justify-center transition-all">
+                    ⬇️ 导出标准 A4 报告 (自动2页)
+                </button>
+                <button onclick="restartTest()" class="bg-gray-600 text-white px-5 py-3 rounded shadow-xl font-bold hover:bg-gray-700 text-sm tracking-widest mb-6 flex items-center justify-center transition-all">
+                    🔄 重新测评
+                </button>
+            </div>
+
+            <div id="report-wrapper" style="width: 794px; margin: 0 auto; position: relative; transform-origin: top center;">
+                <div id="pdf-page-1" class="pdf-page">
+                    <div class="border-b-2 border-blue-900 pb-2 mb-4 flex justify-between items-end">
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-black tracking-tight mb-1">人才测评一页纸</h2>
+                            <p class="text-gray-600 font-medium text-xs" id="report-user-sub"></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-gray-500 mb-1" id="report-stats">有效作答时间: 计算中... | 过快应答率: 计算中...</p>
+                            <p class="font-bold text-blue-900 text-lg leading-tight">伽奈维医疗</p>
+                            <p id="report-validity" class="text-xs font-bold mt-1">【报告状态生成中...】</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <div class="col-span-1"><div class="sec-title">1. 性格总览</div><div id="radar-chart" class="echarts-container" style="width: 100%; height: 160px;"></div></div>
+                        <div class="col-span-2"><div class="sec-title">2. 典型性格特征<span class="sec-sub">基于性格倾向提取核心管理优势</span></div><table class="w-full mt-2"><thead><tr><th class="w-1/5 py-1">管理维度</th><th class="w-1/5 py-1">得分</th><th class="w-3/5 py-1">表现描述</th></tr></thead><tbody id="typical-traits-body"></tbody></table></div>
+                    </div>
+                    <div class="mb-4"><div class="sec-title">3. 性格剖面图<span class="sec-sub">大五人格25个细分维度得分 (满分10分)</span></div><div id="bar-chart" class="echarts-container" style="width: 100%; height: 210px;"></div></div>
+                    <div class="grid grid-cols-2 gap-6 mb-4">
+                        <div><div class="sec-title">4. 领导力指数</div><p class="text-[9px] text-gray-500 mb-1 ml-2">越靠近右侧深色区域优势越明显</p><div id="gauge-chart" class="echarts-container" style="width: 100%; height: 130px;"></div></div>
+                        <div><div class="sec-title">5. 团队角色</div><p class="text-[9px] text-gray-500 mb-1 ml-2">得分越高，越倾向承担该角色</p><div id="role-bar-chart" class="echarts-container" style="width: 100%; height: 130px;"></div></div>
+                    </div>
+                    <div class="mb-4"><div class="sec-title">6. 岗位倾向</div><table class="mt-2"><thead id="job-table-head"></thead><tbody id="job-table-body"></tbody></table></div>
+                    <div><div class="sec-title">7. 发展建议</div><div class="bg-blue-50 p-3 rounded text-[11px] text-gray-800 leading-relaxed border border-blue-100"><ul class="space-y-1.5" id="dev-suggestions"></ul></div></div>
+                    <div class="absolute bottom-4 left-0 w-full text-center text-[10px] text-gray-400 font-bold">© 2026 伽奈维医疗管理科技有限公司 · PAGE 1</div>
+                </div>
+
+                <div id="pdf-page-2" class="pdf-page">
+                    <div class="sec-title text-xl mb-4">8. 维度详解 <span class="sec-sub text-sm">25个子维度的详细解读</span></div>
+                    <table class="text-[10px]">
+                        <thead><tr><th class="w-[8%] py-2">大类</th><th class="w-[38%] text-right pr-4">低分倾向描述 (<5分)</th><th class="w-[16%]">子维度及得分</th><th class="w-[38%] text-left pl-4">高分倾向描述 (≥5分)</th></tr></thead>
+                        <tbody id="detail-table-body"></tbody>
+                    </table>
+                    <div class="absolute bottom-4 left-0 w-full text-center text-[10px] text-gray-400 font-bold">© 2026 伽奈维医疗管理科技有限公司 · PAGE 2</div>
+                </div>
+            </div> 
+        </div>
+    </main>
+
+    <script>
+        window.onload = function() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                const btn = document.getElementById('export-btn');
+                btn.innerHTML = '⚠️ 高清 A4 报告请前往电脑端导出';
+                btn.disabled = true;
+                btn.classList.replace('bg-red-600', 'bg-gray-400');
+                btn.classList.replace('hover:bg-red-700', 'cursor-not-allowed');
+            }
+            loadProgress();
+        };
+
+        const BIG_FIVE_MAP = {
+            '情绪稳定性': ['平和度', '自信度', '情绪控制', '抗压性'],
+            '外倾性': ['乐群性', '活力性', '主导支配', '影响性'],
+            '亲和性': ['同理心', '合作性', '谦虚性', '利他性'],
+            '思维开放性': ['好奇心', '分析思维', '概念思维', '创造思维', '适应性', '独立性'],
+            '尽责性': ['条理性', '自律性', '可靠性', '成就动机', '坚韧性', '主动性', '关注细节']
+        };
+
+        const ALL_TRAITS = Object.values(BIG_FIVE_MAP).flat();
+
+        const TRAIT_DICT = {
+            '平和度': { low: '对可能发生的负面情况敏感，容易体验到不安情绪', high: '大多数情况保持平和的状态，很少担忧' },
+            '自信度': { low: '对于挑战性的工作态度谨慎，避免风险', high: '面对困难不回避，相信自己能够有效应对挑战' },
+            '情绪控制': { low: '容易公开表露情绪，起伏较大，恢复需要时间', high: '平静克制，能够合理表达情绪' },
+            '抗压性': { low: '对压力敏感，批评情境容易体验到挫折感', high: '能够冷静应对压力、接受批评，平静做出反应' },
+            '乐群性': { low: '偏好安静、独处，避免社交活动中表露过度', high: '享受社交活动，快速建立社交关系' },
+            '活力性': { low: '偏好较慢的方式投入活动，接受平稳节奏', high: '精力充沛，行动迅速，享受快节奏工作状态' },
+            '主导支配': { low: '较少指导他人工作，避免过于强势', high: '乐于掌控工作，主动分配并指导他人' },
+            '影响性': { low: '避免执意说服他人，在谈判中显得温和', high: '喜欢并善于运用各种方法说服他人接受观点' },
+            '同理心': { low: '更多从自身需求考虑，对他人感受不敏感', high: '设身处地理解他人，对他人需求感同身受' },
+            '合作性': { low: '倾向独立工作，与他人意见不一致时不愿让步', high: '关注团队目标，包容他人，避免冲突' },
+            '谦虚性': { low: '倾向展现自己，突出个人贡献，建议接受度低', high: '处事低调，不固守经验，倾向接纳他人意见' },
+            '利他性': { low: '优先关注个人需求，避免因他人影响利益', high: '关注他人或团队需要，主动提供帮助' },
+            '好奇心': { low: '喜欢熟悉可预测的事物，兴趣爱好固定', high: '对未知事物充满兴趣，乐于探索规律' },
+            '分析思维': { low: '倾向直觉判断，避免过分依赖逻辑分析', high: '喜欢从不同角度系统分析复杂问题' },
+            '概念思维': { low: '注重实际，倾向从当下操作层面开展工作', high: '洞察信息，倾向归纳提炼，立足长远规划' },
+            '创造思维': { low: '注重实效，解决问题时喜欢用习惯的方式', high: '拥有新奇的想法，享受需要创造力的工作' },
+            '适应性': { low: '倾向在稳定环境工作，需要长时间适应变化', high: '主动拥抱变化，能够灵活调整以适应变化' },
+            '独立性': { low: '倾向在他人的协助下做判断，避免独立决策', high: '倾向独立决策，依靠自己判断展开工作' },
+            '条理性': { low: '不喜欢事先规划，随情景变化临时修改计划', high: '将工作安排的井井有条，并按照计划推进' },
+            '自律性': { low: '容易受到外界干扰，需外力持续推动下工作', high: '能够自我监督，克服外界干扰，坚持到底' },
+            '可靠性': { low: '随性，难以预测，不总是按期履行约定', high: '遵守承诺，即使面临困难，仍旧尽力做到' },
+            '成就动机': { low: '注重当下感受，对待目标较随性', high: '有很高的抱负，设定挑战性目标并积极追求' },
+            '坚韧性': { low: '面临较大困难时易退缩，恢复动力较慢', high: '面对困难能够积极调整，想办法解决困难' },
+            '主动性': { low: '安于现状，不愿主动承担额外工作', high: '主动应对新挑战，自愿承担职责，采取行动' },
+            '关注细节': { low: '对全局更为关心，不会过分沉溺于细节', high: '关注细节问题，很少有重要细节被忽略' }
+        };
+
+        const questionsData = [
+            { id: 1, options: [{id: 'A', text: '即使很生气，我也不会表露出来', trait: '情绪控制'}, {id: 'B', text: '受到批评不会让我的情绪产生太大波动', trait: '抗压性'}, {id: 'C', text: '我会反复确认细节问题', trait: '关注细节'}] },
+            { id: 2, options: [{id: 'A', text: '我总能快速做出调整，以应对外部环境变化', trait: '适应性'}, {id: 'B', text: '我喜欢琢磨事物的规律', trait: '分析思维'}, {id: 'C', text: '我总是很快从挫折中恢复过来', trait: '坚韧性'}] },
+            { id: 3, options: [{id: 'A', text: '在表达自己意见后，我会礼貌请别人纠正我', trait: '谦虚性'}, {id: 'B', text: '我总是能够察觉到别人的需求', trait: '同理心'}, {id: 'C', text: '工作中我很少体验到焦虑', trait: '平和度'}] },
+            { id: 4, options: [{id: 'A', text: '交给我的事情我都会跟进完毕', trait: '可靠性'}, {id: 'B', text: '我擅长做事物发展规律的推演', trait: '概念思维'}, {id: 'C', text: '我喜欢探索新知识', trait: '好奇心'}] },
+            { id: 5, options: [{id: 'A', text: '我喜欢掌控团队的工作节奏', trait: '主导支配'}, {id: 'B', text: '我喜欢缓慢的工作和生活节奏', trait: '活力性'}, {id: 'C', text: '遇到任务，我总是最先站出来', trait: '主动性'}] },
+            { id: 6, options: [{id: 'A', text: '在工作中，我总能说服影响其他人', trait: '影响性'}, {id: 'B', text: '要让我生气不是件容易的事', trait: '情绪控制'}, {id: 'C', text: '我能心平气和地处理临时分配给我的任务', trait: '适应性'}] },
+            { id: 7, options: [{id: 'A', text: '我总是基于客观信息、线索做判断', trait: '分析思维'}, {id: 'B', text: '我总是把各种文档归类得很清楚', trait: '条理性'}, {id: 'C', text: '我交付的成果总是令人放心的', trait: '可靠性'}] },
+            { id: 8, options: [{id: 'A', text: '我喜欢与他人协同完成工作', trait: '合作性'}, {id: 'B', text: '我总会考虑他人的感受', trait: '同理心'}, {id: 'C', text: '他人对我表示反对时，我也总是听取', trait: '谦虚性'}] },
+            { id: 9, options: [{id: 'A', text: '我享受在活动上和许多不同的人交谈', trait: '乐群性'}, {id: 'B', text: '我享受紧张忙碌的工作节奏', trait: '活力性'}, {id: 'C', text: '我有把握完成从没做过的任务', trait: '自信度'}] },
+            { id: 10, options: [{id: 'A', text: '朋友认为我有很强的影响力', trait: '影响性'}, {id: 'B', text: '沟通时，我总是会考虑对方的感受', trait: '同理心'}, {id: 'C', text: '我主动跟他人分享我的经验', trait: '利他性'}] },
+            { id: 11, options: [{id: 'A', text: '事情与我想象的不一样，我能快速调整自己以适应', trait: '适应性'}, {id: 'B', text: '我总能基于当下情况对未来发展做出判断', trait: '概念思维'}, {id: 'C', text: '我总能从不同来源的信息中发现内在关系', trait: '分析思维'}] },
+            { id: 12, options: [{id: 'A', text: '我总能主动把工作落实好', trait: '主动性'}, {id: 'B', text: '对我来说提炼规律很容易', trait: '概念思维'}, {id: 'C', text: '我擅长以逻辑思维解决复杂问题', trait: '分析思维'}] },
+            { id: 13, options: [{id: 'A', text: '我很少把怒气表露出来', trait: '情绪控制'}, {id: 'B', text: '在活动上，我常主动与陌生人讲话', trait: '乐群性'}, {id: 'C', text: '我经常主动参与棘手任务的处理', trait: '主动性'}] },
+            { id: 14, options: [{id: 'A', text: '我经常能对一个问题提出多种解决方案', trait: '创造思维'}, {id: 'B', text: '在处理挑战性任务时，我充满信心', trait: '自信度'}, {id: 'C', text: '遇到工作机会，我会尽力争取', trait: '成就动机'}] },
+            { id: 15, options: [{id: 'A', text: '我不断追求获得更高的水平', trait: '成就动机'}, {id: 'B', text: '我总是主动寻找资源推动任务完成', trait: '主动性'}, {id: 'C', text: '能帮到别人让我感到由衷开心', trait: '利他性'}] },
+            { id: 16, options: [{id: 'A', text: '我能很快感受到他人的真实情绪', trait: '同理心'}, {id: 'B', text: '我更倾向于遵循自己的判断', trait: '独立性'}, {id: 'C', text: '他人总会在我的说服下有所改变', trait: '影响性'}] },
+            { id: 17, options: [{id: 'A', text: '我总能发现其他人不易发现的逻辑关系', trait: '分析思维'}, {id: 'B', text: '我有及时整理物品的习惯', trait: '条理性'}, {id: 'C', text: '我喜欢了解新事物背后的原理', trait: '好奇心'}] },
+            { id: 18, options: [{id: 'A', text: '我常因外界干扰无法在规定时间内完成工作', trait: '自律性'}, {id: 'B', text: '工作受阻，我会感到焦虑', trait: '平和度'}, {id: 'C', text: '压力容易让我感到筋疲力尽', trait: '抗压性'}] },
+            { id: 19, options: [{id: 'A', text: '我总是真诚接受他人的建议', trait: '谦虚性'}, {id: 'B', text: '我享受与他人一起达成目标', trait: '合作性'}, {id: 'C', text: '外部干扰极少影响我', trait: '自律性'}] },
+            { id: 20, options: [{id: 'A', text: '我喜欢分析复杂专业问题', trait: '分析思维'}, {id: 'B', text: '受到责备后，我总能快速打起精神', trait: '坚韧性'}, {id: 'C', text: '我总是一丝不苟地完成工作任务', trait: '关注细节'}] },
+            { id: 21, options: [{id: 'A', text: '即使没人支持，我也充满自信', trait: '自信度'}, {id: 'B', text: '周围的人总是期望我来做决定', trait: '独立性'}, {id: 'C', text: '面对挫折，我总是坚持到底', trait: '坚韧性'}] },
+            { id: 22, options: [{id: 'A', text: '评估未来发展趋势对我来说很容易', trait: '概念思维'}, {id: 'B', text: '我总能在他人身上看到值得学习的地方', trait: '谦虚性'}, {id: 'C', text: '我很容易感知别人的需求', trait: '同理心'}] },
+            { id: 23, options: [{id: 'A', text: '我习惯对文档做清晰的分类和归档', trait: '条理性'}, {id: 'B', text: '对方对我无礼，我也能保持冷静', trait: '情绪控制'}, {id: 'C', text: '我很少在细节上出问题', trait: '关注细节'}] },
+            { id: 24, options: [{id: 'A', text: '我总向他人请教建议', trait: '谦虚性'}, {id: 'B', text: '我很容易关注到别人的情绪变化', trait: '同理心'}, {id: 'C', text: '我喜欢团队协作的氛围', trait: '合作性'}] },
+            { id: 25, options: [{id: 'A', text: '我经常尝试新的工作方法', trait: '创造思维'}, {id: 'B', text: '无论外部情况如何我总能轻松适应', trait: '适应性'}, {id: 'C', text: '帮助他人让我很有成就感', trait: '利他性'}] },
+            { id: 26, options: [{id: 'A', text: '别人做决策前往往会征求我的意见', trait: '影响性'}, {id: 'B', text: '我喜欢参加社交活动', trait: '乐群性'}, {id: 'C', text: '工作中我很少会体验到情绪波动很大', trait: '平和度'}] },
+            { id: 27, options: [{id: 'A', text: '即使困难重重，我也不会中止正在开展的工作', trait: '坚韧性'}, {id: 'B', text: '我经常能构思出特别新奇的东西', trait: '创造思维'}, {id: 'C', text: '对我来说在多项任务灵活切换不是难事', trait: '适应性'}] },
+            { id: 28, options: [{id: 'A', text: '朋友经常说我能够感同身受', trait: '同理心'}, {id: 'B', text: '我相信在工作中合作更有助于提高业绩', trait: '合作性'}, {id: 'C', text: '我时刻保持激情投入工作', trait: '活力性'}] },
+            { id: 29, options: [{id: 'A', text: '我喜欢在快节奏的环境中工作', trait: '活力性'}, {id: 'B', text: '我确信自己的判断力，喜欢自己做决定', trait: '独立性'}, {id: 'C', text: '我不愿意指挥他人', trait: '主导支配'}] },
+            { id: 30, options: [{id: 'A', text: '我常从帮助他人的过程中体会到很大乐趣', trait: '利他性'}, {id: 'B', text: '外界因素干扰我，我仍会按照原则做事', trait: '自律性'}, {id: 'C', text: '我总能基于当前情况形成长期规划', trait: '概念思维'}] },
+            { id: 31, options: [{id: 'A', text: '我喜欢参加集体活动', trait: '乐群性'}, {id: 'B', text: '我常给团队成员分配工作', trait: '主导支配'}, {id: 'C', text: '我善于说服别人接受我的建议', trait: '影响性'}] },
+            { id: 32, options: [{id: 'A', text: '我能在高压环境下冷静工作', trait: '抗压性'}, {id: 'B', text: '我能自如地与初次见面的人交流', trait: '乐群性'}, {id: 'C', text: '受到质疑，不会影响我的信心', trait: '自信度'}] },
+            { id: 33, options: [{id: 'A', text: '我总能关注到细微变化', trait: '关注细节'}, {id: 'B', text: '我擅长从当前情况预测未来发展趋势', trait: '概念思维'}, {id: 'C', text: '我总是很清楚自己下一步的计划', trait: '条理性'}] },
+            { id: 34, options: [{id: 'A', text: '遇到突发事件，我总是很镇静', trait: '平和度'}, {id: 'B', text: '我在工作中总能抵制干扰', trait: '自律性'}, {id: 'C', text: '推进工作前我会安排完备的计划', trait: '条理性'}] },
+            { id: 35, options: [{id: 'A', text: '我擅长从零散的信息中发现内在联系', trait: '分析思维'}, {id: 'B', text: '我总将自己的物品保持得井井有条', trait: '条理性'}, {id: 'C', text: '我总能从表象中提炼问题本质', trait: '概念思维'}] },
+            { id: 36, options: [{id: 'A', text: '我喜欢探索未知的领域', trait: '好奇心'}, {id: 'B', text: '我主动尝试各种方式完成工作', trait: '主动性'}, {id: 'C', text: '我常常主动关心需要帮助的人', trait: '利他性'}] },
+            { id: 37, options: [{id: 'A', text: '意见分歧时我通常能保持冷静', trait: '情绪控制'}, {id: 'B', text: '外部需求发生改变，我也总能顺利应对', trait: '适应性'}, {id: 'C', text: '遇到紧急情况，我仍会保证工作的品质和标准', trait: '可靠性'}] },
+            { id: 38, options: [{id: 'A', text: '高压下我也能保持精神集中', trait: '抗压性'}, {id: 'B', text: '约定好的事情，即便遇到困难我也跟进到底', trait: '坚韧性'}, {id: 'C', text: '我经常为自己设定挑战性目标', trait: '成就动机'}] },
+            { id: 39, options: [{id: 'A', text: '在聚会中我经常成为大家关注的焦点', trait: '乐群性'}, {id: 'B', text: '我喜欢自己做决定', trait: '独立性'}, {id: 'C', text: '他人的建议总能带给我新的视角', trait: '谦虚性'}] },
+            { id: 40, options: [{id: 'A', text: '面对指责，我容易发怒', trait: '情绪控制'}, {id: 'B', text: '处理新任务时，我常感到没有把握', trait: '自信度'}, {id: 'C', text: '在集体活动中，我常感到不自在', trait: '乐群性'}] },
+            { id: 41, options: [{id: 'A', text: '我总能兑现承诺的事情', trait: '可靠性'}, {id: 'B', text: '为了实现长远规划，我往往会拼尽全力', trait: '成就动机'}, {id: 'C', text: '我经常主动提升新技能以更好地工作', trait: '主动性'}] },
+            { id: 42, options: [{id: 'A', text: '忙碌的工作让我感到充实', trait: '活力性'}, {id: 'B', text: '我喜欢对不了解的事情刨根问底', trait: '好奇心'}, {id: 'C', text: '虽然不会得到什么，但我也会向他人提供帮助', trait: '利他性'}] },
+            { id: 43, options: [{id: 'A', text: '我总会追求细节的完美', trait: '关注细节'}, {id: 'B', text: '与他人协作完成工作是我的优先选择', trait: '合作性'}, {id: 'C', text: '在团队中，我喜欢被选为领导者', trait: '主导支配'}] },
+            { id: 44, options: [{id: 'A', text: '讨论前我会考虑对方是怎么想的', trait: '同理心'}, {id: 'B', text: '我总是愿意了解他人的观点', trait: '谦虚性'}, {id: 'C', text: '我享受与他人共同做事的过程', trait: '合作性'}] },
+            { id: 45, options: [{id: 'A', text: '高压下，我很难保持冷静', trait: '抗压性'}, {id: 'B', text: '工作中我经常感到紧张不安', trait: '平和度'}, {id: 'C', text: '我不喜欢在工作上追求细节', trait: '关注细节'}] },
+            { id: 46, options: [{id: 'A', text: '经历挫折，我也能快速恢复', trait: '坚韧性'}, {id: 'B', text: '我总是严守时间约定', trait: '可靠性'}, {id: 'C', text: '我经常尝试新的工作方法来提高效率', trait: '创造思维'}] },
+            { id: 47, options: [{id: 'A', text: '面对工作中的挑战，我不会轻言放弃', trait: '坚韧性'}, {id: 'B', text: '我相信自己总能胜任', trait: '自信度'}, {id: 'C', text: '我总是承担挑战自己能力的任务', trait: '成就动机'}] },
+            { id: 48, options: [{id: 'A', text: '我不喜欢工作内容经常变换的工作', trait: '适应性'}, {id: 'B', text: '一旦工作节奏慢下来，我就变得不自在', trait: '活力性'}, {id: 'C', text: '说服别人接受不同的观点是一件很难的事情', trait: '影响性'}] },
+            { id: 49, options: [{id: 'A', text: '我需要很长时间适应环境变化', trait: '适应性'}, {id: 'B', text: '与参加聚会相比，我更愿意待在家里', trait: '乐群性'}, {id: 'C', text: '我总是把时间安排得满满的', trait: '活力性'}] },
+            { id: 50, options: [{id: 'A', text: '受到批评时，我能保持冷静', trait: '抗压性'}, {id: 'B', text: '我总是尽全力完成自己的工作', trait: '成就动机'}, {id: 'C', text: '紧急情况下，我也有明确的工作计划', trait: '条理性'}] },
+            { id: 51, options: [{id: 'A', text: '没有外部要求，我仍保持规律作息', trait: '自律性'}, {id: 'B', text: '我总有办法让自己的建议被他人接受', trait: '影响性'}, {id: 'C', text: '我不会把情绪表现在脸上', trait: '情绪控制'}] },
+            { id: 52, options: [{id: 'A', text: '即便有更有趣的事，我也总是先专注手头的任务', trait: '自律性'}, {id: 'B', text: '工作环境发生变化，对我的个人状态影响不大', trait: '适应性'}, {id: 'C', text: '没有外部要求，我也喜欢探索新事物', trait: '好奇心'}] },
+            { id: 53, options: [{id: 'A', text: '遇到干扰，我也不会轻易放下手中工作', trait: '自律性'}, {id: 'B', text: '我喜欢探索不同于以往的做法', trait: '创造思维'}, {id: 'C', text: '即使工作困难重重，我也会坚持完成', trait: '坚韧性'}] },
+            { id: 54, options: [{id: 'A', text: '我善于发现细节问题', trait: '关注细节'}, {id: 'B', text: '我总能提出让别人意想不到的想法', trait: '创造思维'}, {id: 'C', text: '我善于基于过去预测未来', trait: '概念思维'}] },
+            { id: 55, options: [{id: 'A', text: '缓慢的工作节奏让我很难受', trait: '活力性'}, {id: 'B', text: '我更喜欢在别人的指导下工作', trait: '独立性'}, {id: 'C', text: '我常因外界因素中断自己的计划', trait: '自律性'}] },
+            { id: 56, options: [{id: 'A', text: '我总能觉察到与以往不一样的地方', trait: '关注细节'}, {id: 'B', text: '我相信自己能处理没接触过的任务', trait: '自信度'}, {id: 'C', text: '为了突破自我，我总是选择更难的任务', trait: '成就动机'}] },
+            { id: 57, options: [{id: 'A', text: '我很享受成为团队领导者的感觉', trait: '主导支配'}, {id: 'B', text: '我会主动分担他人的任务', trait: '利他性'}, {id: 'C', text: '不懂的事情，我搞明白了才会罢休', trait: '好奇心'}] },
+            { id: 58, options: [{id: 'A', text: '我经常有很多新的灵感', trait: '创造思维'}, {id: 'B', text: '探索新事物让我感到兴奋', trait: '好奇心'}, {id: 'C', text: '我觉得需要深度分析的问题很有趣', trait: '分析思维'}] },
+            { id: 59, options: [{id: 'A', text: '我总是主动跟进工作完成情况', trait: '可靠性'}, {id: 'B', text: '工作中我很少感到紧张不安', trait: '平和度'}, {id: 'C', text: '我很关心细节问题是否都被关注到', trait: '关注细节'}] },
+            { id: 60, options: [{id: 'A', text: '我喜欢自己做决定并承担相应后果', trait: '独立性'}, {id: 'B', text: '我经常主导集体讨论', trait: '主导支配'}, {id: 'C', text: '我很关注事情按照计划进行', trait: '条理性'}] },
+            { id: 61, options: [{id: 'A', text: '与大家一起工作让我很愉快', trait: '合作性'}, {id: 'B', text: '我总能发现并欣赏他人的长处', trait: '谦虚性'}, {id: 'C', text: '遇到问题我总是主动沟通解决', trait: '主动性'}] },
+            { id: 62, options: [{id: 'A', text: '我喜欢用客观数据说明问题', trait: '分析思维'}, {id: 'B', text: '处于高竞争环境，我仍能发挥正常水平', trait: '抗压性'}, {id: 'C', text: '我常常从不同寻常的视角看问题', trait: '创造思维'}] },
+            { id: 63, options: [{id: 'A', text: '有人不支持我时，我常自我怀疑', trait: '自信度'}, {id: 'B', text: '我坚定的想法，很难被他人影响', trait: '独立性'}, {id: 'C', text: '我喜欢影响他人赞成我的观点', trait: '影响性'}] },
+            { id: 64, options: [{id: 'A', text: '我对前沿事物充满兴趣', trait: '好奇心'}, {id: 'B', text: '我很少因为他人与我意见不合而发火', trait: '情绪控制'}, {id: 'C', text: '我总能很快摆脱挫败感', trait: '坚韧性'}] },
+            { id: 65, options: [{id: 'A', text: '我总是主动寻找机会，提升工作效率', trait: '主动性'}, {id: 'B', text: '我为个人发展设定了长远的规划', trait: '概念思维'}, {id: 'C', text: '我总能顶住压力，坚持到底', trait: '抗压性'}] },
+            { id: 66, options: [{id: 'A', text: '我很少拒绝别人，即使我很忙', trait: '合作性'}, {id: 'B', text: '当我不赞同他人时，我喜欢说服他们', trait: '影响性'}, {id: 'C', text: '即便要承担风险，我也愿意自己决策', trait: '独立性'}] },
+            { id: 67, options: [{id: 'A', text: '遇到问题，我总先自己寻求解决方法', trait: '独立性'}, {id: 'B', text: '我喜欢通过与他人协作来处理事情解决问题', trait: '合作性'}, {id: 'C', text: '大多数时候我都比团队中其他人更淡定些', trait: '平和度'}] }
+        ];
+
+        let userInfo = {};
+        let currentQIndex = 0;
+        let step = 1; 
+        let currentOptions = []; 
+        let rawScoreMap = {}; 
+        let maxRawMap = {}; 
+        let finalScoreMap = {}; 
+
+        let testStartTime = 0;
+        let lastClickTime = 0;
+        let fastAnswerCount = 0; 
+        let chartInstances = [];
+        let currentBlock = { most: null }; 
+        
+        const CACHE_KEY = 'talents_assessment_progress';
+
+        ALL_TRAITS.forEach(trait => { rawScoreMap[trait] = 0; maxRawMap[trait] = 0; });
+        questionsData.forEach(q => {
+            q.options.forEach(opt => {
+                if(maxRawMap[opt.trait] !== undefined) maxRawMap[opt.trait] += 2; 
+            });
+        });
+
+        // -------------------------
+        // 本地缓存管理
+        // -------------------------
+        function saveProgress() {
+            const state = { userInfo, currentQIndex, step, currentOptions, rawScoreMap, testStartTime, fastAnswerCount, currentBlock };
+            localStorage.setItem(CACHE_KEY, JSON.stringify(state));
+        }
+
+        function loadProgress() {
+            const savedStr = localStorage.getItem(CACHE_KEY);
+            if (savedStr) {
+                try {
+                    const state = JSON.parse(savedStr);
+                    userInfo = state.userInfo;
+                    currentQIndex = state.currentQIndex;
+                    step = state.step;
+                    currentOptions = state.currentOptions;
+                    rawScoreMap = state.rawScoreMap;
+                    testStartTime = state.testStartTime;
+                    fastAnswerCount = state.fastAnswerCount;
+                    currentBlock = state.currentBlock || { most: null };
+
+                    document.getElementById('user-info-display').innerText = `${userInfo.name} | ${userInfo.dept}`;
+                    document.getElementById('user-info-display').classList.remove('hidden');
+                    document.getElementById('view-intro').classList.add('hidden');
+
+                    if (currentQIndex >= questionsData.length) {
+                        calculateFinalScores();
+                        generateReport();
+                    } else {
+                        document.getElementById('view-quiz').classList.remove('hidden');
+                        renderQuestion(true);
+                    }
+                } catch(e) {
+                    console.error("缓存加载失败，已重置", e);
+                    localStorage.removeItem(CACHE_KEY);
+                }
+            }
+        }
+
+        function clearCache() {
+            if(confirm('确定要清除缓存进度吗？之前的作答将会丢失。')) {
+                localStorage.removeItem(CACHE_KEY);
+                location.reload();
+            }
+        }
+
+        function restartTest() {
+            if(confirm('确定要重新开始测评吗？')) {
+                localStorage.removeItem(CACHE_KEY);
+                location.reload();
+            }
+        }
+
+        // -------------------------
+        // 调试通道
+        // -------------------------
+        function quickDebug() {
+            document.getElementById('input-name').value = "陈枭";
+            document.getElementById('input-age').value = "35";
+            document.getElementById('input-dept').value = "研发部";
+            userInfo = { name: "陈枭", gender: "男", age: "35", dept: "研发部", edu: "大学本科" };
+            
+            document.getElementById('user-info-display').innerText = `陈枭 | 研发部`;
+            document.getElementById('user-info-display').classList.remove('hidden');
+            document.getElementById('view-intro').classList.add('hidden');
+            
+            testStartTime = Date.now() - (24 * 60000);
+            fastAnswerCount = 0;
+            
+            ALL_TRAITS.forEach(trait => { rawScoreMap[trait] = 0; });
+
+            const chenXiaoAnswers = [
+                [2, 1], [1, 0], [0, 1], [2, 1], [1, 2], [1, 0], [0, 2], [2, 0], [1, 2], [2, 1],
+                [0, 2], [2, 0], [0, 2], [1, 0], [0, 2], [0, 1], [2, 0], [0, 2], [0, 1], [0, 2],
+                [0, 2], [1, 2], [1, 0], [2, 0], [0, 1], [2, 0], [1, 2], [2, 1], [1, 0], [0, 2],
+                [1, 2], [0, 2], [2, 0], [1, 0], [2, 0], [1, 0], [0, 2], [0, 1], [2, 1], [2, 1],
+                [2, 0], [1, 2], [0, 1], [0, 2], [1, 0], [0, 2], [0, 1], [0, 2], [1, 2], [2, 1],
+                [2, 0], [2, 1], [0, 1], [1, 0], [2, 1], [0, 1], [1, 2], [0, 2], [2, 0], [0, 2],
+                [2, 0], [2, 1], [0, 1], [0, 1], [2, 0], [2, 0], [0, 2]
+            ];
+
+            questionsData.forEach((q, index) => {
+                let mostIndex = chenXiaoAnswers[index][0];
+                let nextIndex = chenXiaoAnswers[index][1];
+                let leastIndex = [0, 1, 2].find(i => i !== mostIndex && i !== nextIndex);
+                let most = q.options[mostIndex], next = q.options[nextIndex], least = q.options[leastIndex];
+
+                [most, next, least].forEach((opt, i) => {
+                    let isNeg = checkNegative(opt.text);
+                    let rawVal = (i === 0) ? 2 : ((i === 1) ? 1 : 0);
+                    let finalVal = isNeg ? (2 - rawVal) : rawVal;
+                    if(rawScoreMap[opt.trait] !== undefined) rawScoreMap[opt.trait] += finalVal;
+                });
+            });
+            currentQIndex = 67; 
+            calculateFinalScores(); 
+            generateReport();
+        }
+
+        // -------------------------
+        // 判定反向题
+        // -------------------------
+        function checkNegative(text) {
+            const negatives = [
+                '无法在规定时间内完成工作', '我会感到焦虑', '让我感到筋疲力尽', '我容易发怒', 
+                '我常感到没有把握', '在集体活动中，我常感到不自在', '我很难保持冷静', 
+                '我经常感到紧张不安', '我不喜欢在工作上追求细节', '我不喜欢工作内容经常变换', 
+                '是一件很难的事情', '我需要很长时间适应', '我更愿意待在家里', 
+                '我更喜欢在别人的指导下', '中断自己的计划', '我常自我怀疑', '我不愿意指挥他人' 
+            ];
+            return negatives.some(neg => text.includes(neg));
+        }
+
+        // -------------------------
+        // 作答流程
+        // -------------------------
+        function startTest() {
+            const name = document.getElementById('input-name').value;
+            const gender = document.getElementById('input-gender').value;
+            const age = document.getElementById('input-age').value;
+            const dept = document.getElementById('input-dept').value;
+            if(!name || !age) { alert('请填写完整个人信息'); return; }
+            
+            userInfo = { name, gender, age, dept, edu: document.getElementById('input-edu').value };
+            document.getElementById('user-info-display').innerText = `${name} | ${dept}`;
+            document.getElementById('user-info-display').classList.remove('hidden');
+            document.getElementById('view-intro').classList.add('hidden');
+            document.getElementById('view-quiz').classList.remove('hidden');
+
+            testStartTime = Date.now(); lastClickTime = Date.now(); 
+            saveProgress(); renderQuestion();
+        }
+
+        function renderQuestion(isRestore = false) {
+            if (currentQIndex >= questionsData.length) { 
+                calculateFinalScores(); generateReport(); return; 
+            }
+            const q = questionsData[currentQIndex];
+            const promptEl = document.getElementById('question-prompt');
+            const container = document.getElementById('options-container');
+            const indicatorEl = document.getElementById('step-indicator');
+            const progress = ((currentQIndex) / questionsData.length) * 100;
+            
+            document.getElementById('progress-text').innerText = `${currentQIndex + 1} / 67`;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            if (step === 1) {
+                indicatorEl.innerText = "第一步: 选出最符合项"; 
+                indicatorEl.className = "text-blue-700 font-bold"; 
+                promptEl.innerText = "以下哪项陈述最符合您？";
+                currentOptions = [...q.options]; 
+            } else {
+                indicatorEl.innerText = "第二步: 选出次符合项"; 
+                indicatorEl.className = "text-orange-600 font-bold"; 
+                promptEl.innerText = "在剩下选项中，哪一项较符合您？";
+            }
+
+            container.innerHTML = ''; 
+            currentOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-white border border-gray-300 p-4 rounded hover:bg-blue-50 hover:border-blue-500 font-bold text-gray-700 md:text-lg transition shadow-sm active:scale-[0.99]";
+                btn.innerText = opt.text; 
+                btn.onclick = () => handleSelect(opt); 
+                container.appendChild(btn);
+            });
+        }
+
+        function handleSelect(selectedOpt) {
+            let now = Date.now(); if ((now - lastClickTime) < 1500) { fastAnswerCount++; } lastClickTime = now;
+
+            if (step === 1) {
+                currentBlock.most = selectedOpt; 
+                currentOptions = currentOptions.filter(o => o.id !== selectedOpt.id);
+                step = 2; saveProgress(); renderQuestion();
+            } else {
+                let most = currentBlock.most;
+                let next = selectedOpt;
+                let least = currentOptions.find(o => o.id !== selectedOpt.id);
+                
+                [most, next, least].forEach((opt, index) => {
+                    let isNeg = checkNegative(opt.text);
+                    let rawVal = (index === 0) ? 2 : ((index === 1) ? 1 : 0);
+                    let finalVal = isNeg ? (2 - rawVal) : rawVal;
+                    if(rawScoreMap[opt.trait] !== undefined) rawScoreMap[opt.trait] += finalVal;
+                });
+
+                step = 1; currentQIndex++; currentBlock = { most: null }; 
+                saveProgress(); renderQuestion();
+            }
+        }
+
+        // -------------------------
+        // 核心计分算法
+        // -------------------------
+        function calculateFinalScores() {
+            let totalRatio = 0, validTraitsCount = 0;
+            ALL_TRAITS.forEach(trait => {
+                let max = maxRawMap[trait] || 0;
+                if(max > 0) { totalRatio += (rawScoreMap[trait] / max); validTraitsCount++; }
+            });
+            const baseline = validTraitsCount > 0 ? (totalRatio / validTraitsCount) : 0.5;
+
+            const TRAIT_NORM_ADJUST = {
+                '平和度': -0.8, '自信度': 0.2, '情绪控制': -1.6, '抗压性': -1.8, '乐群性': 0, '活力性': -1.8,
+                '主导支配': 0.2, '影响性': 0.3, '同理心': -1.9, '合作性': -1.7, '谦虚性': -0.6, '利他性': -2.9,
+                '好奇心': -0.6, '分析思维': -1.3, '概念思维': 1.3, '创造思维': 0, '适应性': 0.0, '独立性': -1.3,
+                '条理性': -0.9, '自律性': 3.1, '可靠性': -2.1, '成就动机': 0.5, '坚韧性': 0.8, '主动性': -0.6, '关注细节': -0.3
+            };
+
+            ALL_TRAITS.forEach(trait => {
+                let raw = rawScoreMap[trait];
+                let max = maxRawMap[trait] || 0;
+                if (max === 0) { finalScoreMap[trait] = 5; return; }
+
+                let ratio = raw / max;
+                let deviation = ratio - baseline; 
+                let score = 5.5 + (deviation * 15.0) + (TRAIT_NORM_ADJUST[trait] || 0);
+                
+                score = Math.round(score);
+                finalScoreMap[trait] = Math.min(10, Math.max(1, score));
+            });
+        }
+
+        function getAvg(traits) { 
+            return traits.reduce((acc, t) => acc + finalScoreMap[t], 0) / traits.length; 
+        }
+
+        function generateReport() {
+            document.getElementById('view-quiz').classList.add('hidden');
+            document.getElementById('view-result').classList.remove('hidden');
+            
+            document.getElementById('report-user-sub').innerText = `${userInfo.name} · ${userInfo.dept} · ${userInfo.gender} · ${userInfo.age}岁 · ${userInfo.edu}`;
+
+            let totalMinutes = Math.max(1, Math.round((Date.now() - testStartTime) / 60000));
+            let fastRate = ((fastAnswerCount / (67 * 2)) * 100).toFixed(1);
+            document.getElementById('report-stats').innerText = `作答时间: ${totalMinutes} 分钟 | 过快应答率: ${fastRate}%`;
+            
+            const validEl = document.getElementById('report-validity');
+            if (totalMinutes < 3 || parseFloat(fastRate) > 30.0) { 
+                validEl.innerText = "【报告无效：存在随机作答】"; 
+                validEl.className = "text-xs font-bold mt-1 text-red-600"; 
+            } else { 
+                validEl.innerText = "【报告有效】"; 
+                validEl.className = "text-xs font-bold mt-1 text-green-700"; 
+            }
+
+            renderRadar(); 
+            renderTypicalTraits(); 
+            renderBarChart(); 
+            renderLeadership(); 
+            renderTeamRoles(); 
+            renderJobPref(); 
+            renderSuggestions(); 
+            renderDetailTable();
+            
+            fitDesktopScreen();
+        }
+
+        function fitDesktopScreen() {
+            const wrapper = document.getElementById('report-wrapper'), screenW = window.innerWidth;
+            if (screenW < 820) {
+                const scale = (screenW - 20) / 794; 
+                wrapper.style.transform = `scale(${scale})`;
+                setTimeout(() => { 
+                    const totalHeight = wrapper.offsetHeight; 
+                    wrapper.style.marginBottom = `-${totalHeight * (1 - scale)}px`; 
+                }, 100);
+            }
+        }
+
+        function registerChart(domId, option) {
+            const chart = echarts.init(document.getElementById(domId)); 
+            option.animation = false; 
+            chart.setOption(option); 
+            chartInstances.push(chart);
+        }
+
+        function renderRadar() {
+            const scores = [
+                getAvg(BIG_FIVE_MAP['尽责性']).toFixed(1), 
+                getAvg(BIG_FIVE_MAP['外倾性']).toFixed(1), 
+                getAvg(BIG_FIVE_MAP['亲和性']).toFixed(1), 
+                getAvg(BIG_FIVE_MAP['思维开放性']).toFixed(1), 
+                getAvg(BIG_FIVE_MAP['情绪稳定性']).toFixed(1)
+            ];
+            registerChart('radar-chart', {
+                radar: { indicator: [{ name: '尽责性', max: 10 }, { name: '外倾性', max: 10 }, { name: '亲和性', max: 10 }, { name: '思维开放性', max: 10 }, { name: '情绪稳定性', max: 10 }], radius: '60%', name: { textStyle: { color: '#000', fontWeight: 'bold', fontSize: 10 } } },
+                series: [{ type: 'radar', data: [{ value: scores, areaStyle: { color: 'rgba(29, 78, 216, 0.25)' }, lineStyle: { color: '#1D4ED8', width: 2 }, itemStyle: { color: '#1D4ED8' } }] }]
+            });
+        }
+
+        function renderTypicalTraits() {
+            const manageSelf = Math.min(10, Math.max(1, getAvg(['平和度', '自信度', '情绪控制', '抗压性']) + 1.5));
+            const manageOthers = Math.min(10, Math.max(1, getAvg(['乐群性', '主导支配', '影响性', '同理心', '合作性', '谦虚性', '利他性']) - 1.1));
+            const manageTasks = Math.min(10, Math.max(1, getAvg(['条理性', '自律性', '可靠性', '成就动机', '坚韧性', '主动性', '关注细节', '分析思维', '概念思维']) + 1.5));
+
+            const selfTrait = ['平和度', '自信度', '情绪控制', '抗压性'].sort((a,b)=>finalScoreMap[b]-finalScoreMap[a])[0];
+            const otherTrait = ['主导支配', '影响性', '合作性', '同理心'].sort((a,b)=>finalScoreMap[b]-finalScoreMap[a])[0];
+            const taskTrait = ['条理性', '可靠性', '主动性', '分析思维'].sort((a,b)=>finalScoreMap[b]-finalScoreMap[a])[0];
+
+            let html = `
+                <tr><td class="font-bold text-black border-l-4 border-blue-600">管理自我</td><td class="font-bold text-[15px] text-blue-700">${manageSelf.toFixed(1)}</td><td class="text-left text-[11px] text-gray-800"><b>${selfTrait}：</b>${TRAIT_DICT[selfTrait][finalScoreMap[selfTrait]>=5?'high':'low']}</td></tr>
+                <tr><td class="font-bold text-black border-l-4 border-green-600">管理他人</td><td class="font-bold text-[15px] text-green-700">${manageOthers.toFixed(1)}</td><td class="text-left text-[11px] text-gray-800"><b>${otherTrait}：</b>${TRAIT_DICT[otherTrait][finalScoreMap[otherTrait]>=5?'high':'low']}</td></tr>
+                <tr><td class="font-bold text-black border-l-4 border-purple-600">管理任务</td><td class="font-bold text-[15px] text-purple-700">${manageTasks.toFixed(1)}</td><td class="text-left text-[11px] text-gray-800"><b>${taskTrait}：</b>${TRAIT_DICT[taskTrait][finalScoreMap[taskTrait]>=5?'high':'low']}</td></tr>
+            `;
+            document.getElementById('typical-traits-body').innerHTML = html;
+        }
+
+        function renderBarChart() {
+            const scores = ALL_TRAITS.map(t => finalScoreMap[t].toFixed(0));
+            const avgScore = (scores.reduce((a,b)=>parseFloat(a)+parseFloat(b),0)/25).toFixed(1);
+            registerChart('bar-chart', {
+                grid: { top: '15%', bottom: '25%', left: '3%', right: '3%', containLabel: true },
+                xAxis: { type: 'category', data: ALL_TRAITS, axisLabel: { interval: 0, rotate: 45, fontSize: 9, color: '#000' } }, 
+                yAxis: { type: 'value', max: 10, splitLine: { lineStyle: { type: 'dashed' } } },
+                series: [{ 
+                    data: scores, type: 'bar', barWidth: '60%', 
+                    label: { show: true, position: 'top', fontSize: 9, color: '#000', fontWeight: 'bold' }, 
+                    itemStyle: { color: (p) => { if(p.dataIndex < 4) return '#60A5FA'; if(p.dataIndex < 8) return '#F59E0B'; if(p.dataIndex < 12) return '#10B981'; if(p.dataIndex < 18) return '#A78BFA'; return '#9CA3AF'; } }, 
+                    markLine: { data: [{ yAxis: avgScore, name: '均分' }], lineStyle: { color: '#DC2626', type: 'solid' }, label: { show: false } } 
+                }]
+            });
+        }
+
+        function renderLeadership() {
+            const baseIndex = (finalScoreMap['自信度'] * 0.15 + finalScoreMap['主导支配'] * 0.20 + finalScoreMap['影响性'] * 0.20 + finalScoreMap['独立性'] * 0.15 + finalScoreMap['坚韧性'] * 0.10 + finalScoreMap['成就动机'] * 0.10 + finalScoreMap['情绪控制'] * 0.10);
+            const index = Math.min(10, Math.max(1, baseIndex - 0.6)).toFixed(1);
+            registerChart('gauge-chart', { 
+                series: [{ 
+                    type: 'gauge', startAngle: 180, endAngle: 0, min: 0, max: 10, 
+                    axisLine: { lineStyle: { width: 20, color: [[0.3, '#DBEAFE'], [0.7, '#60A5FA'], [1, '#1D4ED8']] } }, 
+                    pointer: { itemStyle: { color: '#000' }, width: 3 }, axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false }, 
+                    detail: { offsetCenter: [0, '25%'], fontSize: 20, fontWeight: 'bold', formatter: '{value}', color: '#000' }, 
+                    data: [{ value: index }] 
+                }] 
+            });
+        }
+
+        function renderTeamRoles() {
+            const roles = [
+                { name: '智多星', val: Math.min(10, Math.max(1, getAvg(['创造思维', '好奇心', '独立性', '适应性']) + 2.25)) },
+                { name: '分析者', val: Math.min(10, Math.max(1, getAvg(['分析思维', '概念思维', '独立性', '情绪控制']) + 1.3)) },
+                { name: '指挥官', val: Math.min(10, Math.max(1, getAvg(['主导支配', '影响性', '活力性', '成就动机']) + 3.35)) },
+                { name: '执行者', val: Math.min(10, Math.max(1, getAvg(['可靠性', '条理性', '坚韧性', '自律性']) + 0.5)) },
+                { name: '探索者', val: Math.min(10, Math.max(1, getAvg(['乐群性', '活力性', '好奇心', '适应性']) - 1.35)) },
+                { name: '督促者', val: Math.min(10, Math.max(1, getAvg(['关注细节', '条理性', '可靠性', '自律性']) - 1.4)) },
+                { name: '协调者', val: Math.min(10, Math.max(1, getAvg(['合作性', '同理心', '谦虚性', '平和度', '利他性']) - 1.6)) },
+                { name: '外交家', val: Math.min(10, Math.max(1, getAvg(['合作性', '影响性', '乐群性', '同理心']) - 1.5)) }
+            ].sort((a,b) => b.val - a.val);
+
+            registerChart('role-bar-chart', { 
+                grid: { top: '15%', bottom: '20%', left: '5%', right: '5%' }, 
+                xAxis: { type: 'category', data: roles.map(r => r.name), axisLabel: { fontSize: 10, color: '#000' } }, 
+                yAxis: { show: false, max: 10 }, 
+                series: [{ data: roles.map(r => r.val.toFixed(1)), type: 'bar', barWidth: '45%', label: { show: true, position: 'top', color: '#1D4ED8', fontWeight: 'bold', fontSize: 10 }, itemStyle: { color: '#60A5FA' } }] 
+            });
+        }
+
+        function renderJobPref() {
+            const jobs = [
+                { cat: '创意类', ex: '设计/策划', val: Math.min(10, Math.max(1, getAvg(['创造思维', '适应性', '好奇心', '活力性']) + 3.0)) },
+                { cat: '研究类', ex: '研发/投资', val: Math.min(10, Math.max(1, getAvg(['分析思维', '概念思维', '好奇心', '独立性']) + 3.0)) },
+                { cat: '技术类', ex: '设备/维修', val: Math.min(10, Math.max(1, getAvg(['分析思维', '关注细节', '可靠性', '独立性']) - 1.25)) },
+                { cat: '服务类', ex: '客服/教师', val: Math.min(10, Math.max(1, getAvg(['同理心', '利他性', '合作性', '谦虚性']) - 0.75)) },
+                { cat: '职能类', ex: '财务/法务', val: Math.min(10, Math.max(1, getAvg(['条理性', '关注细节', '可靠性', '自律性']) - 1.1)) },
+                { cat: '影响类', ex: '管理/销售', val: Math.min(10, Math.max(1, getAvg(['影响性', '主导支配', '自信度', '乐群性']) - 1.35)) }
+            ].sort((a,b) => b.val - a.val);
+
+            let thead = '<tr>'; let tbody1 = '<tr>'; let tbody2 = '<tr>'; let tbody3 = '<tr>';
+            jobs.forEach(j => {
+                let lvl = j.val > 7.5 ? '高匹配' : (j.val > 6 ? '中高匹配' : (j.val > 4.5 ? '中匹配' : '低匹配'));
+                thead += `<th class="py-1">${j.cat}</th>`; 
+                tbody1 += `<td class="text-[10px] text-gray-500 py-1">${j.ex}</td>`; 
+                tbody2 += `<td class="font-bold text-[11px] py-1 ${j.val > 6 ? 'text-blue-700' : 'text-gray-800'}">${lvl}</td>`; 
+                tbody3 += `<td class="font-bold text-xs py-1">${j.val.toFixed(1)}</td>`;
+            });
+            thead += '</tr>'; tbody1 += '</tr>'; tbody2 += '</tr>'; tbody3 += '</tr>';
+            document.getElementById('job-table-head').innerHTML = thead; 
+            document.getElementById('job-table-body').innerHTML = tbody1 + tbody2 + tbody3;
+        }
+
+        function renderSuggestions() {
+            let html = '';
+            if (finalScoreMap['抗压性'] < 5.5) html += '<li><b>管理自我：</b>在工作中，建议制定清晰的目标，逐步分解任务，提升抗压能力，同时强化执行和坚持性。</li>'; else html += '<li><b>管理自我：</b>建议接受、设置短期挑战任务，主动参与团队活动，逐步建立更强的目标感。</li>';
+            if (finalScoreMap['同理心'] < 5.5) html += '<li><b>管理他人：</b>在帮助他人时，建议通过主动交流和反馈确认，提升对他人真实需求的理解。</li>'; else html += '<li><b>管理他人：</b>建议在团队合作中发挥同理心优势，适时表达见解，提升团队凝聚力。</li>';
+            if (finalScoreMap['分析思维'] < 5.5) html += '<li><b>管理任务：</b>建议从简单问题入手，积累复杂问题的分析方法，尝试洞察提炼核心信息。</li>'; else html += '<li><b>管理任务：</b>建议主动参与工作规划，在团队中负责信息整合和趋势预测，提出落地的战略建议。</li>';
+            document.getElementById('dev-suggestions').innerHTML = html;
+        }
+
+        function renderDetailTable() {
+            let html = '';
+            Object.keys(BIG_FIVE_MAP).forEach(cat => {
+                let traits = BIG_FIVE_MAP[cat];
+                traits.forEach((t, index) => {
+                    let score = finalScoreMap[t].toFixed(0); 
+                    let isLow = score < 5;
+                    html += `<tr>
+                        ${index === 0 ? `<td rowspan="${traits.length}" class="font-bold bg-gray-100 text-black border-b border-gray-300 w-[8%]">${cat}</td>` : ''}
+                        <td class="text-right pr-4 text-gray-700 leading-snug py-0.5 ${isLow ? 'bg-orange-50 font-bold' : ''}">${TRAIT_DICT[t].low}</td>
+                        <td class="font-bold text-blue-900 bg-blue-50 leading-none py-1">${t}<br><span class="text-[10px]">${score}</span></td>
+                        <td class="text-left pl-4 text-gray-700 leading-snug py-0.5 ${!isLow ? 'bg-green-50 font-bold' : ''}">${TRAIT_DICT[t].high}</td>
+                    </tr>`;
+                });
+            });
+            document.getElementById('detail-table-body').innerHTML = html;
+        }
+// ==========================================
+// 隐藏的快捷键测试入口 (Alt+Q / Alt+W)
+// ==========================================
+document.addEventListener('keydown', function(event) {
+    // 确保同时按下了 Alt 键
+    if (event.altKey) {
+        // 将按键转为小写，兼容开启大写锁定(Caps Lock)的情况
+        const key = event.key.toLowerCase(); 
+
+        if (key === 'q') {
+            event.preventDefault(); // 阻止浏览器可能的默认快捷键行为
+            console.log("🛠️ 触发快捷键 Alt+Q: 加载[陈枭]模拟数据...");
+            
+            // 确保函数存在再执行
+            if (typeof quickDebug === 'function') {
+                quickDebug();
+            }
+        } 
+        else if (key === 'w') {
+            event.preventDefault(); // 阻止浏览器可能的默认快捷键行为
+            console.log("🛠️ 触发快捷键 Alt+W: 加载[胡应中]模拟数据...");
+            
+            // 确保函数存在再执行
+            if (typeof quickDebugHuYingzhong === 'function') {
+                quickDebugHuYingzhong();
+            }
+        }
+    }
+});
+        async function exportPDF() {
+            const btn = document.getElementById('export-btn'); 
+            btn.innerHTML = '⏳ 正在处理超清页面，请勿操作...'; 
+            btn.disabled = true;
+            
+            const wrapper = document.getElementById('report-wrapper'), page1 = document.getElementById('pdf-page-1'), page2 = document.getElementById('pdf-page-2');
+            const originalTransform = wrapper.style.transform, originalMargin = wrapper.style.marginBottom;
+            
+            wrapper.style.transform = 'none'; 
+            wrapper.style.marginBottom = '0px'; 
+            wrapper.classList.add('exporting-mode'); 
+            window.scrollTo(0, 0);
+
+            const chartBackups = [];
+            chartInstances.forEach(chart => {
+                const dom = chart.getDom();
+                const imgData = chart.getDataURL({ pixelRatio: 2, backgroundColor: '#fff' });
+                const img = document.createElement('img');
+                img.src = imgData; img.style.width = '100%'; img.style.height = '100%';
+                chartBackups.push({ dom: dom, originalNodes: Array.from(dom.childNodes) });
+                dom.innerHTML = ''; dom.appendChild(img); 
+            });
+
+            await new Promise(r => setTimeout(r, 300)); 
+
+            try {
+                const canvasOpt = { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123, scrollY: 0, scrollX: 0 };
+                const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'pt', 'a4'); 
+                
+                const canvas1 = await html2canvas(page1, canvasOpt); 
+                pdf.addImage(canvas1.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 595.28, 841.89);
+                
+                pdf.addPage(); 
+                const canvas2 = await html2canvas(page2, canvasOpt); 
+                pdf.addImage(canvas2.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 595.28, 841.89);
+                
+                pdf.save(`伽奈维医疗_人才测评_${userInfo.dept}_${userInfo.name}.pdf`);
+            } catch (error) { 
+                alert("生成 PDF 失败，请检查浏览器权限！"); 
+            } finally {
+                wrapper.classList.remove('exporting-mode'); 
+                wrapper.style.transform = originalTransform; 
+                wrapper.style.marginBottom = originalMargin;
+                
+                chartBackups.forEach(backup => { 
+                    backup.dom.innerHTML = ''; 
+                    backup.originalNodes.forEach(node => backup.dom.appendChild(node)); 
+                });
+                btn.innerHTML = '⬇️ 导出标准 A4 报告 (自动2页)'; 
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

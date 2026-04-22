@@ -1,0 +1,60 @@
+{
+  "user": {
+    "id": "u-demo",
+    "name": "李晓岚",
+    "role": "RA / 注册经理",
+    "email": "demo@meddevice-ai.com"
+  },
+  "projects": [
+    {
+      "id": "p-1001",
+      "name": "高频电刀系统注册加速包",
+      "market": "中国 + 欧盟",
+      "stage": "注册资料完善中",
+      "updatedAt": "2026-04-19",
+      "riskLevel": "高"
+    },
+    {
+      "id": "p-1002",
+      "name": "SaMD 术中决策辅助软件",
+      "market": "中国 + FDA",
+      "stage": "临床评价准备",
+      "updatedAt": "2026-04-18",
+      "riskLevel": "中"
+    }
+  ],
+  "documents": [
+    {
+      "id": "d-3001",
+      "projectId": "p-1001",
+      "name": "IFU v3.2",
+      "type": "说明书",
+      "size": "2.1 MB",
+      "updatedAt": "2026-04-18",
+      "status": "待翻译审校"
+    },
+    {
+      "id": "d-3002",
+      "projectId": "p-1001",
+      "name": "CER v0.9",
+      "type": "临床评价",
+      "size": "1.4 MB",
+      "updatedAt": "2026-04-17",
+      "status": "待临床确认"
+    }
+  ],
+  "activities": [
+    {
+      "id": "a-1",
+      "time": "09:20",
+      "title": "法规扫描完成",
+      "detail": "MDR 2026 草案新增 3 条高优先级差异。"
+    },
+    {
+      "id": "a-2",
+      "time": "11:05",
+      "title": "CER 审阅提醒",
+      "detail": "临床负责人尚未确认同品种结论。"
+    }
+  ]
+}

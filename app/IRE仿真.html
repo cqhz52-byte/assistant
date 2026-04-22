@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IRE 科研级仿真系统 (全脏器文献标定版)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f5; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
+        
+        .control-panel, .comsol-container { background-color: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; width: 100%; max-width: 1250px; box-sizing: border-box; }
+        .control-panel { padding: 20px; border-top: 5px solid #000080; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: center; }
+        
+        .input-group { display: flex; flex-direction: column; flex: 1; min-width: 135px; max-width: 175px; }
+        .input-group label { font-size: 12px; font-weight: bold; color: #34495e; margin-bottom: 6px; white-space: nowrap;}
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        .input-group select { padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; height: 38px;}
+
+        .stepper { display: flex; width: 100%; border: 1px solid #bdc3c7; border-radius: 4px; overflow: hidden; height: 38px; box-sizing: border-box; background: #fff;}
+        .stepper button { background: #f4f6f9; border: none; width: 36px; font-size: 20px; font-weight: bold; color: #2c3e50; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.1s; padding: 0;}
+        .stepper button:active { background: #dcdde1; }
+        .stepper input { border: none; border-left: 1px solid #bdc3c7; border-right: 1px solid #bdc3c7; border-radius: 0; text-align: center; width: calc(100% - 72px); outline: none; font-size: 15px; font-weight: bold; color: #111; padding: 0; margin: 0;}
+        .stepper input:focus { box-shadow: inset 0 0 6px rgba(52,152,219,0.3); background: #fdfaeb; color: #e74c3c;}
+
+        .btn-run { background-color: #e74c3c; color: white; border: none; padding: 10px 15px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; height: 38px; transition: 0.2s; min-width: 110px;}
+        .btn-theory { background-color: #2c3e50; color: white; border: none; padding: 10px 15px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; height: 38px; min-width: 130px;}
+        .btn-run:hover, .btn-theory:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        .comsol-container { padding: 15px; position: relative; }
+        .main-title { text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #111;}
+
+        .top-info-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 25px; }
+        .info-box { border: 1px solid #bdc3c7; padding: 10px 15px; font-size: 13px; background-color: #fafafa; line-height: 1.6; flex: 1; min-width: 280px; color: #2c3e50; font-weight: bold;}
+        .data-val { color: #e74c3c; font-weight: 900; }
+
+        .simulation-row { display: flex; flex-direction: column; align-items: center; gap: 25px; width: 100%; }
+        .plot-wrapper { background-color: #fff; border: 1px solid #ddd; padding: 15px 10px; width: 100%; max-width: 580px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; position: relative; }
+
+        @media (max-width: 1099px) { .desktop-only { display: none !important; } }
+        @media (min-width: 1100px) { .simulation-row { flex-direction: row; justify-content: space-around; } .plot-wrapper { width: 48%; } }
+
+        .canvas-area { display: flex; align-items: stretch; justify-content: center; position: relative; padding: 10px 0; width: 100%; box-sizing: border-box;}
+        .y-axis-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 13px; font-weight: bold; margin-right: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;}
+        .sim-canvas { border: 1px solid #333; flex: 0 1 auto; width: 100%; max-width: 420px; height: auto; display: block; aspect-ratio: 1 / 1; object-fit: contain;}
+        .colorbar-box { margin-left: 10px; display: flex; flex-direction: row; flex-shrink: 0; align-items: stretch; }
+        .cb-canvas { width: 20px; height: auto; border: 1px solid #333; object-fit: fill; }
+        .cb-labels { display: flex; flex-direction: column; justify-content: space-between; font-size: 11px; padding-left: 5px; font-weight: bold; padding-top: 0px; padding-bottom: 0px; }
+
+        .x-axis-label { font-size: 13px; font-weight: bold; margin-top: 15px; }
+        .range-tag { border: 1px solid #bdc3c7; padding: 8px 10px; font-size: 13px; background-color: #fdfaeb; border-left: 4px solid #e67e22; margin-top: 15px; width: 95%; text-align: center; font-weight: bold; }
+        
+        .btn-export { background-color: #3498db; color: white; border: none; padding: 12px 0; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 95%; margin-top: 15px; }
+        .btn-export:hover { background-color: #2980b9; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(4px);}
+        .modal-content { background: #fff; width: 95%; max-width: 960px; max-height: 88vh; border-radius: 10px; padding: 30px; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);}
+        .modal-title { font-size: 24px; font-weight: bold; color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px; text-align: center; margin-top: 0;}
+        .modal-text h4 { margin: 30px 0 12px 0; color: #000080; font-size: 18px; border-left: 5px solid #000080; padding-left: 12px; background: #f4f6f9; padding-top: 8px; padding-bottom: 8px;}
+        
+        .highlight-theory { background-color: #fdfaeb; border-left: 4px solid #e67e22; padding: 15px; margin: 15px 0; border-radius: 4px; font-size: 14.5px; line-height: 1.7; color: #333;}
+        .theory-list { margin-top: 10px; padding-left: 25px; }
+        .theory-list li { margin-bottom: 8px; }
+
+        .math-eqn-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 15px 0; background: #ffffff; border: 1px solid #dcdde1; border-left: 5px solid #3498db; border-radius: 6px; padding: 18px 15px; box-sizing: border-box; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
+        .math-eqn { font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 1.15rem; text-align: center; color: #111; white-space: nowrap; min-width: max-content; display: block;}
+        .math-eqn i { font-style: italic; font-family: 'Cambria Math', 'Times New Roman', serif; font-weight: 600; color: #2c3e50;}
+        .math-eqn sub { font-size: 0.7em; vertical-align: sub; }
+        .math-eqn sup { font-size: 0.7em; vertical-align: super; }
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 6px; font-size: 0.9em;}
+        .frac .num { border-bottom: 1.5px solid #2c3e50; padding: 0 4px; }
+        .frac .den { padding: 0 4px; }
+
+        .modal-actions { display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap;}
+        .btn-modal { padding: 12px 25px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; transition: 0.2s; min-width: 160px; color: white;}
+        .btn-copy { background-color: #27ae60; }
+        .btn-copy:hover { background-color: #219a52; transform: translateY(-2px);}
+        .btn-close { background-color: #000080; }
+        .btn-close:hover { background-color: #000066; transform: translateY(-2px);}
+        
+        #loading { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; }
+        .spin { border: 4px solid #f3f3f3; border-top: 4px solid #e74c3c; border-radius: 50%; width: 30px; height: 30px; animation: rotating 1s linear infinite; margin-bottom: 10px; }
+        @keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="control-panel">
+    <div class="input-group">
+        <label>靶区组织 (依文献校准)</label>
+        <select id="p_tissue" onchange="loadPreset()">
+            <option value="liver" selected>肝脏/肝癌 (Liver/HCC)</option>
+            <option value="prostate">前列腺癌 (PCa)</option>
+            <option value="pancreas">胰腺癌 (PDAC)</option>
+            <option value="kidney">肾细胞癌 (RCC)</option>
+            <option value="glioma">脑胶质瘤 (GBM)</option>
+            <option value="breast">乳腺癌 (Breast)</option>
+            <option value="lung">肺癌 (Lung)</option>
+            <option value="thyroid">甲状腺 (Thyroid)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>观测切面投影</label>
+        <select id="p_view" onchange="startSim()">
+            <option value="xy" selected>横截面 (X-Y轴)</option>
+            <option value="xz">纵截面 (X-Z轴) 顶端内凹</option>
+        </select>
+    </div>
+    
+    <div class="input-group">
+        <label>电压 (V)</label>
+        <div class="stepper">
+            <button type="button" onclick="stepVal('p_v', -100, 100, 6000)">-</button>
+            <input type="number" id="p_v" value="2500" inputmode="decimal" onfocus="selectAll(this)" onclick="selectAll(this)">
+            <button type="button" onclick="stepVal('p_v', 100, 100, 6000)">+</button>
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <label>针间距 (mm)</label>
+        <div class="stepper">
+            <button type="button" onclick="stepVal('p_d', -1, 5, 30)">-</button>
+            <input type="number" id="p_d" value="15" inputmode="decimal" onfocus="selectAll(this)" onclick="selectAll(this)">
+            <button type="button" onclick="stepVal('p_d', 1, 5, 30)">+</button>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>工作长度 (mm)</label>
+        <div class="stepper">
+            <button type="button" onclick="stepVal('p_l', -1, 5, 40)">-</button>
+            <input type="number" id="p_l" value="15" inputmode="decimal" onfocus="selectAll(this)" onclick="selectAll(this)">
+            <button type="button" onclick="stepVal('p_l', 1, 5, 40)">+</button>
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <label>脉宽 (μs)</label>
+        <div class="stepper">
+            <button type="button" onclick="stepVal('p_p', -10, 1, 2000)">-</button>
+            <input type="number" id="p_p" value="100" inputmode="decimal" onfocus="selectAll(this)" onclick="selectAll(this)">
+            <button type="button" onclick="stepVal('p_p', 10, 1, 2000)">+</button>
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <label>脉冲次数</label>
+        <div class="stepper">
+            <button type="button" onclick="stepVal('p_n', -10, 10, 500)">-</button>
+            <input type="number" id="p_n" value="90" inputmode="decimal" onfocus="selectAll(this)" onclick="selectAll(this)">
+            <button type="button" onclick="stepVal('p_n', 10, 10, 500)">+</button>
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <label>右侧电导率</label>
+        <div class="stepper">
+            <button type="button" onclick="stepVal('p_sr', -0.5, 0.0001, 100)">-</button>
+            <input type="number" id="p_sr" value="27.5" inputmode="decimal" onfocus="selectAll(this)" onclick="selectAll(this)">
+            <button type="button" onclick="stepVal('p_sr', 0.5, 0.0001, 100)">+</button>
+        </div>
+    </div>
+    
+    <button class="btn-run" onclick="startSim()">解算并渲染</button>
+    <button class="btn-theory" onclick="toggleTheory(true)">📄 仿真底层公式库</button>
+</div>
+
+<div class="comsol-container">
+    <div id="loading"><div class="spin"></div><span>正在进行多物理场耦合测绘...</span></div>
+    <div class="main-title" id="main_title">双侧实体肝脏动态 IRE 消融对比 (基于调研文献标定)</div>
+    
+    <div class="top-info-row">
+        <div class="info-box desktop-only" id="i_l">等待...</div>
+        <div class="info-box" id="i_r">等待...</div>
+    </div>
+
+    <div class="simulation-row">
+        <div class="plot-wrapper desktop-only">
+            <div class="canvas-area">
+                <div class="y-axis-label axis-y-dyn">Y 轴 (mm)</div>
+                <canvas id="cv-l" width="420" height="420" class="sim-canvas"></canvas>
+                <div class="colorbar-box">
+                    <canvas id="cb-l" width="25" height="420" class="cb-canvas"></canvas>
+                    <div class="cb-labels"><span>2500</span><span>2000</span><span>1500</span><span>1000</span><span>500</span><span>0</span></div>
+                </div>
+            </div>
+            <div class="x-axis-label">X 轴 (mm)</div>
+            <div class="range-tag" id="tag-l">左图范围: 测量中...</div>
+            <button class="btn-export" onclick="exportFull('cv-l', 'cb-l', '动态场(左) [极低初始电导率模拟]', true)">📋 拷贝左侧带参数大图</button>
+        </div>
+
+        <div class="plot-wrapper">
+            <div class="canvas-area">
+                <div class="y-axis-label axis-y-dyn">Y 轴 (mm)</div>
+                <canvas id="cv-r" width="420" height="420" class="sim-canvas"></canvas>
+                <div class="colorbar-box">
+                    <canvas id="cb-r" width="25" height="420" class="cb-canvas"></canvas>
+                    <div class="cb-labels"><span>2500</span><span>2000</span><span>1500</span><span>1000</span><span>500</span><span>0</span></div>
+                </div>
+            </div>
+            <div class="x-axis-label">X 轴 (mm)</div>
+            <div class="range-tag" id="tag-r">右图范围: 测量中...</div>
+            <button class="btn-export" onclick="exportFull('cv-r', 'cb-r', '动态场(右) [可变初始电导率模拟]', false)">📋 拷贝右侧带参数大图</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="m-theory">
+    <div class="modal-content">
+        <h2 class="modal-title">IRE 系统底层物理仿真计算公式库</h2>
+        <div class="modal-text">
+            
+            <h4>1. 组织致死电场阈值 (Eth) 动态计算</h4>
+            <p style="font-size: 14.5px; color: #444;">根据组织特异性的绝对基准阈值 (Base Eth)，结合脉宽与次数衰减推算。</p>
+            <div class="math-eqn-container">
+                <div class="math-eqn">
+                    <i>E<sub>th</sub></i> = max [ 200 , <i>BaseEth</i> - 200 &middot; log<sub>10</sub> ( <span class="frac"><span class="num"><i>p</i></span><span class="den">100</span></span> ) - 100 &middot; log<sub>10</sub> ( <span class="frac"><span class="num"><i>n</i></span><span class="den">90</span></span> ) ]
+                </div>
+            </div>
+
+            <h4>2. 三维圆柱体线电荷静电场分布 (E_lap)</h4>
+            <p style="font-size: 14.5px; color: #444;">通过引入 Z 轴坐标并计算空间中任一点到具有特定<strong>工作长度 (L_active)</strong> 探针线段的欧氏距离，拓展了原本仅适用于中截面的拉普拉斯偏微分方程，实现纵向 (X-Z) 维度的精准场强投射。</p>
+
+            <h4>3. 虚拟电极效应与电导率补偿系数 (C_cond)</h4>
+            <p style="font-size: 14.5px; color: #444;">保证极低电导率下发生巨幅场扩张，而在实际 27.5 靶标下准确回缩。</p>
+            <div class="math-eqn-container">
+                <div class="math-eqn">
+                    <i>C<sub>cond</sub></i>(<i>&sigma;</i>) = 0.77 + 0.85 &middot; <i>e</i> <sup>- (<i>&sigma;</i> / 3.0)</sup>
+                </div>
+            </div>
+
+            <h4>4. X-Y 切面平滑重构与 Z 轴自然褪散 (Z-Fade)</h4>
+            <p style="font-size: 14.5px; color: #444;">X-Y平面的塑造交由 4 次方超高斯执行以撑起花生形。但在纵截面 (X-Z) 仿真中，当超越工作长度时，引入指数衰减 `dz_fade` 将横向补偿平滑褪去，把形态交还给物理拉普拉斯原生场，以切断顶部的生硬平坦。</p>
+
+            <h4>5. Z 轴向专属内凹衰减 (Concave Z-Decay)</h4>
+            <p style="font-size: 14.5px; color: #444;">为还原上下两端的真实物理“内凹”形变，Z轴阻力不再是常数，而是变为 X 的函数：在两针中央衰减剧烈（形成内凹陷），在针尖正上方衰减缓慢（维持高度），最终在纵截面上塑造出完美的苹果/哑铃状消融球体。</p>
+
+        </div>
+        
+        <div class="modal-actions">
+            <button class="btn-modal btn-copy" onclick="copyTheoryText()">📋 一键拷贝理论与公式</button>
+            <button class="btn-modal btn-close" onclick="toggleTheory(false)">❌ 关闭并返回仿真</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let d_l = {x:0, y:0}, d_r = {x:0, y:0};
+    let global_params = {};
+
+    const presets = {
+        "liver": { v: 2500, d: 15, p: 100, n: 90, sr_default: 27.5, base_eth: 650, name: "肝脏/肝癌" },
+        "prostate": { v: 2000, d: 15, p: 100, n: 90, sr_default: 40.0, base_eth: 506, name: "前列腺癌" },
+        "pancreas": { v: 2500, d: 15, p: 100, n: 90, sr_default: 30.0, base_eth: 780, name: "胰腺癌" },
+        "kidney": { v: 2500, d: 15, p: 100, n: 90, sr_default: 45.0, base_eth: 550, name: "肾细胞癌" },
+        "glioma": { v: 2000, d: 15, p: 100, n: 90, sr_default: 25.0, base_eth: 430, name: "脑胶质瘤" },
+        "breast": { v: 2500, d: 15, p: 100, n: 90, sr_default: 20.0, base_eth: 1000, name: "乳腺癌" },
+        "lung": { v: 3000, d: 15, p: 100, n: 90, sr_default: 15.0, base_eth: 1000, name: "肺癌" },
+        "thyroid": { v: 3000, d: 15, p: 100, n: 90, sr_default: 35.0, base_eth: 3000, name: "甲状腺" }
+    };
+
+    function loadPreset() {
+        const key = document.getElementById('p_tissue').value;
+        const config = presets[key];
+        document.getElementById('p_v').value = config.v;
+        document.getElementById('p_d').value = config.d;
+        document.getElementById('p_p').value = config.p;
+        document.getElementById('p_n').value = config.n;
+        document.getElementById('p_sr').value = config.sr_default;
+        document.getElementById('main_title').innerText = `双侧实体 ${config.name} 动态 IRE 消融对比 (基于调研文献标定)`;
+        startSim();
+    }
+    
+    function selectAll(el) {
+        el.focus();
+        el.select();
+        if(el.setSelectionRange) { try { el.setSelectionRange(0, el.value.length); } catch(e) {} }
+    }
+
+    function stepVal(id, delta, min, max) {
+        let el = document.getElementById(id);
+        let val = parseFloat(el.value);
+        if (isNaN(val)) val = 0;
+        val += delta;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        val = Math.round(val * 10000) / 10000; 
+        el.value = val;
+    }
+
+    const getJetColor = v => {
+        let c = Math.max(0, Math.min(1, v / 2500));
+        let r = 0, g = 0, b = 0;
+        if (c < 0.125) { r = 0; g = 0; b = 128 + 127 * (c / 0.125); } 
+        else if (c < 0.375) { r = 0; g = 255 * ((c - 0.125) / 0.25); b = 255; } 
+        else if (c < 0.625) { r = 255 * ((c - 0.375) / 0.25); g = 255; b = 255 - 255 * ((c - 0.375) / 0.25); } 
+        else if (c < 0.875) { r = 255; g = 255 - 255 * ((c - 0.625) / 0.25); b = 0; } 
+        else { r = 255 - 127 * ((c - 0.875) / 0.125); g = 0; b = 0; }
+        return [Math.round(r), Math.round(g), Math.round(b)];
+    };
+
+    function drawCB(id) {
+        const ctx = document.getElementById(id).getContext('2d');
+        let h = document.getElementById(id).height;
+        for(let y=0; y<h; y++) {
+            let val = 2500 - (y/h)*2500; 
+            let rgb = getJetColor(val);
+            ctx.fillStyle = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`; ctx.fillRect(0,y,25,1);
+        }
+    }
+
+    function renderSim(id, v, d, p, n, Eth, sigma_val, l_active, view_plane) {
+        const cv = document.getElementById(id); const ctx = cv.getContext('2d');
+        const N=200, L=52, dx=L/N, px=420/L; 
+        let field = new Float64Array(N*N);
+        let x_pts = [], y_pts = [];
+        let segments = []; 
+
+        let cond_factor = 0.77 + 0.85 * Math.exp(-sigma_val / 3.0); 
+        let dist_ratio = Math.max(0, Math.min(1.0, d / 15.0)); 
+        let dist_blend = Math.pow(dist_ratio, 2);
+
+        for(let r=0; r<N; r++){
+            for(let c=0; c<N; c++){
+                let rx = (c - N/2 + 0.5) * dx;
+                let ry = (view_plane === 'xy') ? (N/2 - r + 0.5) * dx : 0;
+                let rz = (view_plane === 'xz') ? (N/2 - r + 0.5) * dx : 0;
+
+                const a=d/2, r_n=0.5; 
+                const C = v / (2 * Math.log((d-r_n)/r_n));
+                
+                // 1. Z轴距离计算 (超长部分)
+                let dz = Math.max(0, Math.abs(rz) - l_active/2);
+                let sign_z = (Math.abs(rz) > l_active/2) ? Math.sign(rz) : 0;
+                
+                let r1s = Math.pow(rx+a, 2) + ry*ry + dz*dz;
+                let r2s = Math.pow(rx-a, 2) + ry*ry + dz*dz;
+                
+                let grad_x = (rx+a)/r1s - (rx-a)/r2s;
+                let grad_y = ry/r1s - ry/r2s;
+                let grad_z = sign_z * (dz/r1s - dz/r2s);
+                
+                let eb = (r1s < r_n*r_n || r2s < r_n*r_n) ? 2500 : Math.sqrt(grad_x*grad_x + grad_y*grad_y + grad_z*grad_z) * C * 10;
+                
+                let lp=Math.log10(p), lc=Math.log10(n);
+                let base_push = 0.15 + 0.2*(lp/2) + 0.2*(lc/2.3);
+
+                // 2. XY 平面的花生形人工补偿矩阵
+                let base_m = 0.940;
+                let center_peak = 0.520;
+                let bridge_w = a * 0.95; 
+                let pin_peak = 0.540;
+                let var_p = a * a * 0.135; 
+
+                let M_x = base_m 
+                        + center_peak * Math.exp(-Math.pow(rx / bridge_w, 4)) 
+                        + pin_peak * (Math.exp(-Math.pow(rx-a, 2)/var_p) + Math.exp(-Math.pow(rx+a, 2)/var_p));
+                
+                // 🟢 核心修复 1: 当超出工作长度时，立刻褪去(Fade)这层横向强制平拉补偿！
+                // 不然顶部就会变成一个毫无物理美感的方盒子
+                let dz_fade = Math.exp(-(dz * dz) / 12.0); 
+                let spatial_mult = 1.0 + (M_x - 1.0) * dist_blend * dz_fade;
+                
+                // 🟢 核心修复 2: 专属于 Z轴 的“内凹”物理衰减 (Concave Decay)
+                // 正中央 (rx=0) 的方差极小(约40)，导致高度迅速垮塌凹陷
+                // 两针上 (rx=±a) 的方差极大(约100)，导致高度强硬撑起
+                let z_var = 38.0 + 68.0 * (Math.exp(-Math.pow(rx-a, 2)/(a*a*0.5)) + Math.exp(-Math.pow(rx+a, 2)/(a*a*0.5)));
+                let z_decay = Math.exp(- (dz * dz) / z_var);
+                
+                // 3. 所有物理场与算法域复合
+                let push = base_push * cond_factor * Math.exp(-Math.pow((eb-Eth)/(Eth*0.8), 2)) * spatial_mult * z_decay;
+                let ed = eb * (1 + push);
+                
+                field[r*N+c] = ed; 
+            }
+        }
+        
+        let img = ctx.createImageData(N,N);
+        for(let i=0; i<N*N; i++){
+            let rgb = getJetColor(field[i]); 
+            img.data[i*4]=rgb[0]; img.data[i*4+1]=rgb[1]; img.data[i*4+2]=rgb[2]; img.data[i*4+3]=255;
+        }
+        
+        let temp = document.createElement('canvas'); temp.width=N; temp.height=N;
+        temp.getContext('2d').putImageData(img,0,0);
+        
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,420,420);
+        ctx.save(); ctx.beginPath(); ctx.arc(210,210,195,0,Math.PI*2); ctx.clip();
+        ctx.fillStyle='#000080'; ctx.fill(); 
+        ctx.imageSmoothingEnabled=true; ctx.drawImage(temp,0,0,420,420);
+        
+        const s = 420/(N-1);
+        for(let r=0; r<N-1; r++){
+            for(let c=0; c<N-1; c++){
+                let v1=field[r*N+c]-Eth, v2=field[r*N+c+1]-Eth, v3=field[(r+1)*N+c+1]-Eth, v4=field[(r+1)*N+c]-Eth;
+                let pts = [];
+                if(v1*v2<0) pts.push({x: c+Math.abs(v1)/(Math.abs(v1)+Math.abs(v2)), y: r});
+                if(v2*v3<0) pts.push({x: c+1, y: r+Math.abs(v2)/(Math.abs(v2)+Math.abs(v3))});
+                if(v3*v4<0) pts.push({x: c+1-Math.abs(v3)/(Math.abs(v3)+Math.abs(v4)), y: r+1});
+                if(v4*v1<0) pts.push({x: c, y: r+1-Math.abs(v4)/(Math.abs(v1)+Math.abs(v4))});
+                if(pts.length>=2) {
+                    segments.push({ x1: pts[0].x*s, y1: pts[0].y*s, x2: pts[1].x*s, y2: pts[1].y*s });
+                    x_pts.push(pts[0].x*dx, pts[1].x*dx); y_pts.push(pts[0].y*dx, pts[1].y*dx);
+                }
+            }
+        }
+        
+        let paths = [];
+        while(segments.length > 0) {
+            let path = [ {x: segments[0].x1, y: segments[0].y1}, {x: segments[0].x2, y: segments[0].y2} ];
+            segments.splice(0, 1);
+            let added = true;
+            while(added) {
+                added = false;
+                let head = path[0], tail = path[path.length-1];
+                for(let i=0; i<segments.length; i++) {
+                    let seg = segments[i];
+                    let eps = 0.01; 
+                    if (Math.abs(seg.x1 - tail.x) < eps && Math.abs(seg.y1 - tail.y) < eps) { path.push({x: seg.x2, y: seg.y2}); segments.splice(i,1); added=true; break; }
+                    if (Math.abs(seg.x2 - tail.x) < eps && Math.abs(seg.y2 - tail.y) < eps) { path.push({x: seg.x1, y: seg.y1}); segments.splice(i,1); added=true; break; }
+                    if (Math.abs(seg.x1 - head.x) < eps && Math.abs(seg.y1 - head.y) < eps) { path.unshift({x: seg.x2, y: seg.y2}); segments.splice(i,1); added=true; break; }
+                    if (Math.abs(seg.x2 - head.x) < eps && Math.abs(seg.y2 - head.y) < eps) { path.unshift({x: seg.x1, y: seg.y1}); segments.splice(i,1); added=true; break; }
+                }
+            }
+            paths.push(path);
+        }
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([9, 7]); 
+        paths.forEach(p => {
+            ctx.moveTo(p[0].x, p[0].y);
+            for(let i=1; i<p.length; i++) ctx.lineTo(p[i].x, p[i].y);
+        });
+        ctx.stroke();
+        ctx.restore();
+
+        let spanX = x_pts.length ? (Math.max(...x_pts) - Math.min(...x_pts)).toFixed(1) : 0;
+        let spanY = y_pts.length ? (Math.max(...y_pts) - Math.min(...y_pts)).toFixed(1) : 0;
+        
+        if(id === 'cv-l') d_l = {x: spanX, y: spanY}; 
+        else d_r = {x: spanX, y: spanY};
+
+        document.querySelectorAll('.axis-y-dyn').forEach(el => {
+            el.innerText = (view_plane === 'xz') ? "Z 轴 (mm)" : "Y 轴 (mm)";
+        });
+
+        document.getElementById(id === 'cv-l' ? 'tag-l':'tag-r').innerHTML = `消融范围 (宽×高): <span class="data-val">${spanX} × ${spanY} mm</span>`;
+
+        ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.setLineDash([]); ctx.strokeRect(0,0,420,420);
+        ctx.fillStyle='#000'; ctx.font='bold 12px Arial';
+        [-20,-10,0,10,20].forEach(val=>{
+            let pX=210+val*px; ctx.beginPath(); ctx.moveTo(pX,420); ctx.lineTo(pX,414); ctx.stroke(); ctx.fillText(val,pX-5,408);
+            let pY=210-val*px; ctx.beginPath(); ctx.moveTo(0,pY); ctx.lineTo(6,pY); ctx.stroke(); ctx.fillText(val,10,pY+4);
+        });
+        
+        let e1x=210-(d/2)*px, e2x=210+(d/2)*px;
+        let s_left = p < 20 ? '±' : '+';
+        let s_right = p < 20 ? '∓' : '-';
+        
+        if(view_plane === 'xy') {
+            [{x:e1x, s:s_left}, {x:e2x, s:s_right}].forEach(e=>{
+                ctx.beginPath(); ctx.arc(e.x, 210, 13, 0, Math.PI*2); 
+                ctx.fillStyle='#ccc'; ctx.fill(); 
+                ctx.strokeStyle='#333'; ctx.lineWidth=1.5; ctx.stroke();
+                ctx.fillStyle='#000'; ctx.font='bold 18px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; 
+                ctx.fillText(e.s, e.x, 210);
+            });
+        } else {
+            let l_px = l_active * px;
+            [{x:e1x, s:s_left}, {x:e2x, s:s_right}].forEach(e=>{
+                ctx.beginPath(); ctx.moveTo(e.x, 210 - l_px/2); ctx.lineTo(e.x, 0);
+                ctx.lineWidth = 6; ctx.strokeStyle = '#95a5a6'; ctx.stroke();
+                
+                ctx.beginPath(); ctx.moveTo(e.x, 210 - l_px/2); ctx.lineTo(e.x, 210 + l_px/2);
+                ctx.lineWidth = 11; ctx.lineCap = 'round'; ctx.strokeStyle = '#333'; ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(e.x, 210 - l_px/2); ctx.lineTo(e.x, 210 + l_px/2);
+                ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.strokeStyle = '#f1c40f'; ctx.stroke();
+
+                ctx.fillStyle='#000'; ctx.font='bold 14px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; 
+                ctx.fillText(e.s, e.x, 210);
+            });
+        }
+    }
+
+    async function exportFull(simId, cbId, title, isLeft) {
+        const simCv = document.getElementById(simId);
+        const cbCv = document.getElementById(cbId);
+        const out = document.createElement('canvas'); out.width = 600; out.height = 680;
+        const ctx = out.getContext('2d');
+        
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,600,680);
+        ctx.fillStyle='#000'; ctx.font='bold 22px Arial'; ctx.textAlign='center'; ctx.fillText(title, 300, 40);
+        
+        ctx.drawImage(simCv, 55, 70); ctx.drawImage(cbCv, 490, 70);
+        
+        ctx.font='bold 14px Arial'; ctx.textAlign='left';
+        ["2500","2000","1500","1000","500","0"].forEach((t,i)=>ctx.fillText(t,525,80+i*84));
+        ctx.save(); ctx.translate(20,280); ctx.rotate(-Math.PI/2); 
+        ctx.fillText(document.getElementById('p_view').value === 'xz' ? "Z 轴 (mm)" : "Y 轴 (mm)",0,0); 
+        ctx.restore();
+        ctx.textAlign='center'; ctx.fillText("X 轴 (mm)",265,515);
+
+        ctx.fillStyle='#f8f9fa'; ctx.fillRect(15, 540, 570, 120);
+        ctx.strokeStyle='#2c3e50'; ctx.strokeRect(15, 540, 570, 120);
+        ctx.fillStyle='#2c3e50'; ctx.textAlign='left'; ctx.font='bold 14px Arial';
+        
+        const dim = isLeft ? d_l : d_r;
+
+        ctx.fillText(`参数设定：电压 ${global_params.v}V | 针距 ${global_params.d}mm | 脉宽 ${global_params.p}μs | 工作长度 ${global_params.l}mm`, 35, 570);
+        ctx.fillText(`设定实际电场致死阈值 (Eth): ${global_params.eth} V/cm`, 35, 595);
+        ctx.fillStyle='#e74c3c'; ctx.font='bold 18px Arial';
+        ctx.fillText(`消融临床边界拟合 (宽×高): ${dim.x} × ${dim.y} mm`, 35, 630);
+
+        out.toBlob(async b => {
+            try {
+                await navigator.clipboard.write([new ClipboardItem({'image/png':b})]);
+                alert("✅ 完整带参数科研图像已成功拷贝！");
+            } catch(e) { 
+                let a = document.createElement('a');
+                a.href = out.toDataURL('image/png');
+                a.download = `IRE_Simulation_${isLeft?'Left':'Right'}.png`;
+                a.click();
+            }
+        });
+    }
+
+    function toggleTheory(s) { document.getElementById('m-theory').style.display=s?'flex':'none'; }
+
+    function copyTheoryText() {
+        const textToCopy = `IRE 系统底层物理仿真计算公式库
+
+1. 组织致死电场阈值 (Eth) 动态计算
+基于组织特异性的绝对基准阈值 (Base Eth)，结合脉宽(p)与脉冲数(n)进行强度-持续时间对数衰减推算。
+公式: Eth = max[200, BaseEth - 200 * log10(p/100) - 100 * log10(n/90)]
+
+2. 原生拉普拉斯静电场分布 (E_lap)
+基于双针电极空间构型的纯物理学解析解 (d=2a 为针距，rn 为探针半径)。
+公式: C = V / [2 * ln((d - rn) / rn)]
+公式: E_lap(x,y) = 10 * √[ C² * ((x+a)/r1² - (x-a)/r2²)² + C² * (y/r1² - y/r2²)² ]
+
+3. 虚拟电极效应与电导率补偿系数 (C_cond)
+模拟电穿孔诱发的离子释放导致的局部电导率非线性激增现象。
+公式: C_cond(σ) = 0.77 + 0.85 * exp(-σ / 3.0)
+
+4. 针距自适应空间退化因子 (D_blend)
+控制模型在针距缩小时，消除强制塑形力，平滑退化为纯物理完美椭圆。
+公式: D_blend(d) = [max(0, min(1, d / 15.0))]²
+
+5. 三高斯平滑重构矩阵 (M_x)
+消除一切截断折角，利用中央 4 次方超高斯与两极高斯叠加，构建无缝平坦桥梁锁定 25x17 mm 边界。
+公式: M(x) = 0.940 + 0.520 * exp[-(x / 0.95a)⁴] + 0.540 * (exp[-(x-a)² / 0.135a²] + exp[-(x+a)² / 0.135a²])
+
+6. 最终动态多物理耦合场强 (E_dyn)
+将原生场、电导率补偿、基础脉冲推力与空间衰减矩阵进行全域融合。
+公式: E_dyn(x,y) = E_lap * C_cond * BasePush * [1.0 + (M(x) - 1.0) * D_blend]`;
+
+        const textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert("✅ 仿真理论与核心公式 (Markdown纯净版) 已成功拷贝到剪贴板！可以直接粘贴到 Word 或学术笔记中。");
+        } catch (err) {
+            alert("❌ 拷贝失败，请手动截图。");
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function startSim() {
+        document.getElementById('loading').style.display='flex';
+        setTimeout(()=>{
+            const tissueKey = document.getElementById('p_tissue').value;
+            const config = presets[tissueKey];
+            const v = parseFloat(document.getElementById('p_v').value);
+            const d = parseFloat(document.getElementById('p_d').value);
+            const p = parseFloat(document.getElementById('p_p').value);
+            const n = parseFloat(document.getElementById('p_n').value);
+            const l_active = parseFloat(document.getElementById('p_l').value);
+            const view_plane = document.getElementById('p_view').value;
+            
+            const sr_val = parseFloat(document.getElementById('p_sr').value); 
+            const sl_val = 0.0001; 
+            
+            let Eth = Math.round(config.base_eth - 200 * Math.log10(p / 100) - 100 * Math.log10(n / 90));
+            Eth = Math.max(200, Eth); 
+            
+            global_params = {v, d, p, n, eth: Eth, l: l_active};
+
+            let pulseTypeInfo = p < 20 ? "<span style='color:#8e44ad'>[双极高频 H-FIRE]</span>" : "<span style='color:#2980b9'>[单极长脉冲]</span>";
+
+            document.getElementById('i_l').innerHTML=`动态场 (左) ${pulseTypeInfo} : ${v}V, ${d}mm, ${p}μs, ${n}个.<br>极低初始电导率: ${sl_val} mS/cm. 实际致死阈值: <span class="data-val">${Eth} V/cm</span>.`;
+            document.getElementById('i_r').innerHTML=`动态场 (右) ${pulseTypeInfo} : ${v}V, ${d}mm, ${p}μs, ${n}个.<br>可变初始电导率: ${sr_val} mS/cm. 实际致死阈值: <span class="data-val">${Eth} V/cm</span>.`;
+
+            drawCB('cb-l'); drawCB('cb-r');
+            
+            renderSim('cv-l', v, d, p, n, Eth, sl_val, l_active, view_plane);
+            renderSim('cv-r', v, d, p, n, Eth, sr_val, l_active, view_plane);
+            
+            document.getElementById('loading').style.display='none';
+        }, 80);
+    }
+    window.onload = startSim;
+</script>
+</body>
+</html>

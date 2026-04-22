@@ -1,0 +1,2140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>医疗器械操作演示系统</title>
+  <style>
+    :root {
+      --bg: #0b132b;
+      --bg-soft: #111f46;
+      --card: #132a59;
+      --card-2: #0f2249;
+      --line: #2e4a87;
+      --text: #e8eefc;
+      --text-soft: #adc0ef;
+      --accent: #ff9d2f;
+      --ok: #38c172;
+      --warn: #f6ad55;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: radial-gradient(circle at 30% 0%, #16306a 0%, var(--bg) 45%);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    }
+    .page {
+      max-width: 1920px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 300px;
+      gap: 14px;
+      min-height: 100vh;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(22, 43, 90, 0.95), rgba(13, 31, 70, 0.95));
+      box-shadow: 0 14px 30px rgba(3, 8, 20, 0.35);
+      overflow: hidden;
+      min-height: 0;
+    }
+    .panel-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7, 18, 45, 0.45);
+    }
+    .panel-header h2,
+    .panel-header h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #f1f5ff;
+      letter-spacing: 0.3px;
+    }
+    .panel-body {
+      padding: 12px;
+    }
+
+    .tool-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .tool-title .badge {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(255, 157, 47, 0.45);
+      color: #ffd6a4;
+      background: rgba(255, 157, 47, 0.14);
+      flex-shrink: 0;
+    }
+    .tool-title h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .hint {
+      color: var(--text-soft);
+      font-size: 12px;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    .step-list {
+      max-height: calc(100vh - 250px);
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+      padding-right: 2px;
+    }
+    .step-item {
+      border: 1px solid rgba(111, 145, 220, 0.35);
+      background: rgba(18, 42, 92, 0.65);
+      border-radius: 10px;
+      padding: 9px 10px;
+      cursor: pointer;
+      transition: 0.15s ease;
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .step-item:hover { border-color: #8fb1ff; }
+    .step-item.active {
+      border-color: var(--accent);
+      background: rgba(255, 157, 47, 0.14);
+    }
+    .step-item.done .num {
+      background: rgba(56, 193, 114, 0.15);
+      color: #8af6b3;
+      border-color: rgba(56, 193, 114, 0.4);
+    }
+    .num {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      border: 1px solid rgba(149, 178, 245, 0.4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #d9e6ff;
+    }
+    .step-main {
+      min-width: 0;
+    }
+    .step-main strong {
+      display: block;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .step-main span {
+      color: var(--text-soft);
+      font-size: 11px;
+    }
+
+    .viewer-wrap {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100%;
+      min-height: 0;
+    }
+    .viewer-top {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+    .viewer-title {
+      min-width: 0;
+    }
+    .viewer-title strong {
+      display: block;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .viewer-title span {
+      color: #9eb8eb;
+      font-size: 12px;
+    }
+    .progress {
+      min-width: 120px;
+      text-align: right;
+      font-size: 12px;
+      color: #d4e3ff;
+    }
+    .progress .bar {
+      margin-top: 6px;
+      width: 160px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(196, 218, 255, 0.18);
+      overflow: hidden;
+      display: inline-block;
+    }
+    .progress .bar > i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #58a6ff, #ff9d2f);
+      transition: width .2s ease;
+    }
+
+    .device-stage {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .screen {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #08142e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: start;
+      aspect-ratio: 1024 / 600;
+      width: 100%;
+      min-height: 0;
+    }
+    .screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+      opacity: 1;
+      transition: opacity .18s ease;
+    }
+    .hotspot-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .screen.loading img {
+      opacity: 0.08;
+    }
+    .screen.loading .hotspot-layer {
+      visibility: hidden;
+    }
+    .screen-loader {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at center, rgba(30, 58, 118, 0.32), rgba(5, 10, 22, 0.72)),
+        linear-gradient(180deg, rgba(8, 20, 46, 0.25), rgba(8, 20, 46, 0.55));
+      color: #dce7ff;
+      font-size: 14px;
+      letter-spacing: 0.4px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+    }
+    .screen.loading .screen-loader {
+      opacity: 1;
+    }
+    .hotspot {
+      position: absolute;
+      border: 2px solid transparent;
+      background: transparent;
+      border-radius: 10px;
+      color: transparent;
+      font-size: 0;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.2;
+      padding: 4px;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: none;
+      animation: none;
+      transition: transform .15s ease, background .15s ease;
+    }
+    .hotspot-btn {
+      border-style: solid;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+    }
+    .hotspot-btn:hover {
+      border-color: rgba(255, 157, 47, 0.28);
+      background: rgba(255, 157, 47, 0.05);
+      transform: scale(1.02);
+    }
+    .hotspot-toolbar {
+      border-style: solid;
+      border-width: 1.5px;
+      border-color: transparent;
+      border-radius: 8px;
+      box-shadow: none;
+      animation: none;
+    }
+    .hotspot-toolbar:hover {
+      border-color: rgba(255, 157, 47, 0.78);
+      background: rgba(255, 157, 47, 0.08);
+      transform: scale(1.02);
+    }
+    .hotspot-toolbar.active {
+      border-color: rgba(102, 211, 155, 0.95);
+      box-shadow: 0 0 0 1px rgba(56, 193, 114, 0.28);
+    }
+    .hotspot-btn.active {
+      border-color: #66d39b;
+      background: transparent;
+      box-shadow: 0 0 0 2px rgba(56, 193, 114, 0.4), 0 0 0 0 rgba(56, 193, 114, 0.35);
+      animation: none;
+    }
+    .hotspot:hover {
+      transform: scale(1.03);
+      background: transparent;
+    }
+    @keyframes hotspotPulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 157, 47, 0.5); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 157, 47, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 157, 47, 0); }
+    }
+    .hotspot-input {
+      position: absolute;
+      z-index: 4;
+      border: 2px solid rgba(90, 149, 255, 0.75);
+      border-radius: 8px;
+      background: rgba(8, 20, 45, 0.82);
+      color: #eef4ff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 0 8px;
+      outline: none;
+      pointer-events: auto;
+      transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .hotspot-input::placeholder {
+      color: #a8bfe8;
+      font-weight: 500;
+    }
+    .hotspot-input:focus,
+    .hotspot-input.active {
+      border-color: #66d39b;
+      background: rgba(10, 30, 56, 0.94);
+      box-shadow: 0 0 0 2px rgba(56, 193, 114, 0.35);
+    }
+    .hotspot-input.card-value {
+      border-color: rgba(184, 213, 255, 0.92);
+      border-radius: 12px;
+      background: rgba(18, 35, 74, 0.9);
+      box-shadow: inset 0 0 0 1px rgba(113, 148, 220, 0.16);
+      color: #f4f8ff;
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+      padding: 0 14px;
+      text-shadow: 0 1px 6px rgba(8, 18, 44, 0.85);
+    }
+    .hotspot-input.card-value::placeholder {
+      color: rgba(228, 238, 255, 0.78);
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .hotspot-input.card-value:focus,
+    .hotspot-input.card-value.active {
+      border-color: rgba(102, 211, 155, 0.96);
+      background: rgba(15, 34, 72, 0.96);
+      box-shadow: 0 0 0 2px rgba(56, 193, 114, 0.28), inset 0 0 0 1px rgba(102, 211, 155, 0.18);
+    }
+    .hotspot-inputnav {
+      border-style: solid;
+      border-color: transparent;
+      box-shadow: none;
+      animation: none;
+      background: transparent;
+    }
+    .hotspot-inputnav:hover,
+    .hotspot-inputnav.active {
+      border-color: rgba(102, 211, 155, 0.92);
+      box-shadow: 0 0 0 1px rgba(56, 193, 114, 0.28);
+      background: rgba(102, 211, 155, 0.04);
+    }
+    .hotspot-display {
+      position: absolute;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      user-select: none;
+      text-align: center;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .hotspot-display.raw-value {
+      color: #f7fbff;
+      font-size: 16px;
+      font-weight: 700;
+      background: rgba(20, 40, 82, 0.88);
+      border-radius: 9px;
+      box-shadow: inset 0 0 0 1px rgba(129, 161, 230, 0.12);
+      text-shadow: 0 1px 6px rgba(7, 18, 45, 0.9);
+    }
+    .hotspot-display.raw-line {
+      border-radius: 6px;
+      background: rgba(17, 34, 72, 0.96);
+      box-shadow: inset 0 0 0 1px rgba(111, 145, 220, 0.14);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+    }
+    .hotspot-display.metric-value {
+      color: #ff7d1a;
+      font-size: 50px;
+      font-weight: 700;
+      background: linear-gradient(180deg, rgba(16, 33, 72, 0.96), rgba(17, 34, 74, 0.9));
+      border-radius: 18px;
+      box-shadow: inset 0 0 0 1px rgba(104, 133, 198, 0.14);
+      text-shadow: 0 2px 10px rgba(7, 18, 45, 0.88);
+    }
+    .hotspot-display.metric-value.compact {
+      font-size: 40px;
+      border-radius: 16px;
+      letter-spacing: -0.8px;
+    }
+    .hotspot-display.metric-channel {
+      color: #18345d;
+      font-size: 24px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 14px;
+      box-shadow: 0 0 18px rgba(134, 228, 255, 0.26);
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+    }
+    .hotspot-display.charge-value {
+      color: #ff4f8b;
+      font-size: 42px;
+      font-weight: 700;
+      background: radial-gradient(circle at center, rgba(35, 52, 96, 0.95), rgba(18, 34, 74, 0.92));
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px rgba(255, 154, 191, 0.14);
+      text-shadow: 0 2px 10px rgba(7, 18, 45, 0.88);
+    }
+    .charge-gauge {
+      position: absolute;
+      z-index: 2;
+      pointer-events: none;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity .18s ease;
+      filter: drop-shadow(0 0 14px rgba(255, 108, 154, 0.35));
+    }
+    .floating-tag {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      z-index: 2;
+      font-size: 12px;
+      color: #e5efff;
+      border: 1px solid rgba(132, 165, 236, 0.4);
+      background: rgba(10, 23, 53, 0.68);
+      border-radius: 999px;
+      padding: 3px 9px;
+    }
+
+    .op-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(14, 32, 73, 0.82);
+      padding: 12px;
+      overflow: auto;
+      max-height: 320px;
+    }
+    .op-card h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      color: #f3f7ff;
+    }
+    .op-card p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #b8caef;
+    }
+
+    .operation-box {
+      margin-top: 10px;
+      border-top: 1px dashed rgba(143, 170, 232, 0.35);
+      padding-top: 10px;
+    }
+    .fields {
+      display: grid;
+      gap: 7px;
+      margin-top: 8px;
+    }
+    .field {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #d3e2ff;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid #4a68ac;
+      border-radius: 7px;
+      min-height: 32px;
+      background: #0f2249;
+      color: #eef4ff;
+      padding: 0 8px;
+      outline: none;
+    }
+    .field input:focus,
+    .field select:focus { border-color: #7db0ff; }
+
+    .buttons {
+      border-top: 1px solid var(--line);
+      padding: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(8, 18, 44, 0.35);
+    }
+    .left-btns,
+    .right-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid #6f91dc;
+      background: #11306a;
+      color: #eaf2ff;
+      border-radius: 9px;
+      min-height: 34px;
+      padding: 0 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      transition: .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn.primary {
+      border-color: #ff9d2f;
+      background: linear-gradient(135deg, #ff9d2f, #ff7a24);
+      color: #fff;
+    }
+    .btn.success {
+      border-color: #38c172;
+      background: linear-gradient(135deg, #2ba85f, #1e8f50);
+    }
+    .btn.ghost {
+      background: transparent;
+      border-color: rgba(132, 165, 236, 0.55);
+    }
+
+    .summary-grid {
+      display: grid;
+      gap: 8px;
+    }
+    .summary-card {
+      border: 1px solid rgba(143, 170, 232, 0.35);
+      background: rgba(13, 31, 71, 0.72);
+      border-radius: 10px;
+      padding: 8px 9px;
+    }
+    .summary-card strong {
+      display: block;
+      font-size: 12px;
+      color: #f1f5ff;
+      margin-bottom: 4px;
+    }
+    .summary-card div {
+      font-size: 12px;
+      color: #b9ccef;
+      line-height: 1.5;
+    }
+
+    .log-list {
+      margin-top: 10px;
+      border-top: 1px dashed rgba(143, 170, 232, 0.35);
+      padding-top: 10px;
+      max-height: 320px;
+      overflow: auto;
+      display: grid;
+      gap: 7px;
+    }
+    .log-item {
+      font-size: 12px;
+      color: #c8d9fb;
+      border: 1px solid rgba(111, 145, 220, 0.28);
+      border-radius: 8px;
+      background: rgba(12, 29, 67, 0.6);
+      padding: 6px 8px;
+      line-height: 1.45;
+    }
+    .log-item time {
+      color: #8db2f3;
+      margin-right: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 1260px) {
+      .page {
+        grid-template-columns: 300px 1fr;
+      }
+      .panel.right {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: 1fr;
+        padding: 10px;
+      }
+      .panel.left {
+        order: 1;
+      }
+      .panel.viewer {
+        order: 2;
+      }
+      .panel.right {
+        order: 3;
+      }
+      .step-list {
+        max-height: 260px;
+      }
+      .device-stage {
+        grid-template-columns: 1fr;
+      }
+      .hotspot {
+        font-size: 10px;
+        border-radius: 8px;
+        padding: 2px;
+      }
+      .hotspot-display.raw-value {
+        font-size: 12px;
+        border-radius: 6px;
+      }
+      .hotspot-display.raw-line {
+        font-size: 11px;
+      }
+      .hotspot-input.card-value {
+        font-size: 22px;
+        border-radius: 10px;
+      }
+      .hotspot-input.card-value::placeholder {
+        font-size: 15px;
+      }
+      .hotspot-display.metric-value {
+        font-size: 32px;
+        border-radius: 12px;
+      }
+      .hotspot-display.metric-value.compact {
+        font-size: 28px;
+        border-radius: 10px;
+      }
+      .hotspot-display.metric-channel {
+        font-size: 18px;
+        border-radius: 10px;
+      }
+      .hotspot-display.charge-value {
+        font-size: 30px;
+      }
+      .buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .left-btns,
+      .right-btns {
+        width: 100%;
+      }
+      .btn {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <aside class="panel left">
+      <div class="panel-header">
+        <div class="tool-title">
+          <span class="badge">演示模式</span>
+          <h1>医疗器械交互流程模拟</h1>
+        </div>
+        <div class="hint">
+          目的：帮助操作者熟悉设备界面与标准操作顺序。<br />
+          用法：按步骤执行“本步操作”，系统会记录流程并生成操作回顾。
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="step-list" id="stepList"></div>
+      </div>
+    </aside>
+
+    <main class="panel viewer">
+      <section class="viewer-wrap">
+        <div class="viewer-top">
+          <div class="viewer-title">
+            <strong id="viewerTitle">-</strong>
+            <span id="viewerDesc">-</span>
+          </div>
+          <div class="progress">
+            <div id="progressText">0 / 0</div>
+            <span class="bar"><i id="progressFill"></i></span>
+          </div>
+        </div>
+
+        <div class="device-stage">
+          <div class="screen">
+            <span class="floating-tag" id="phaseTag">阶段</span>
+            <img id="stepImage" src="" alt="设备界面截图" />
+            <div class="hotspot-layer" id="hotspotLayer"></div>
+            <div class="screen-loader" id="screenLoader">界面加载中...</div>
+          </div>
+          <div class="op-card">
+            <h4>本步操作要点</h4>
+            <p id="opGuide">-</p>
+
+            <div class="operation-box">
+              <h4>模拟输入</h4>
+              <div class="fields" id="operationFields"></div>
+              <button class="btn success" id="doStepBtn" style="margin-top:10px;width:100%;">执行本步操作</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <div class="left-btns">
+            <button class="btn ghost" id="prevBtn">上一步</button>
+            <button class="btn" id="nextBtn">下一步</button>
+            <button class="btn primary" id="autoBtn">自动演示</button>
+          </div>
+          <div class="right-btns">
+            <button class="btn ghost" id="resetBtn">重置流程</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="panel right">
+      <div class="panel-header">
+        <h3>演示记录与参数回顾</h3>
+      </div>
+      <div class="panel-body">
+        <div class="summary-grid" id="summaryGrid"></div>
+        <div class="log-list" id="logList"></div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const steps = [
+      {
+        id: "boot",
+        phase: "开机",
+        title: "设备开机与品牌识别",
+        desc: "确认设备软件版本与界面版本正常显示。",
+        image: "./界面截图CN/1.webp",
+        guide: "开机后停留 3-5 秒，核对 Logo、软件版本号、UI 版本号。",
+        fields: []
+      },
+      {
+        id: "operator",
+        phase: "信息录入",
+        title: "录入操作者信息",
+        desc: "填写手术时间、医生姓名与注意事项。",
+        image: "./界面截图CN/3操作者信息.webp",
+        guide: "进入“医生信息”界面，依次录入手术时间、医生姓名、注意事项。",
+        fields: [
+          { key: "surgeryTime", label: "手术时间", type: "text", placeholder: "例如 2026-04-20 09:30" },
+          { key: "doctorName", label: "医生姓名", type: "text", placeholder: "请输入姓名" },
+          { key: "note", label: "注意事项", type: "text", placeholder: "例如 禁止误触脚踏" }
+        ]
+      },
+      {
+        id: "patient",
+        phase: "信息录入",
+        title: "录入患者信息",
+        desc: "填写患者ID、姓名、年龄与患者数据备注。",
+        image: "./界面截图CN/4患者信息.webp",
+        guide: "切换至“患者信息”，录入患者基础信息，避免空字段提交。",
+        fields: [
+          { key: "patientId", label: "患者ID", type: "text", placeholder: "例如 P2026042001" },
+          { key: "patientName", label: "姓名", type: "text", placeholder: "请输入患者姓名" },
+          { key: "patientAge", label: "年龄", type: "number", placeholder: "例如 57" }
+        ]
+      },
+      {
+        id: "target",
+        phase: "治疗规划",
+        title: "设置损毁区与目标区",
+        desc: "输入几何尺寸并确认边缘安全距离。",
+        image: "./界面截图CN/5.webp",
+        guide: "根据影像评估填写损毁区与目标区长宽高，确认边缘距离。",
+        fields: [
+          { key: "lesionL", label: "损毁长cm", type: "number", placeholder: "1.0" },
+          { key: "lesionW", label: "损毁宽cm", type: "number", placeholder: "1.0" },
+          { key: "lesionH", label: "损毁高cm", type: "number", placeholder: "1.0" },
+          { key: "targetL", label: "目标长cm", type: "number", placeholder: "3.0" },
+          { key: "targetW", label: "目标宽cm", type: "number", placeholder: "3.0" },
+          { key: "targetH", label: "目标高cm", type: "number", placeholder: "3.0" },
+          { key: "margin", label: "边缘cm", type: "number", placeholder: "1.0" }
+        ]
+      },
+      {
+        id: "organ",
+        phase: "治疗规划",
+        title: "选择器官与模式",
+        desc: "选择器官类型、单极/双极模式及PPM同步策略。",
+        image: "./界面截图CN/6.webp",
+        guide: "按临床计划选择器官与治疗模式，确认PPM及ECG同步设置。",
+        fields: [
+          { key: "organ", label: "器官", type: "select", options: ["肝脏", "肺部", "胰腺", "肾脏", "前列腺"] },
+          { key: "mode", label: "模式", type: "select", options: ["单极性模式", "双极性模式"] },
+          { key: "ppm", label: "PPM", type: "select", options: ["60", "90", "120", "240"] },
+          { key: "ecgSync", label: "ECG同步", type: "select", options: ["关闭", "开启"] }
+        ]
+      },
+      {
+        id: "electrode",
+        phase: "电极配置",
+        title: "选择电极配置",
+        desc: "根据通道数选择电极点位。",
+        image: "./界面截图CN/7.webp",
+        guide: "进入电极配置，选择与规划一致的针道与通道组合。",
+        fields: [
+          { key: "electrodeLayout", label: "电极布局", type: "select", options: ["2点", "4点", "5点", "6点"] }
+        ]
+      },
+      {
+        id: "parameterRaw",
+        phase: "参数设置",
+        title: "设置基础参数",
+        desc: "脉宽、场强、数量、PPM、间距与电压参数录入。",
+        image: "./界面截图CN/8.webp",
+        guide: "录入基础参数后，先观察通道1/2切换状态，再继续。",
+        fields: [
+          { key: "pulseWidth", label: "脉宽us", type: "number", placeholder: "100" },
+          { key: "fieldStrength", label: "场强V/cm", type: "number", placeholder: "1500" },
+          { key: "count", label: "数量", type: "number", placeholder: "90" },
+          { key: "ppmSet", label: "PPM", type: "number", placeholder: "60" },
+          { key: "spacing", label: "间距cm", type: "number", placeholder: "1.0" },
+          { key: "voltageSet", label: "电压V", type: "number", placeholder: "1500" }
+        ]
+      },
+      {
+        id: "parameterCard",
+        phase: "参数设置",
+        title: "参数卡片复核",
+        desc: "以卡片形式复核关键参数并确认。",
+        image: "./界面截图CN/9.webp",
+        guide: "检查6项参数卡片与预期一致，点击确认进入下一步。",
+        fields: []
+      },
+      {
+        id: "channelConfirm",
+        phase: "通道确认",
+        title: "通道映射确认",
+        desc: "核对通道1/2映射关系并确认。",
+        image: "./界面截图CN/10.webp",
+        guide: "确认通道环形映射关系，避免通道与针道错配。",
+        fields: [
+          { key: "channelStrategy", label: "通道策略", type: "select", options: ["顺时针", "逆时针", "固定映射"] }
+        ]
+      },
+      {
+        id: "voltagePage",
+        phase: "设备状态",
+        title: "电压与充放电状态页",
+        desc: "查看测试、充电、放电三状态。",
+        image: "./界面截图CN/11.webp",
+        guide: "确认设备电压监测正常，充放电按流程可触发。",
+        fields: []
+      },
+      {
+        id: "preStart",
+        phase: "设备状态",
+        title: "启动前状态检查",
+        desc: "核对计数、电压、电流、阻抗四项。",
+        image: "./界面截图CN/12.webp",
+        guide: "确保计数、电压、电流、阻抗显示在允许范围，再启动。",
+        fields: []
+      },
+      {
+        id: "monitor",
+        phase: "监测",
+        title: "波形与趋势监测",
+        desc: "实时观察电压、电流、阻抗趋势。",
+        image: "./界面截图CN/13.webp",
+        guide: "关注曲线波动和异常值，必要时暂停并回溯参数。",
+        fields: []
+      },
+      {
+        id: "output",
+        phase: "输出",
+        title: "输出功率页（初始）",
+        desc: "查看功率设置、输出功率、阻抗、凝血针道。",
+        image: "./界面截图CN/14.webp",
+        guide: "启动输出前记录初始值，作为术后追溯基线。",
+        fields: [
+          { key: "powerSet", label: "功率设置W", type: "number", placeholder: "0" },
+          { key: "needleChannel", label: "凝血针道", type: "number", placeholder: "0" }
+        ]
+      },
+      {
+        id: "outputRunning",
+        phase: "输出",
+        title: "输出功率页（运行中）",
+        desc: "运行中参数以实时值展示。",
+        image: "./界面截图CN/14-1.webp",
+        guide: "运行中重点观察功率与阻抗变化，若超阈值立即停机。",
+        fields: []
+      },
+      {
+        id: "recordPage",
+        phase: "记录",
+        title: "记录文件浏览",
+        desc: "浏览导出的记录文件和页码。",
+        image: "./界面截图CN/15.webp",
+        guide: "核对记录文件完整性，确认当前页与导出文件对应。",
+        fields: []
+      },
+      {
+        id: "reviewPage",
+        phase: "复核",
+        title: "参数复核总览",
+        desc: "汇总患者信息、设置参数、工作参数并执行确认。",
+        image: "./界面截图CN/16.webp",
+        guide: "复核三栏内容一致后点击确认，完成本次流程。",
+        fields: []
+      },
+      {
+        id: "settings",
+        phase: "系统设置",
+        title: "系统时间/亮度/音量/语言",
+        desc: "确认系统基础设置，适配手术场景。",
+        image: "./界面截图CN/17.webp",
+        guide: "按手术室环境设置亮度音量，语言保持中文或按需切换。",
+        fields: [
+          { key: "language", label: "语言", type: "select", options: ["中文", "English"] }
+        ]
+      },
+      {
+        id: "version",
+        phase: "系统设置",
+        title: "版本信息核验",
+        desc: "核验硬件、界面、软件发布与完整版本。",
+        image: "./界面截图CN/18.webp",
+        guide: "演示结束前进行版本核验，形成培训闭环。",
+        fields: []
+      }
+    ];
+
+    const defaultForm = {
+      surgeryTime: "",
+      doctorName: "",
+      note: "",
+      patientId: "",
+      patientName: "",
+      patientAge: "",
+      lesionL: "1.0",
+      lesionW: "1.0",
+      lesionH: "1.0",
+      targetL: "3.0",
+      targetW: "3.0",
+      targetH: "3.0",
+      margin: "1.0",
+      organ: "肝脏",
+      mode: "双极性模式",
+      ppm: "60",
+      ecgSync: "关闭",
+      electrodeLayout: "4点",
+      pulseWidth: "100",
+      fieldStrength: "1500",
+      count: "90",
+      ppmSet: "60",
+      spacing: "1.0",
+      voltageSet: "1500",
+      electrodeVariant: "layout-2",
+      channelStrategy: "顺时针",
+      powerSet: "0",
+      needleChannel: "0",
+      language: "中文"
+    };
+
+    const pxRect = (x, y, w, h, extra = {}) => ({
+      unit: "px",
+      baseWidth: 1024,
+      baseHeight: 600,
+      x,
+      y,
+      w,
+      h,
+      ...extra
+    });
+
+    const toolbarSlots = [
+      { x: 208, y: 14, w: 56, h: 54 },
+      { x: 289, y: 14, w: 56, h: 54 },
+      { x: 369, y: 14, w: 56, h: 54 },
+      { x: 450, y: 14, w: 56, h: 54 },
+      { x: 531, y: 14, w: 56, h: 54 },
+      { x: 611, y: 14, w: 56, h: 54 },
+      { x: 691, y: 14, w: 56, h: 54 },
+      { x: 772, y: 14, w: 56, h: 54 }
+    ];
+
+    const toolbarTargetByKey = {
+      operator: "operator",
+      patient: "patient",
+      planning: "target",
+      status: "voltagePage",
+      monitor: "monitor",
+      output: "output",
+      record: "recordPage",
+      settings: "settings"
+    };
+
+    const toolbarLabelByKey = {
+      operator: "操作者信息",
+      patient: "患者信息",
+      planning: "治疗规划",
+      status: "设备状态",
+      monitor: "波形监测",
+      output: "输出功率",
+      record: "记录复核",
+      settings: "系统设置"
+    };
+
+    const toolbarOrderA = ["operator", "patient", "planning", "status", "monitor", "output", "record", "settings"];
+    const toolbarOrderB = ["patient", "operator", "planning", "status", "output", "monitor", "record", "settings"];
+
+    function buildToolbarHotspots(order, activeKey, currentStepId) {
+      return order.map((key, index) => {
+        const slot = toolbarSlots[index];
+        return pxRect(slot.x, slot.y, slot.w, slot.h, {
+          kind: "button",
+          label: toolbarLabelByKey[key],
+          goTo: key === activeKey ? currentStepId : toolbarTargetByKey[key],
+          toolbar: true,
+          toolbarKey: key,
+          activeToolbarKey: activeKey
+        });
+      });
+    }
+
+    const hotspotPresets = {
+      toolbar_operator: buildToolbarHotspots(toolbarOrderA, "operator", "operator"),
+      toolbar_patient: buildToolbarHotspots(toolbarOrderA, "patient", "patient"),
+      toolbar_planning_target: buildToolbarHotspots(toolbarOrderB, "planning", "target"),
+      toolbar_planning_organ: buildToolbarHotspots(toolbarOrderB, "planning", "organ"),
+      toolbar_planning_electrode: buildToolbarHotspots(toolbarOrderB, "planning", "electrode"),
+      toolbar_planning_parameterRaw: buildToolbarHotspots(toolbarOrderB, "planning", "parameterRaw"),
+      toolbar_planning_parameterCard: buildToolbarHotspots(toolbarOrderB, "planning", "parameterCard"),
+      toolbar_planning_channelConfirm: buildToolbarHotspots(toolbarOrderB, "planning", "channelConfirm"),
+      toolbar_status_voltagePage: buildToolbarHotspots(toolbarOrderA, "status", "voltagePage"),
+      toolbar_status_preStart: buildToolbarHotspots(toolbarOrderA, "status", "preStart"),
+      toolbar_monitor: buildToolbarHotspots(toolbarOrderA, "monitor", "monitor"),
+      toolbar_output: buildToolbarHotspots(toolbarOrderA, "output", "output"),
+      toolbar_outputRunning: buildToolbarHotspots(toolbarOrderA, "output", "outputRunning"),
+      toolbar_recordPage: buildToolbarHotspots(toolbarOrderB, "record", "recordPage"),
+      toolbar_reviewPage: buildToolbarHotspots(toolbarOrderB, "record", "reviewPage"),
+      toolbar_settings: buildToolbarHotspots(toolbarOrderA, "settings", "settings"),
+      operator: [
+        pxRect(500, 164, 190, 40, { kind: "input", key: "surgeryTime", placeholder: "手术时间" }),
+        pxRect(500, 206, 190, 40, { kind: "input", key: "doctorName", placeholder: "医生姓名" }),
+        pxRect(308, 290, 382, 42, { kind: "input", key: "note", placeholder: "注意事项" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ],
+      patient: [
+        pxRect(500, 164, 190, 40, { kind: "input", key: "patientId", placeholder: "患者ID" }),
+        pxRect(500, 206, 190, 40, { kind: "input", key: "patientName", placeholder: "姓名" }),
+        pxRect(500, 248, 190, 40, { kind: "input", key: "patientAge", placeholder: "年龄" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ],
+      target: [
+        pxRect(404, 221, 104, 45, { kind: "input", key: "lesionL", placeholder: "长" }),
+        pxRect(404, 266, 104, 45, { kind: "input", key: "lesionW", placeholder: "宽" }),
+        pxRect(404, 311, 104, 45, { kind: "input", key: "lesionH", placeholder: "高" }),
+        pxRect(608, 221, 104, 45, { kind: "input", key: "targetL", placeholder: "长" }),
+        pxRect(608, 266, 104, 45, { kind: "input", key: "targetW", placeholder: "宽" }),
+        pxRect(608, 311, 104, 45, { kind: "input", key: "targetH", placeholder: "高" }),
+        pxRect(509, 357, 96, 44, { kind: "input", key: "margin", placeholder: "边缘" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ],
+      organ: [
+        pxRect(354, 110, 90, 84, { kind: "button", label: "肝脏", key: "organ", value: "肝脏" }),
+        pxRect(468, 110, 90, 84, { kind: "button", label: "肺部", key: "organ", value: "肺部" }),
+        pxRect(581, 110, 90, 84, { kind: "button", label: "胰腺", key: "organ", value: "胰腺" }),
+        pxRect(354, 217, 90, 84, { kind: "button", label: "肾脏", key: "organ", value: "肾脏" }),
+        pxRect(468, 217, 90, 84, { kind: "button", label: "前列腺", key: "organ", value: "前列腺" }),
+        pxRect(356, 371, 122, 58, { kind: "button", label: "单极", key: "mode", value: "单极性模式" }),
+        pxRect(548, 371, 122, 58, { kind: "button", label: "双极", key: "mode", value: "双极性模式" }),
+        pxRect(149, 502, 129, 52, { kind: "button", label: "PPM 60", key: "ppm", value: "60" }),
+        pxRect(303, 502, 129, 52, { kind: "button", label: "PPM 90", key: "ppm", value: "90" }),
+        pxRect(456, 502, 129, 52, { kind: "button", label: "PPM 120", key: "ppm", value: "120" }),
+        pxRect(609, 502, 129, 52, { kind: "button", label: "PPM 240", key: "ppm", value: "240" }),
+        pxRect(761, 502, 129, 52, { kind: "button", label: "ECG同步", key: "ecgSync", value: "开启" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ],
+      electrode: [
+        pxRect(160, 261, 48, 48, { kind: "button", label: "2点", key: "electrodeLayout", value: "2点" }),
+        pxRect(281, 246, 66, 64, { kind: "button", label: "4点", key: "electrodeLayout", value: "4点" }),
+        pxRect(419, 246, 66, 64, { kind: "button", label: "4点", key: "electrodeLayout", value: "4点" }),
+        pxRect(144, 361, 66, 64, { kind: "button", label: "5点", key: "electrodeLayout", value: "5点" }),
+        pxRect(281, 361, 66, 64, { kind: "button", label: "6点", key: "electrodeLayout", value: "6点" }),
+        pxRect(419, 361, 66, 64, { kind: "button", label: "6点", key: "electrodeLayout", value: "6点" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ],
+      parameterRaw: [
+        pxRect(86, 150, 67, 43, { kind: "input", key: "pulseWidth", placeholder: "脉宽" }),
+        pxRect(164, 150, 77, 43, { kind: "input", key: "fieldStrength", placeholder: "场强" }),
+        pxRect(244, 150, 52, 43, { kind: "input", key: "count", placeholder: "数量" }),
+        pxRect(311, 150, 52, 43, { kind: "input", key: "ppmSet", placeholder: "PPM" }),
+        pxRect(377, 150, 52, 43, { kind: "input", key: "spacing", placeholder: "间距" }),
+        pxRect(441, 150, 72, 43, { kind: "input", key: "voltageSet", placeholder: "电压" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ],
+      parameterCard: [
+        pxRect(66, 154, 193, 92, { kind: "input", key: "spacing", placeholder: "间距" }),
+        pxRect(303, 158, 191, 92, { kind: "input", key: "fieldStrength", placeholder: "场强" }),
+        pxRect(68, 259, 191, 91, { kind: "input", key: "count", placeholder: "数量" }),
+        pxRect(303, 259, 191, 91, { kind: "input", key: "ppmSet", placeholder: "PPM" }),
+        pxRect(68, 361, 191, 91, { kind: "input", key: "pulseWidth", placeholder: "脉宽" }),
+        pxRect(303, 362, 191, 91, { kind: "input", key: "voltageSet", placeholder: "电压" }),
+        pxRect(542, 149, 72, 46, { kind: "button", label: "通道1", key: "channelStrategy", value: "顺时针" }),
+        pxRect(617, 149, 61, 46, { kind: "button", label: "通道2", key: "channelStrategy", value: "逆时针" }),
+        pxRect(331, 498, 141, 51, { kind: "button", label: "确认", run: true, next: true })
+      ],
+      channelConfirm: [
+        pxRect(547, 150, 52, 44, { kind: "button", label: "通道1", key: "channelStrategy", value: "顺时针" }),
+        pxRect(607, 150, 52, 44, { kind: "button", label: "通道2", key: "channelStrategy", value: "逆时针" }),
+        pxRect(826, 515, 136, 50, { kind: "button", label: "确认", run: true, next: true })
+      ],
+      voltagePage: [
+        pxRect(706, 208, 96, 96, { kind: "button", label: "测试", log: "已点击：测试" }),
+        pxRect(637, 362, 95, 95, { kind: "button", label: "充电", log: "已点击：充电" }),
+        pxRect(767, 362, 95, 95, { kind: "button", label: "放电", log: "已点击：放电" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ],
+      preStart: [
+        pxRect(470, 494, 104, 91, { kind: "button", label: "开始", run: true, next: true }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ],
+      output: [
+        pxRect(522, 131, 93, 58, { kind: "input", key: "powerSet", placeholder: "功率设置" }),
+        pxRect(830, 258, 92, 62, { kind: "input", key: "needleChannel", placeholder: "针道" }),
+        pxRect(799, 409, 129, 105, { kind: "button", label: "启动输出", run: true, next: true })
+      ],
+      recordPage: [
+        pxRect(99, 516, 34, 74, { kind: "button", label: "上一页", prev: true }),
+        pxRect(874, 508, 38, 80, { kind: "button", label: "下一页", next: true })
+      ],
+      reviewPage: [
+        pxRect(904, 318, 90, 64, { kind: "button", label: "删除" }),
+        pxRect(882, 476, 112, 95, { kind: "button", label: "确认", run: true, next: true })
+      ],
+      settings: [
+        pxRect(380, 398, 122, 48, { kind: "button", label: "中文", key: "language", value: "中文" }),
+        pxRect(617, 396, 176, 50, { kind: "button", label: "English", key: "language", value: "English" })
+      ]
+    };
+
+    const state = {
+      current: 0,
+      autoTimer: null,
+      form: { ...defaultForm },
+      done: {},
+      logs: [],
+      draft: {
+        parameterCard: null
+      },
+      runtime: {
+        chargeVoltage: 0,
+        chargeMode: "idle",
+        chargeTimer: null,
+        pulseTimer: null,
+        parameterRowCount: 1,
+        metrics: {
+          channel: "1",
+          count: 0,
+          voltage: 0,
+          current: 0,
+          resistance: 0
+        }
+      },
+      ui: {
+        activeHotspotId: "",
+        imageReady: false,
+        imageRequestId: 0,
+        loadedImageSrc: "",
+        pendingFocusKey: ""
+      }
+    };
+
+    const stepList = document.getElementById("stepList");
+    const viewerTitle = document.getElementById("viewerTitle");
+    const viewerDesc = document.getElementById("viewerDesc");
+    const phaseTag = document.getElementById("phaseTag");
+    const stepImage = document.getElementById("stepImage");
+    const screenEl = stepImage.closest(".screen");
+    const hotspotLayer = document.getElementById("hotspotLayer");
+    const screenLoader = document.getElementById("screenLoader");
+    const opGuide = document.getElementById("opGuide");
+    const operationFields = document.getElementById("operationFields");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const summaryGrid = document.getElementById("summaryGrid");
+    const logList = document.getElementById("logList");
+    const imagePreloadCache = new Map();
+
+    function nowText() {
+      const d = new Date();
+      return d.toLocaleTimeString("zh-CN", { hour12: false });
+    }
+
+    function addLog(message) {
+      state.logs.unshift({ t: nowText(), message });
+      state.logs = state.logs.slice(0, 80);
+      renderLogs();
+    }
+
+    function renderLogs() {
+      logList.innerHTML = state.logs.map(item => (
+        `<div class="log-item"><time>${item.t}</time>${item.message}</div>`
+      )).join("");
+    }
+
+    function nowDateTimeText() {
+      const d = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    const toolbarPresetByStep = {
+      operator: "toolbar_operator",
+      patient: "toolbar_patient",
+      target: "toolbar_planning_target",
+      organ: "toolbar_planning_organ",
+      electrode: "toolbar_planning_electrode",
+      parameterRaw: "toolbar_planning_parameterRaw",
+      parameterCard: "toolbar_planning_parameterCard",
+      channelConfirm: "toolbar_planning_channelConfirm",
+      voltagePage: "toolbar_status_voltagePage",
+      preStart: "toolbar_status_preStart",
+      monitor: "toolbar_monitor",
+      output: "toolbar_output",
+      outputRunning: "toolbar_outputRunning",
+      recordPage: "toolbar_recordPage",
+      reviewPage: "toolbar_reviewPage",
+      settings: "toolbar_settings"
+    };
+
+    const PARAMETER_KEYS = ["pulseWidth", "fieldStrength", "count", "ppmSet", "spacing", "voltageSet"];
+    const PRESTART_PPM = 240;
+    const PARAMETER_ROW_Y = [150, 218, 286, 354];
+
+    function buildElectrodeHotspots() {
+      return [
+        pxRect(160, 261, 48, 48, { kind: "button", label: "2点", key: "electrodeVariant", value: "layout-2", set: { electrodeLayout: "2点" } }),
+        pxRect(281, 246, 66, 64, { kind: "button", label: "4点A", key: "electrodeVariant", value: "layout-4a", set: { electrodeLayout: "4点" } }),
+        pxRect(419, 246, 66, 64, { kind: "button", label: "4点B", key: "electrodeVariant", value: "layout-4b", set: { electrodeLayout: "4点" } }),
+        pxRect(144, 361, 66, 64, { kind: "button", label: "5点", key: "electrodeVariant", value: "layout-5", set: { electrodeLayout: "5点" } }),
+        pxRect(281, 361, 66, 64, { kind: "button", label: "6点A", key: "electrodeVariant", value: "layout-6a", set: { electrodeLayout: "6点" } }),
+        pxRect(419, 361, 66, 64, { kind: "button", label: "6点B", key: "electrodeVariant", value: "layout-6b", set: { electrodeLayout: "6点" } }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ];
+    }
+
+    function buildParameterRawHotspots() {
+      return [
+        pxRect(86, 150, 67, 43, { kind: "display", key: "pulseWidth", displayClass: "raw-value" }),
+        pxRect(164, 150, 77, 43, { kind: "display", key: "fieldStrength", displayClass: "raw-value" }),
+        pxRect(244, 150, 52, 43, { kind: "display", key: "count", displayClass: "raw-value" }),
+        pxRect(311, 150, 52, 43, { kind: "display", key: "ppmSet", displayClass: "raw-value" }),
+        pxRect(377, 150, 52, 43, { kind: "display", key: "spacing", displayClass: "raw-value" }),
+        pxRect(441, 150, 72, 43, { kind: "display", key: "voltageSet", displayClass: "raw-value" }),
+        pxRect(86, 150, 67, 43, { kind: "button", label: "编辑脉宽", goTo: "parameterCard", focusKey: "pulseWidth", resetParameterDraft: true, inputNav: true }),
+        pxRect(164, 150, 77, 43, { kind: "button", label: "编辑场强", goTo: "parameterCard", focusKey: "fieldStrength", resetParameterDraft: true, inputNav: true }),
+        pxRect(244, 150, 52, 43, { kind: "button", label: "编辑数量", goTo: "parameterCard", focusKey: "count", resetParameterDraft: true, inputNav: true }),
+        pxRect(311, 150, 52, 43, { kind: "button", label: "编辑PPM", goTo: "parameterCard", focusKey: "ppmSet", resetParameterDraft: true, inputNav: true }),
+        pxRect(377, 150, 52, 43, { kind: "button", label: "编辑间距", goTo: "parameterCard", focusKey: "spacing", resetParameterDraft: true, inputNav: true }),
+        pxRect(441, 150, 72, 43, { kind: "button", label: "编辑电压", goTo: "parameterCard", focusKey: "voltageSet", resetParameterDraft: true, inputNav: true }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ];
+    }
+
+    function buildParameterCardHotspots() {
+      return [
+        pxRect(66, 154, 193, 92, { kind: "input", key: "spacing", placeholder: "间距", inputClass: "card-value" }),
+        pxRect(303, 158, 191, 92, { kind: "input", key: "fieldStrength", placeholder: "场强", inputClass: "card-value" }),
+        pxRect(68, 259, 191, 91, { kind: "input", key: "count", placeholder: "数量", inputClass: "card-value" }),
+        pxRect(303, 259, 191, 91, { kind: "input", key: "ppmSet", placeholder: "PPM", inputClass: "card-value" }),
+        pxRect(68, 361, 191, 91, { kind: "input", key: "pulseWidth", placeholder: "脉宽", inputClass: "card-value" }),
+        pxRect(303, 362, 191, 91, { kind: "input", key: "voltageSet", placeholder: "电压", inputClass: "card-value" }),
+        pxRect(542, 149, 72, 46, { kind: "button", label: "通道1", key: "channelStrategy", value: "顺时针" }),
+        pxRect(617, 149, 61, 46, { kind: "button", label: "通道2", key: "channelStrategy", value: "逆时针" }),
+        pxRect(331, 498, 141, 51, { kind: "button", label: "确认", action: "confirmParameterCard" })
+      ];
+    }
+
+    function buildVoltagePageHotspots() {
+      return [
+        pxRect(244, 179, 287, 287, { kind: "chargeGauge" }),
+        pxRect(324, 260, 126, 126, { kind: "display", source: "charge", metricKey: "chargeVoltage", displayClass: "charge-value", format: "int" }),
+        pxRect(706, 208, 96, 96, { kind: "button", label: "测试", log: "已点击：测试" }),
+        pxRect(637, 362, 95, 95, { kind: "button", label: "充电", action: "chargeDevice", log: "已点击：充电" }),
+        pxRect(767, 362, 95, 95, { kind: "button", label: "放电", action: "dischargeDevice", log: "已点击：放电" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ];
+    }
+
+    function buildPreStartHotspots() {
+      return [
+        pxRect(459, 110, 121, 58, { kind: "display", source: "runtime", metricKey: "channel", displayClass: "metric-channel" }),
+        pxRect(348, 188, 98, 82, { kind: "display", source: "runtime", metricKey: "count", displayClass: "metric-value compact", format: "int" }),
+        pxRect(676, 188, 136, 82, { kind: "display", source: "runtime", metricKey: "voltage", displayClass: "metric-value compact", format: "int" }),
+        pxRect(318, 340, 126, 80, { kind: "display", source: "runtime", metricKey: "current", displayClass: "metric-value compact", format: "fixed1" }),
+        pxRect(692, 340, 98, 80, { kind: "display", source: "runtime", metricKey: "resistance", displayClass: "metric-value compact", format: "int" }),
+        pxRect(470, 494, 104, 91, { kind: "button", label: "开始", action: "startPreStart" }),
+        pxRect(975, 430, 38, 70, { kind: "button", label: "上一页", prev: true }),
+        pxRect(975, 518, 38, 70, { kind: "button", label: "下一页", next: true })
+      ];
+    }
+
+    function getStepHotspots(step) {
+      const toolbarHotspots = hotspotPresets[toolbarPresetByStep[step.id]] || [];
+      let bodyHotspots;
+      if (step.id === "parameterRaw") {
+        bodyHotspots = buildParameterRawHotspots();
+      } else if (step.id === "parameterCard") {
+        bodyHotspots = buildParameterCardHotspots();
+      } else if (step.id === "voltagePage") {
+        bodyHotspots = buildVoltagePageHotspots();
+      } else if (step.id === "preStart") {
+        bodyHotspots = buildPreStartHotspots();
+      } else {
+        bodyHotspots = step.hotspots || hotspotPresets[step.id] || [];
+      }
+      return [...toolbarHotspots, ...bodyHotspots];
+    }
+
+    function cloneParameterCardDraft() {
+      return PARAMETER_KEYS.reduce((acc, key) => {
+        acc[key] = state.form[key] ?? "";
+        return acc;
+      }, {});
+    }
+
+    function ensureParameterCardDraft() {
+      if (!state.draft.parameterCard) {
+        state.draft.parameterCard = cloneParameterCardDraft();
+      }
+      return state.draft.parameterCard;
+    }
+
+    function resetParameterCardDraft() {
+      state.draft.parameterCard = cloneParameterCardDraft();
+      return state.draft.parameterCard;
+    }
+
+    function isParameterDraftStep(step) {
+      return step && step.id === "parameterCard";
+    }
+
+    function getFormValue(step, key) {
+      if (isParameterDraftStep(step)) {
+        return ensureParameterCardDraft()[key] ?? "";
+      }
+      return state.form[key] ?? "";
+    }
+
+    function setFormValue(step, key, value) {
+      if (isParameterDraftStep(step)) {
+        ensureParameterCardDraft()[key] = value;
+        return;
+      }
+      state.form[key] = value;
+    }
+
+    function syncAllParameterFieldsToForm() {
+      PARAMETER_KEYS.forEach(key => syncFieldInputValue(key, state.form[key] ?? ""));
+    }
+
+    function validateParameterValues(sourceValues) {
+      return PARAMETER_KEYS.every(key => String(sourceValues[key] ?? "").trim().length > 0);
+    }
+
+    function commitParameterCardDraft() {
+      const draft = ensureParameterCardDraft();
+      if (!validateParameterValues(draft)) {
+        addLog("基础参数未填写完整，无法确认返回");
+        alert("请先完成第8页全部参数输入");
+        return false;
+      }
+      PARAMETER_KEYS.forEach(key => {
+        state.form[key] = draft[key] ?? "";
+      });
+      state.done.parameterCard = true;
+      state.done.parameterRaw = true;
+      syncAllParameterFieldsToForm();
+      renderSummary();
+      addLog("已确认参数卡片，返回第7页");
+      return true;
+    }
+
+    function clearChargeTimer() {
+      if (state.runtime.chargeTimer) {
+        clearInterval(state.runtime.chargeTimer);
+        state.runtime.chargeTimer = null;
+      }
+    }
+
+    function clearPulseTimer() {
+      if (state.runtime.pulseTimer) {
+        clearInterval(state.runtime.pulseTimer);
+        state.runtime.pulseTimer = null;
+      }
+    }
+
+    function refreshCurrentStepHotspots() {
+      const currentStep = steps[state.current];
+      if (currentStep) {
+        renderHotspots(currentStep);
+      }
+    }
+
+    function updateRuntimeMetrics(partial) {
+      state.runtime.metrics = {
+        ...state.runtime.metrics,
+        ...partial
+      };
+      if (steps[state.current] && steps[state.current].id === "preStart") {
+        refreshCurrentStepHotspots();
+      }
+    }
+
+    function startChargeAnimation(targetVoltage = Number(state.form.voltageSet) || 0) {
+      clearChargeTimer();
+      state.runtime.chargeMode = "charging";
+      const safeTarget = Math.max(0, targetVoltage);
+      state.runtime.chargeTimer = setInterval(() => {
+        const next = Math.min(safeTarget, (Number(state.runtime.chargeVoltage) || 0) + Math.max(10, safeTarget / 20));
+        state.runtime.chargeVoltage = next;
+        if (steps[state.current] && steps[state.current].id === "voltagePage") {
+          refreshCurrentStepHotspots();
+        }
+        if (next >= safeTarget) {
+          clearChargeTimer();
+        }
+      }, 80);
+    }
+
+    function startDischargeAnimation() {
+      clearChargeTimer();
+      state.runtime.chargeMode = "discharging";
+      state.runtime.chargeTimer = setInterval(() => {
+        const next = Math.max(0, (Number(state.runtime.chargeVoltage) || 0) - Math.max(20, (Number(state.form.voltageSet) || 0) / 15));
+        state.runtime.chargeVoltage = next;
+        if (steps[state.current] && steps[state.current].id === "voltagePage") {
+          refreshCurrentStepHotspots();
+        }
+        if (next <= 0) {
+          state.runtime.chargeVoltage = 0;
+          state.runtime.chargeMode = "idle";
+          clearChargeTimer();
+        }
+      }, 80);
+    }
+
+    function startPreStartSimulation() {
+      clearPulseTimer();
+      const voltage = Number(state.form.voltageSet) || 0;
+      const startCount = Math.max(0, Math.round(Number(state.form.count) || 0));
+      const pulseInterval = Math.max(40, Math.round(60000 / PRESTART_PPM));
+      const runtimeChannel = state.form.channelStrategy === "逆时针" ? "2" : "1";
+      if (startCount <= 0) {
+        addLog("开始前检查失败：数量参数必须大于 0");
+        alert("请先设置有效的数量参数");
+        return;
+      }
+      const computeMetrics = (countRemaining) => {
+        const total = Math.max(1, startCount);
+        const progress = 1 - countRemaining / total;
+        const resistance = 100 - progress * 50;
+        const current = resistance > 0 ? voltage / resistance : 0;
+        return {
+          channel: runtimeChannel,
+          count: countRemaining,
+          voltage,
+          resistance,
+          current
+        };
+      };
+      updateRuntimeMetrics(computeMetrics(startCount));
+      addLog(`已启动反馈参数模拟：${PRESTART_PPM} PPM`);
+      state.done.preStart = true;
+      state.runtime.pulseTimer = setInterval(() => {
+        const currentCount = Number(state.runtime.metrics.count) || 0;
+        const nextCount = Math.max(0, currentCount - 1);
+        updateRuntimeMetrics(computeMetrics(nextCount));
+        if (nextCount <= 0) {
+          clearPulseTimer();
+          addLog("反馈参数模拟完成");
+        }
+      }, pulseInterval);
+    }
+
+    function goToStep(stepId, options = {}) {
+      const targetIndex = steps.findIndex(item => item.id === stepId);
+      if (targetIndex < 0) return false;
+      state.ui.pendingFocusKey = options.focusKey || "";
+      if (options.resetParameterDraft) {
+        resetParameterCardDraft();
+      }
+      state.current = targetIndex;
+      state.ui.activeHotspotId = "";
+      render();
+      return true;
+    }
+
+    function setImageLoading(isLoading) {
+      state.ui.imageReady = !isLoading;
+      screenEl.classList.toggle("loading", isLoading);
+      if (screenLoader) {
+        screenLoader.setAttribute("aria-hidden", isLoading ? "false" : "true");
+      }
+      if (isLoading) {
+        hotspotLayer.innerHTML = "";
+      }
+    }
+
+    function preloadImage(src) {
+      if (!src) return Promise.resolve();
+      if (imagePreloadCache.has(src)) {
+        return imagePreloadCache.get(src);
+      }
+      const task = new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(src);
+        img.onerror = reject;
+        img.src = src;
+      });
+      imagePreloadCache.set(src, task);
+      return task;
+    }
+
+    function warmStepImages(index) {
+      [index - 1, index, index + 1].forEach(i => {
+        if (i >= 0 && i < steps.length) {
+          preloadImage(steps[i].image).catch(() => {});
+        }
+      });
+    }
+
+    function warmAllStepImages() {
+      steps.forEach(step => {
+        preloadImage(step.image).catch(() => {});
+      });
+    }
+
+    function getImageViewportRect() {
+      const stageW = stepImage.clientWidth || stepImage.parentElement.clientWidth || 0;
+      const stageH = stepImage.clientHeight || stepImage.parentElement.clientHeight || 0;
+      let imgW = stepImage.naturalWidth || 0;
+      let imgH = stepImage.naturalHeight || 0;
+      if (!imgW || !imgH) {
+        imgW = stageW || 1;
+        imgH = stageH || 1;
+      }
+      const scale = Math.min(stageW / imgW, stageH / imgH) || 1;
+      const drawW = imgW * scale;
+      const drawH = imgH * scale;
+      const offsetX = (stageW - drawW) / 2;
+      const offsetY = (stageH - drawH) / 2;
+      return { offsetX, offsetY, drawW, drawH };
+    }
+
+    function isPixelRect(rect) {
+      return rect.unit === "px" || rect.coordSpace === "image";
+    }
+
+    function toViewportRect(rect, viewport) {
+      if (isPixelRect(rect)) {
+        const baseW = Number(rect.baseWidth) || stepImage.naturalWidth || 1024;
+        const baseH = Number(rect.baseHeight) || stepImage.naturalHeight || 600;
+        const x = Math.max(0, Number(rect.x) || 0);
+        const y = Math.max(0, Number(rect.y) || 0);
+        const w = Math.max(4, Number(rect.w) || 10);
+        const h = Math.max(4, Number(rect.h) || 8);
+        return {
+          left: viewport.offsetX + (x / baseW) * viewport.drawW,
+          top: viewport.offsetY + (y / baseH) * viewport.drawH,
+          width: (w / baseW) * viewport.drawW,
+          height: (h / baseH) * viewport.drawH
+        };
+      }
+      const x = Math.max(0, Math.min(100, Number(rect.x) || 0));
+      const y = Math.max(0, Math.min(100, Number(rect.y) || 0));
+      const w = Math.max(4, Math.min(100, Number(rect.w) || 10));
+      const h = Math.max(4, Math.min(100, Number(rect.h) || 8));
+      return {
+        left: viewport.offsetX + (x / 100) * viewport.drawW,
+        top: viewport.offsetY + (y / 100) * viewport.drawH,
+        width: (w / 100) * viewport.drawW,
+        height: (h / 100) * viewport.drawH
+      };
+    }
+
+    function getHotspotId(step, index) {
+      return `${step.id}:${index}`;
+    }
+
+    function syncFieldInputValue(key, value) {
+      const fieldEl = operationFields.querySelector(`[data-key="${key}"]`);
+      if (!fieldEl) return;
+      if (String(fieldEl.value ?? "") !== String(value ?? "")) {
+        fieldEl.value = value ?? "";
+      }
+    }
+
+    function formatMetricValue(value, format) {
+      const num = Number(value) || 0;
+      if (format === "fixed1") return num.toFixed(1);
+      if (format === "int") return String(Math.round(num));
+      return String(value ?? "");
+    }
+
+    function getDisplayValue(spot, step) {
+      if (spot.source === "runtime" && spot.metricKey) {
+        return formatMetricValue(state.runtime.metrics[spot.metricKey], spot.format);
+      }
+      if (spot.source === "charge" && spot.metricKey) {
+        return formatMetricValue(state.runtime[spot.metricKey], spot.format);
+      }
+      if (spot.key) {
+        return formatMetricValue(getFormValue(step, spot.key), spot.format);
+      }
+      return spot.text || "";
+    }
+
+    function isHotspotActive(step, spot, index) {
+      if (spot.toolbar && spot.toolbarKey) {
+        return spot.toolbarKey === spot.activeToolbarKey;
+      }
+      if (spot.key && Object.prototype.hasOwnProperty.call(spot, "value")) {
+        return String(state.form[spot.key] ?? "") === String(spot.value ?? "");
+      }
+      return state.ui.activeHotspotId === getHotspotId(step, index);
+    }
+
+    function cycleValue(key, values) {
+      const current = String(state.form[key] ?? "");
+      const idx = values.indexOf(current);
+      const next = values[(idx + 1) % values.length];
+      state.form[key] = next;
+      return next;
+    }
+
+    function applyHotspotAction(step, spot) {
+      let touched = false;
+      if (spot.action === "confirmParameterCard") {
+        if (!commitParameterCardDraft()) {
+          render();
+          return;
+        }
+        goToStep("parameterRaw");
+        return;
+      }
+      if (spot.action === "chargeDevice") {
+        startChargeAnimation();
+      }
+      if (spot.action === "dischargeDevice") {
+        startDischargeAnimation();
+      }
+      if (spot.action === "startPreStart") {
+        startPreStartSimulation();
+      }
+      if (spot.goTo) {
+        if (spot.goTo !== step.id) {
+          goToStep(spot.goTo, {
+            focusKey: spot.focusKey,
+            resetParameterDraft: Boolean(spot.resetParameterDraft)
+          });
+          return;
+        }
+      }
+      if (spot.key && Object.prototype.hasOwnProperty.call(spot, "value")) {
+        state.form[spot.key] = spot.value;
+        syncFieldInputValue(spot.key, spot.value);
+        touched = true;
+      }
+      if (spot.set) {
+        Object.entries(spot.set).forEach(([key, value]) => {
+          state.form[key] = value === "@now" ? nowDateTimeText() : value;
+          syncFieldInputValue(key, state.form[key]);
+          touched = true;
+        });
+      }
+      if (spot.cycle && Array.isArray(spot.cycle.values) && spot.cycle.values.length > 0) {
+        const next = cycleValue(spot.cycle.key, spot.cycle.values);
+        syncFieldInputValue(spot.cycle.key, next);
+        addLog(`已切换：${spot.cycle.key} = ${next}`);
+        touched = true;
+      }
+      if (spot.log) addLog(spot.log);
+      if (spot.run) {
+        if (!validateStep(step)) {
+          render();
+          return;
+        }
+        state.done[step.id] = true;
+        addLog(`已执行：${step.title}（通过图中点位）`);
+      } else if (touched) {
+        addLog(`已通过界面点位更新：${step.title}`);
+      }
+      if (spot.prev && state.current > 0) {
+        state.current -= 1;
+        state.ui.activeHotspotId = "";
+      }
+      if (spot.next && state.current < steps.length - 1) {
+        state.current += 1;
+        state.ui.activeHotspotId = "";
+      }
+      render();
+    }
+
+    function renderHotspots(step) {
+      if (!state.ui.imageReady || stepImage.getAttribute("src") !== step.image) {
+        hotspotLayer.innerHTML = "";
+        return;
+      }
+      const hotspots = getStepHotspots(step);
+      if (!hotspots.length) {
+        hotspotLayer.innerHTML = "";
+        return;
+      }
+      hotspotLayer.innerHTML = "";
+      const viewport = getImageViewportRect();
+      hotspots.forEach((spot, index) => {
+        const rect = toViewportRect(spot, viewport);
+
+        if (spot.kind === "display") {
+          const display = document.createElement("div");
+          display.className = `hotspot-display ${spot.displayClass || ""}`.trim();
+          display.style.left = `${rect.left}px`;
+          display.style.top = `${rect.top}px`;
+          display.style.width = `${rect.width}px`;
+          display.style.height = `${rect.height}px`;
+          display.textContent = getDisplayValue(spot, step);
+          hotspotLayer.appendChild(display);
+          return;
+        }
+
+        if (spot.kind === "chargeGauge") {
+          const gauge = document.createElement("div");
+          const targetVoltage = Math.max(1, Number(state.form.voltageSet) || 1);
+          const ratio = Math.max(0, Math.min(1, (Number(state.runtime.chargeVoltage) || 0) / targetVoltage));
+          gauge.className = "charge-gauge";
+          gauge.style.left = `${rect.left}px`;
+          gauge.style.top = `${rect.top}px`;
+          gauge.style.width = `${rect.width}px`;
+          gauge.style.height = `${rect.height}px`;
+          gauge.style.opacity = ratio > 0.01 ? "1" : "0";
+          gauge.style.background = `conic-gradient(from -90deg, rgba(255, 79, 139, 0.95) 0deg, rgba(255, 163, 67, 0.92) ${ratio * 360}deg, rgba(255, 255, 255, 0.04) ${ratio * 360}deg 360deg)`;
+          gauge.style.webkitMask = "radial-gradient(farthest-side, transparent calc(100% - 20px), #000 calc(100% - 19px))";
+          gauge.style.mask = "radial-gradient(farthest-side, transparent calc(100% - 20px), #000 calc(100% - 19px))";
+          hotspotLayer.appendChild(gauge);
+          return;
+        }
+
+        if (spot.kind === "input" && spot.key) {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "hotspot-input";
+          if (spot.inputClass) input.classList.add(...String(spot.inputClass).split(/\s+/).filter(Boolean));
+          input.dataset.hotspotIndex = String(index);
+          input.style.left = `${rect.left}px`;
+          input.style.top = `${rect.top}px`;
+          input.style.width = `${rect.width}px`;
+          input.style.height = `${rect.height}px`;
+          input.placeholder = spot.placeholder || spot.label || "";
+          input.value = getFormValue(step, spot.key);
+          input.addEventListener("focus", () => {
+            state.ui.activeHotspotId = getHotspotId(step, index);
+            input.classList.add("active");
+          });
+          input.addEventListener("blur", () => {
+            input.classList.remove("active");
+          });
+          input.addEventListener("input", (e) => {
+            setFormValue(step, spot.key, e.target.value);
+            if (!isParameterDraftStep(step)) {
+              syncFieldInputValue(spot.key, e.target.value);
+              renderSummary();
+            }
+          });
+          hotspotLayer.appendChild(input);
+          if (state.ui.pendingFocusKey && state.ui.pendingFocusKey === spot.key) {
+            setTimeout(() => {
+              if (!input.isConnected) return;
+              input.focus();
+              input.select();
+              state.ui.pendingFocusKey = "";
+            }, 0);
+          }
+          return;
+        }
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "hotspot hotspot-btn";
+        if (spot.toolbar) btn.classList.add("hotspot-toolbar");
+        if (spot.inputNav) btn.classList.add("hotspot-inputnav");
+        if (isHotspotActive(step, spot, index)) btn.classList.add("active");
+        btn.dataset.hotspotIndex = String(index);
+        btn.style.left = `${rect.left}px`;
+        btn.style.top = `${rect.top}px`;
+        btn.style.width = `${rect.width}px`;
+        btn.style.height = `${rect.height}px`;
+        btn.title = spot.label || "交互点";
+        btn.textContent = "";
+        btn.setAttribute("aria-label", spot.label || "交互点");
+        btn.addEventListener("click", () => {
+          state.ui.activeHotspotId = getHotspotId(step, index);
+          applyHotspotAction(step, spot);
+        });
+        hotspotLayer.appendChild(btn);
+      });
+    }
+
+    function setCurrent(index) {
+      state.current = Math.max(0, Math.min(steps.length - 1, index));
+      state.ui.activeHotspotId = "";
+      render();
+    }
+
+    function renderStepList() {
+      stepList.innerHTML = steps.map((step, idx) => {
+        const done = state.done[step.id];
+        const active = idx === state.current;
+        return `
+          <div class="step-item ${active ? "active" : ""} ${done ? "done" : ""}" data-index="${idx}">
+            <span class="num">${done ? "✓" : idx + 1}</span>
+            <div class="step-main">
+              <strong>${step.title}</strong>
+              <span>${step.phase}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+      stepList.querySelectorAll(".step-item").forEach(el => {
+        el.addEventListener("click", () => setCurrent(Number(el.dataset.index)));
+      });
+    }
+
+    function renderOperationFields(step) {
+      if (step.id === "parameterRaw") {
+        operationFields.innerHTML = `
+          <div class="hint" style="margin:0;color:#9fb8ea;">
+            请点击上方截图中的任一参数输入框进入第8页编辑，确认后会自动返回本页并刷新显示。
+          </div>
+        `;
+        return;
+      }
+      if (step.id === "parameterCard") {
+        operationFields.innerHTML = `
+          <div class="hint" style="margin:0;color:#9fb8ea;">
+            请直接在截图中的参数卡片上输入，点击“确认”后回写到第7页。
+          </div>
+        `;
+        return;
+      }
+      if (!step.fields || step.fields.length === 0) {
+        operationFields.innerHTML = `<div class="hint" style="margin:0;color:#9fb8ea;">本步无必填输入，点击“执行本步操作”即可继续。</div>`;
+        return;
+      }
+      operationFields.innerHTML = step.fields.map(field => {
+        const value = state.form[field.key] ?? "";
+        if (field.type === "select") {
+          return `
+            <label class="field">
+              <span>${field.label}</span>
+              <select data-key="${field.key}">
+                ${field.options.map(opt => `<option value="${opt}" ${opt === value ? "selected" : ""}>${opt}</option>`).join("")}
+              </select>
+            </label>
+          `;
+        }
+        return `
+          <label class="field">
+            <span>${field.label}</span>
+            <input data-key="${field.key}" type="${field.type}" value="${value}" placeholder="${field.placeholder || ""}" />
+          </label>
+        `;
+      }).join("");
+      operationFields.querySelectorAll("[data-key]").forEach(el => {
+        el.addEventListener("input", e => {
+          state.form[e.target.dataset.key] = e.target.value;
+          renderSummary();
+          renderHotspots(step);
+        });
+        el.addEventListener("change", e => {
+          state.form[e.target.dataset.key] = e.target.value;
+          renderSummary();
+          renderHotspots(step);
+        });
+      });
+    }
+
+    function validateStep(step) {
+      if (!step.fields || step.fields.length === 0) return true;
+      const empty = step.fields.find(field => {
+        const v = String(state.form[field.key] ?? "").trim();
+        return v.length === 0;
+      });
+      if (empty) {
+        addLog(`步骤“${step.title}”未完成：${empty.label} 为空`);
+        alert(`请先填写：${empty.label}`);
+        return false;
+      }
+      return true;
+    }
+
+    function runStep() {
+      const step = steps[state.current];
+      if (!validateStep(step)) return;
+      state.done[step.id] = true;
+      addLog(`已执行：${step.title}`);
+      render();
+    }
+
+    function nextStep() {
+      if (state.current < steps.length - 1) setCurrent(state.current + 1);
+    }
+
+    function prevStep() {
+      if (state.current > 0) setCurrent(state.current - 1);
+    }
+
+    function renderSummary() {
+      const cards = [
+        {
+          title: "操作者信息",
+          rows: [
+            `手术时间：${state.form.surgeryTime || "-"}`,
+            `医生姓名：${state.form.doctorName || "-"}`,
+            `注意事项：${state.form.note || "-"}`
+          ]
+        },
+        {
+          title: "患者信息",
+          rows: [
+            `患者ID：${state.form.patientId || "-"}`,
+            `姓名/年龄：${state.form.patientName || "-"} / ${state.form.patientAge || "-"}`
+          ]
+        },
+        {
+          title: "目标消融区",
+          rows: [
+            `损毁区(L/W/H)：${state.form.lesionL}/${state.form.lesionW}/${state.form.lesionH} cm`,
+            `目标区(L/W/H)：${state.form.targetL}/${state.form.targetW}/${state.form.targetH} cm`,
+            `边缘：${state.form.margin} cm`
+          ]
+        },
+        {
+          title: "关键参数",
+          rows: [
+            `脉宽/场强：${state.form.pulseWidth} us / ${state.form.fieldStrength} V/cm`,
+            `数量/PPM：${state.form.count} / ${state.form.ppmSet}`,
+            `间距/电压：${state.form.spacing} cm / ${state.form.voltageSet} V`
+          ]
+        }
+      ];
+      summaryGrid.innerHTML = cards.map(card => `
+        <div class="summary-card">
+          <strong>${card.title}</strong>
+          <div>${card.rows.join("<br/>")}</div>
+        </div>
+      `).join("");
+    }
+
+    function render() {
+      const step = steps[state.current];
+      const doStepBtn = document.getElementById("doStepBtn");
+      viewerTitle.textContent = `${state.current + 1}. ${step.title}`;
+      viewerDesc.textContent = step.desc;
+      phaseTag.textContent = step.phase;
+      opGuide.textContent = step.guide;
+
+      progressText.textContent = `${state.current + 1} / ${steps.length}`;
+      progressFill.style.width = `${((state.current + 1) / steps.length) * 100}%`;
+
+      document.getElementById("prevBtn").disabled = state.current === 0;
+      document.getElementById("nextBtn").disabled = state.current === steps.length - 1;
+
+      if (step.id === "parameterRaw") {
+        doStepBtn.textContent = "请点击图片中的参数框进入第8页";
+        doStepBtn.disabled = true;
+      } else if (step.id === "parameterCard") {
+        doStepBtn.textContent = "请点击图片中的“确认”返回第7页";
+        doStepBtn.disabled = true;
+      } else if (step.id === "preStart") {
+        doStepBtn.textContent = "请点击图片中的“开始”启动反馈";
+        doStepBtn.disabled = true;
+      } else {
+        doStepBtn.textContent = "执行本步操作";
+        doStepBtn.disabled = false;
+      }
+
+      renderOperationFields(step);
+      renderStepList();
+      renderSummary();
+      warmStepImages(state.current);
+
+      const currentSrc = stepImage.getAttribute("src") || "";
+      const sameImageReady = currentSrc === step.image && stepImage.complete && stepImage.naturalWidth > 0;
+      if (sameImageReady) {
+        state.ui.loadedImageSrc = step.image;
+        setImageLoading(false);
+        renderHotspots(step);
+        return;
+      }
+
+      const requestId = ++state.ui.imageRequestId;
+      setImageLoading(true);
+      preloadImage(step.image)
+        .then(() => {
+          if (requestId !== state.ui.imageRequestId) return;
+          if (steps[state.current].image !== step.image) return;
+          stepImage.src = step.image;
+          if (stepImage.complete && stepImage.naturalWidth > 0) {
+            state.ui.loadedImageSrc = step.image;
+            setImageLoading(false);
+            renderHotspots(step);
+          }
+        })
+        .catch(() => {
+          if (requestId !== state.ui.imageRequestId) return;
+          stepImage.src = step.image;
+        });
+    }
+
+    function stopAuto() {
+      if (state.autoTimer) {
+        clearInterval(state.autoTimer);
+        state.autoTimer = null;
+      }
+      document.getElementById("autoBtn").textContent = "自动演示";
+    }
+
+    function startAuto() {
+      if (state.autoTimer) {
+        stopAuto();
+        return;
+      }
+      document.getElementById("autoBtn").textContent = "停止演示";
+      state.autoTimer = setInterval(() => {
+        const step = steps[state.current];
+        if (!state.done[step.id] && validateStep(step)) {
+          state.done[step.id] = true;
+          addLog(`自动执行：${step.title}`);
+        }
+        if (state.current < steps.length - 1) {
+          setCurrent(state.current + 1);
+        } else {
+          addLog("自动演示完成");
+          stopAuto();
+        }
+      }, 2400);
+    }
+
+    function resetAll() {
+      stopAuto();
+      clearChargeTimer();
+      clearPulseTimer();
+      state.current = 0;
+      state.done = {};
+      state.form = { ...defaultForm };
+      state.draft.parameterCard = null;
+      state.runtime.chargeVoltage = 0;
+      state.runtime.chargeMode = "idle";
+      state.runtime.metrics = {
+        channel: "1",
+        count: 0,
+        voltage: 0,
+        current: 0,
+        resistance: 0
+      };
+      state.logs = [];
+      addLog("已重置演示流程");
+      render();
+    }
+
+    document.getElementById("doStepBtn").addEventListener("click", runStep);
+    document.getElementById("nextBtn").addEventListener("click", nextStep);
+    document.getElementById("prevBtn").addEventListener("click", prevStep);
+    document.getElementById("autoBtn").addEventListener("click", startAuto);
+    document.getElementById("resetBtn").addEventListener("click", resetAll);
+    stepImage.addEventListener("load", () => {
+      const step = steps[state.current];
+      if (stepImage.getAttribute("src") !== step.image) return;
+      state.ui.loadedImageSrc = step.image;
+      setImageLoading(false);
+      renderHotspots(step);
+      warmStepImages(state.current);
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(() => warmAllStepImages(), { timeout: 1200 });
+      } else {
+        setTimeout(() => warmAllStepImages(), 600);
+      }
+    });
+    window.addEventListener("resize", () => {
+      const step = steps[state.current];
+      if (!state.ui.imageReady) return;
+      renderHotspots(step);
+    });
+
+    addLog("演示工具已加载");
+    setImageLoading(true);
+    render();
+  </script>
+</body>
+</html>
