@@ -274,6 +274,8 @@ function App() {
     })
   }, [hospitalKeyword])
 
+  const visibleHospitals = useMemo(() => filteredHospitals.slice(0, 8), [filteredHospitals])
+
   const metrics = useMemo(
     () => [
       dashboardMetrics[0],
@@ -621,53 +623,76 @@ function App() {
             <span className="mini-pill">尽量使用快捷项</span>
           </div>
 
-          <div className="product-grid">
-            {productLines.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={`product-card ${item.accent} ${
-                  formState.productLineId === item.id ? 'selected' : ''
-                }`}
-                onClick={() => selectProductLine(item.id)}
+          <div className="selector-block compact-product-block">
+            <div className="block-title">
+              <strong>产品系统</strong>
+              <span>改为紧凑选择，减少页面占用。</span>
+            </div>
+
+            <label className="field">
+              <span>选择产品线</span>
+              <select
+                value={formState.productLineId}
+                onChange={(event) => selectProductLine(event.target.value)}
               >
-                <span className="product-icon">{item.icon}</span>
-                <strong>{item.shortName}</strong>
-                <p>{item.description}</p>
-              </button>
-            ))}
+                {productLines.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="compact-selection-card">
+              <span className="product-icon">{selectedProductLine.icon}</span>
+              <div>
+                <strong>{selectedProductLine.name}</strong>
+                <p>{selectedProductLine.description}</p>
+              </div>
+            </div>
           </div>
 
           <div className="selector-block">
             <div className="block-title">
               <strong>医院</strong>
-              <span>支持按医院、区域和等级搜索</span>
+              <span>内置全国重点医院库，支持按医院、区域和等级搜索</span>
             </div>
             <label className="field">
               <span>搜索医院</span>
               <input
                 value={hospitalKeyword}
                 onChange={(event) => setHospitalKeyword(event.target.value)}
-                placeholder="例如：龙华 / 华东 / 三甲"
+                placeholder="例如：协和 / 华西 / 上海 / 华东 / 三甲"
               />
             </label>
 
+            <div className="search-result-meta">
+              <span>匹配 {filteredHospitals.length} 家医院</span>
+              {filteredHospitals.length > visibleHospitals.length ? (
+                <span>当前仅展示前 {visibleHospitals.length} 家</span>
+              ) : null}
+            </div>
+
             <div className="hospital-list">
-              {filteredHospitals.map((hospital) => (
-                <button
-                  key={hospital.id}
-                  type="button"
-                  className={`selector-card ${
-                    formState.hospitalId === hospital.id ? 'selected' : ''
-                  }`}
-                  onClick={() => selectHospital(hospital)}
-                >
-                  <strong>{hospital.name}</strong>
-                  <span>
-                    {hospital.region} · {hospital.level}
-                  </span>
-                </button>
-              ))}
+              {visibleHospitals.length === 0 ? (
+                <div className="empty-search-state">未找到匹配医院，请换个关键词再试。</div>
+              ) : (
+                visibleHospitals.map((hospital) => (
+                  <button
+                    key={hospital.id}
+                    type="button"
+                    className={`selector-card ${
+                      formState.hospitalId === hospital.id ? 'selected' : ''
+                    }`}
+                    onClick={() => selectHospital(hospital)}
+                  >
+                    <strong>{hospital.name}</strong>
+                    <span>
+                      {hospital.region} · {hospital.level}
+                    </span>
+                  </button>
+                ))
+              )}
             </div>
           </div>
 

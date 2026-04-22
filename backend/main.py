@@ -41,13 +41,18 @@ app.add_middleware(
 
 def seed_reference_data() -> None:
     with SessionLocal() as db:
-      if not db.scalar(select(Hospital).limit(1)):
-          db.add_all([Hospital(**item) for item in HOSPITALS])
+        existing_hospital_ids = set(db.scalars(select(Hospital.id)))
+        existing_device_ids = set(db.scalars(select(Device.id)))
 
-      if not db.scalar(select(Device).limit(1)):
-          db.add_all([Device(**item) for item in DEVICES])
+        for item in HOSPITALS:
+            if item['id'] not in existing_hospital_ids:
+                db.add(Hospital(**item))
 
-      db.commit()
+        for item in DEVICES:
+            if item['id'] not in existing_device_ids:
+                db.add(Device(**item))
+
+        db.commit()
 
 
 @app.on_event('startup')

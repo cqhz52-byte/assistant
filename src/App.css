@@ -554,6 +554,7 @@
 }
 
 .field input,
+.field select,
 .field textarea {
   width: 100%;
   padding: 14px 16px;
@@ -566,10 +567,30 @@
 }
 
 .field input:focus,
+.field select:focus,
 .field textarea:focus {
   outline: none;
   border-color: rgba(255, 134, 0, 0.42);
   box-shadow: 0 0 0 4px rgba(255, 134, 0, 0.12);
+}
+
+.compact-product-block {
+  margin-top: 0;
+}
+
+.compact-selection-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(35, 35, 35, 0.08);
+  background: linear-gradient(145deg, rgba(255, 247, 237, 0.92), rgba(255, 255, 255, 0.96));
+}
+
+.compact-selection-card p {
+  color: var(--text-soft);
 }
 
 .chip-row {
@@ -580,8 +601,24 @@
 
 .hospital-list {
   margin-top: 14px;
-  max-height: 270px;
+  max-height: 220px;
   overflow: auto;
+}
+
+.search-result-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+}
+
+.empty-search-state {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px dashed rgba(35, 35, 35, 0.12);
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, 0.82);
 }
 
 .parameter-grid {
