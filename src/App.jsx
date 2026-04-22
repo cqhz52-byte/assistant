@@ -19,16 +19,29 @@ import {
   statusOptions,
   todayTasks,
 } from './lib/clinicalData'
-import { createCaseRecord, getCaseSupportBootstrap } from './lib/api'
+import {
+  createCaseRecord,
+  demoProfile,
+  formatErrorMessage,
+  getCaseSupportBootstrap,
+  getCurrentProfile,
+  getCurrentSession,
+  getModeLabel,
+  onAuthStateChange,
+  signInWithPassword,
+  signOut,
+  signUpWithPassword,
+  supabaseConfigured,
+} from './lib/caseSupportService'
 import { loadDraft, removeDraft, saveDraft } from './lib/offlineStore'
 
 const DRAFT_KEY = 'active-clinical-case'
 
 const steps = [
-  { id: 'product', label: '产品与医院', hint: '选产品线、医院、医生' },
-  { id: 'params', label: '术中参数', hint: '动态模板、状态、异常' },
-  { id: 'consumables', label: '耗材追踪', hint: '模板添加、批号补录' },
-  { id: 'summary', label: '总结归档', hint: '图片、结果、提交入库' },
+  { id: 'product', label: '产品与医院', hint: '产品线、医院、医生、术式' },
+  { id: 'params', label: '术中参数', hint: '模板参数、病例状态、异常开关' },
+  { id: 'consumables', label: '耗材追踪', hint: '一键套用模板、补录批号' },
+  { id: 'summary', label: '总结归档', hint: '结果、图片、数据库提交' },
 ]
 
 function formatDateTime(value) {
@@ -44,13 +57,6 @@ function formatDateTime(value) {
   })
 }
 
-function buildParameterState(device, existingValues = {}) {
-  return device.parameterSchema.reduce((result, parameter) => {
-    result[parameter.key] = existingValues[parameter.key] ?? ''
-    return result
-  }, {})
-}
-
 function getHospitalById(id) {
   return hospitals.find((item) => item.id === id) ?? hospitals[0]
 }
@@ -61,6 +67,13 @@ function getProductLineById(id) {
 
 function getDeviceById(id) {
   return devices.find((item) => item.id === id) ?? devices[0]
+}
+
+function buildParameterState(device, existingValues = {}) {
+  return device.parameterSchema.reduce((result, parameter) => {
+    result[parameter.key] = existingValues[parameter.key] ?? ''
+    return result
+  }, {})
 }
 
 function withDevicePreset(draft) {
@@ -78,11 +91,12 @@ function withDevicePreset(draft) {
   }
 }
 
-function normalizeDraft(draft) {
+function normalizeDraft(draft, profileName = '') {
   const base = createDefaultCaseDraft()
   const merged = {
     ...base,
     ...draft,
+    engineerName: draft?.engineerName || profileName || base.engineerName,
     attachments: Array.isArray(draft?.attachments) ? draft.attachments : [],
     consumables:
       Array.isArray(draft?.consumables) && draft.consumables.length > 0
@@ -106,6 +120,103 @@ function toCaseCard(caseItem) {
   }
 }
 
+function AuthScreen({
+  authMode,
+  authForm,
+  authMessage,
+  authPending,
+  onChange,
+  onSubmit,
+  onToggleMode,
+}) {
+  return (
+    <main className="auth-shell">
+      <section className="auth-card">
+        <div className="auth-brand">
+          <img src="/curaway-logo.jpg" alt="Curaway" className="auth-logo" />
+          <p className="eyebrow">Supabase Login</p>
+          <h1>登录 Curaway 临床跟台系统</h1>
+          <p className="hero-text">
+            配置好 Supabase 环境变量后，这里会接管真实登录和在线数据库。当前支持邮箱密码登录与注册。
+          </p>
+        </div>
+
+        {authMessage ? <div className="notice-banner">{authMessage}</div> : null}
+
+        <form className="auth-form" onSubmit={onSubmit}>
+          {authMode === 'signup' ? (
+            <label className="field">
+              <span>姓名</span>
+              <input
+                value={authForm.name}
+                onChange={(event) => onChange('name', event.target.value)}
+                placeholder="例如：王工程师"
+              />
+            </label>
+          ) : null}
+
+          <label className="field">
+            <span>邮箱</span>
+            <input
+              type="email"
+              value={authForm.email}
+              onChange={(event) => onChange('email', event.target.value)}
+              placeholder="name@curaway.com"
+            />
+          </label>
+
+          <label className="field">
+            <span>密码</span>
+            <input
+              type="password"
+              value={authForm.password}
+              onChange={(event) => onChange('password', event.target.value)}
+              placeholder="至少 6 位"
+            />
+          </label>
+
+          {authMode === 'signup' ? (
+            <div className="selector-block compact-block">
+              <div className="block-title">
+                <strong>角色</strong>
+                <span>会写入 Supabase `profiles` 表</span>
+              </div>
+              <div className="chip-row">
+                {[
+                  { id: 'engineer', label: '工程师' },
+                  { id: 'admin', label: '管理员' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`chip ${authForm.role === item.id ? 'active' : ''}`}
+                    onClick={() => onChange('role', item.id)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="auth-actions">
+            <button type="submit" className="primary-button" disabled={authPending}>
+              {authPending
+                ? '处理中...'
+                : authMode === 'signin'
+                  ? '登录并进入系统'
+                  : '注册并创建账户'}
+            </button>
+            <button type="button" className="ghost-button" onClick={onToggleMode}>
+              {authMode === 'signin' ? '没有账号？去注册' : '已有账号？去登录'}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+  )
+}
+
 function App() {
   const [view, setView] = useState('dashboard')
   const [stepIndex, setStepIndex] = useState(0)
@@ -122,6 +233,19 @@ function App() {
     completedCases: recentCases.filter((item) => item.status === '已完成').length,
     pendingSync: recentCases.filter((item) => item.status === '待同步').length,
   })
+  const [authReady, setAuthReady] = useState(false)
+  const [session, setSession] = useState(null)
+  const [profile, setProfile] = useState(supabaseConfigured ? null : demoProfile)
+  const [authMode, setAuthMode] = useState('signin')
+  const [authPending, setAuthPending] = useState(false)
+  const [authMessage, setAuthMessage] = useState('')
+  const [authForm, setAuthForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'engineer',
+  })
+  const [loadedUserKey, setLoadedUserKey] = useState('')
 
   const selectedHospital = useMemo(() => getHospitalById(formState.hospitalId), [formState.hospitalId])
   const selectedProductLine = useMemo(
@@ -147,9 +271,9 @@ function App() {
   const metrics = useMemo(
     () => [
       dashboardMetrics[0],
-      { ...dashboardMetrics[1], value: `${caseStats.totalCases} 条`, helper: '病例数据已入库' },
-      { ...dashboardMetrics[2], value: `${selectedDevice.defaultConsumables.length} 类`, helper: '当前设备建议耗材模板' },
-      { ...dashboardMetrics[3], value: `${caseStats.pendingSync} 条`, helper: '待同步或补录的病例' },
+      { ...dashboardMetrics[1], value: `${caseStats.totalCases} 条`, helper: 'Supabase 或本地数据库累计病例' },
+      { ...dashboardMetrics[2], value: `${selectedDevice.defaultConsumables.length} 类`, helper: '当前设备推荐耗材模板' },
+      { ...dashboardMetrics[3], value: `${caseStats.pendingSync} 条`, helper: getModeLabel() },
     ],
     [caseStats, selectedDevice.defaultConsumables.length],
   )
@@ -157,34 +281,94 @@ function App() {
   useEffect(() => {
     let active = true
 
-    async function bootstrap() {
+    async function initializeAuth() {
+      try {
+        const { session: nextSession } = await getCurrentSession()
+        if (!active) return
+
+        setSession(nextSession)
+        if (nextSession?.user) {
+          const nextProfile = await getCurrentProfile(nextSession.user)
+          if (!active) return
+          setProfile(nextProfile)
+        } else if (!supabaseConfigured) {
+          setProfile(demoProfile)
+        }
+      } catch (error) {
+        if (!active) return
+        setNotice(formatErrorMessage(error, '初始化登录状态失败。'))
+      } finally {
+        if (active) {
+          setAuthReady(true)
+        }
+      }
+    }
+
+    initializeAuth()
+
+    const unsubscribe = onAuthStateChange(async (nextSession) => {
+      if (!active) return
+      setSession(nextSession)
+      if (nextSession?.user) {
+        try {
+          const nextProfile = await getCurrentProfile(nextSession.user)
+          if (!active) return
+          setProfile(nextProfile)
+          setAuthMessage('')
+        } catch (error) {
+          if (!active) return
+          setAuthMessage(formatErrorMessage(error, '读取用户资料失败。'))
+        }
+      } else {
+        setProfile(null)
+        setLoadedUserKey('')
+      }
+    })
+
+    return () => {
+      active = false
+      unsubscribe()
+    }
+  }, [])
+
+  useEffect(() => {
+    const userKey = supabaseConfigured ? session?.user?.id ?? '' : 'demo-mode'
+    const profileReady = supabaseConfigured ? Boolean(profile?.id && session?.user?.id) : true
+    if (!authReady || !profileReady || loadedUserKey === userKey) return
+
+    let active = true
+
+    async function bootstrapApp() {
       try {
         const [draft, bootstrapData] = await Promise.all([
           loadDraft(DRAFT_KEY),
-          getCaseSupportBootstrap().catch(() => null),
+          getCaseSupportBootstrap(),
         ])
-
         if (!active) return
 
+        const profileName = profile?.name || demoProfile.name
+        const nextDraft = normalizeDraft(draft, profileName)
+        setFormState(nextDraft)
+        setHospitalKeyword(getHospitalById(nextDraft.hospitalId).name)
+        setLastSavedAt(draft?.savedAt ?? '')
         if (draft) {
-          const nextDraft = normalizeDraft(draft)
-          setFormState(nextDraft)
-          setHospitalKeyword(getHospitalById(nextDraft.hospitalId).name)
-          setLastSavedAt(draft.savedAt ?? '')
           setView('form')
-          setNotice('已恢复上次未完成的跟台草稿。')
-        } else {
-          setHospitalKeyword(getHospitalById(createDefaultCaseDraft().hospitalId).name)
+          setNotice('已恢复上次未完成的草稿。')
         }
 
         if (bootstrapData?.cases?.length) {
           setRecentCaseList(bootstrapData.cases.map(toCaseCard).slice(0, 6))
           setCaseStats({
-            totalCases: bootstrapData.totalCases,
-            completedCases: bootstrapData.completedCases,
-            pendingSync: bootstrapData.pendingSync,
+            totalCases: bootstrapData.totalCases ?? bootstrapData.cases.length,
+            completedCases: bootstrapData.completedCases ?? 0,
+            pendingSync: bootstrapData.pendingSync ?? 0,
           })
         }
+
+        setLoadedUserKey(userKey)
+      } catch (error) {
+        if (!active) return
+        setNotice(formatErrorMessage(error, '读取病例数据失败。'))
       } finally {
         if (active) {
           setSaveState('idle')
@@ -193,12 +377,12 @@ function App() {
       }
     }
 
-    bootstrap()
+    bootstrapApp()
 
     return () => {
       active = false
     }
-  }, [])
+  }, [authReady, loadedUserKey, profile, session])
 
   useEffect(() => {
     if (!isHydrated) return
@@ -207,12 +391,12 @@ function App() {
       try {
         setSaveState('saving')
         await saveDraft(DRAFT_KEY, formState)
-        setSaveState('saved')
         setLastSavedAt(new Date().toISOString())
+        setSaveState('saved')
       } catch {
         setSaveState('error')
       }
-    }, 300)
+    }, 320)
 
     return () => window.clearTimeout(timeoutId)
   }, [formState, isHydrated])
@@ -231,9 +415,19 @@ function App() {
     }))
   }
 
+  function updateAuthField(field, value) {
+    setAuthForm((current) => ({ ...current, [field]: value }))
+  }
+
+  function selectHospital(hospital) {
+    setHospitalKeyword(hospital.name)
+    updateField('hospitalId', hospital.id)
+  }
+
   function selectProductLine(productLineId) {
     const productLine = getProductLineById(productLineId)
     const nextDevice = getDefaultDeviceForProductLine(productLineId)
+
     setFormState((current) =>
       withDevicePreset({
         ...current,
@@ -247,7 +441,6 @@ function App() {
   }
 
   function selectDevice(deviceId) {
-    const device = getDeviceById(deviceId)
     setFormState((current) =>
       withDevicePreset({
         ...current,
@@ -256,14 +449,11 @@ function App() {
         consumables:
           current.consumables.length > 0
             ? current.consumables
-            : device.defaultConsumables.slice(0, 2).map((item) => createEmptyConsumable(item)),
+            : getDeviceById(deviceId).defaultConsumables
+                .slice(0, 2)
+                .map((item) => createEmptyConsumable(item)),
       }),
     )
-  }
-
-  function selectHospital(hospital) {
-    setHospitalKeyword(hospital.name)
-    updateField('hospitalId', hospital.id)
   }
 
   function addConsumable(name = '') {
@@ -314,7 +504,7 @@ function App() {
   }
 
   async function clearDraftState() {
-    const nextDraft = normalizeDraft(null)
+    const nextDraft = normalizeDraft(null, profile?.name || demoProfile.name)
     setFormState(nextDraft)
     setHospitalKeyword(getHospitalById(nextDraft.hospitalId).name)
     setStepIndex(0)
@@ -327,11 +517,10 @@ function App() {
   function validateCurrentStep() {
     if (stepIndex === 0) {
       if (!formState.hospitalId || !formState.doctorName || !formState.deviceId) {
-        setNotice('请先完成医院、医生和设备选择。')
+        setNotice('请先完整选择医院、医生和设备。')
         return false
       }
     }
-
     return true
   }
 
@@ -346,11 +535,48 @@ function App() {
     setStepIndex((current) => Math.max(current - 1, 0))
   }
 
+  async function handleAuthSubmit(event) {
+    event.preventDefault()
+    setAuthPending(true)
+    setAuthMessage('')
+
+    try {
+      if (authMode === 'signin') {
+        await signInWithPassword(authForm.email, authForm.password)
+        setAuthMessage('登录成功，正在进入系统。')
+      } else {
+        const result = await signUpWithPassword(authForm)
+        if (result.session) {
+          setAuthMessage('注册成功，已自动登录。')
+        } else {
+          setAuthMessage('注册成功，请检查邮箱确认链接后再登录。')
+          setAuthMode('signin')
+        }
+      }
+    } catch (error) {
+      setAuthMessage(formatErrorMessage(error, '认证失败，请稍后重试。'))
+    } finally {
+      setAuthPending(false)
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await signOut()
+      setSession(null)
+      setProfile(null)
+      setAuthMessage('已退出登录。')
+      setLoadedUserKey('')
+    } catch (error) {
+      setNotice(formatErrorMessage(error, '退出登录失败。'))
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
 
     if (!formState.hospitalId || !formState.doctorName || !formState.deviceId) {
-      setNotice('请先完整填写基础信息。')
+      setNotice('请先完成基础信息。')
       setStepIndex(0)
       return
     }
@@ -360,17 +586,15 @@ function App() {
       hospitalName: selectedHospital.name,
       productLineName: selectedProductLine.name,
       deviceName: selectedDevice.modelName,
-      status: formState.status || '待同步',
     }
 
     try {
       setIsSubmitting(true)
-      const result = await createCaseRecord(payload)
+      const result = await createCaseRecord(payload, session?.user?.id || profile?.id)
       const createdCase = toCaseCard(result.case)
-
       setRecentCaseList((current) => [createdCase, ...current].slice(0, 6))
       setCaseStats((current) => ({
-        totalCases: result.totalCases,
+        totalCases: result.totalCases ?? current.totalCases + 1,
         completedCases:
           result.case.status === '已完成' ? current.completedCases + 1 : current.completedCases,
         pendingSync:
@@ -378,16 +602,18 @@ function App() {
       }))
 
       await removeDraft(DRAFT_KEY)
-      const nextDraft = normalizeDraft(null)
+      const nextDraft = normalizeDraft(null, profile?.name || demoProfile.name)
       setFormState(nextDraft)
       setHospitalKeyword(getHospitalById(nextDraft.hospitalId).name)
       setView('dashboard')
       setStepIndex(0)
-      setSaveState('idle')
       setLastSavedAt('')
-      setNotice('病例已成功写入数据库。')
+      setSaveState('idle')
+      setNotice(
+        supabaseConfigured ? '病例已成功写入 Supabase。' : '病例已写入本地演示数据库。',
+      )
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : '病例提交失败，请稍后重试。')
+      setNotice(formatErrorMessage(error, '病例提交失败。'))
     } finally {
       setIsSubmitting(false)
     }
@@ -400,9 +626,9 @@ function App() {
           <div className="section-head">
             <div>
               <p className="section-kicker">Step 1</p>
-              <h3>先选产品线和医院</h3>
+              <h3>产品线与医院</h3>
             </div>
-            <span className="mini-pill">减少文字输入</span>
+            <span className="mini-pill">优先点选，减少输入</span>
           </div>
 
           <div className="product-grid">
@@ -422,7 +648,7 @@ function App() {
 
           <div className="selector-block">
             <div className="block-title">
-              <strong>对应设备</strong>
+              <strong>设备型号</strong>
               <span>{selectedProductLine.name}</span>
             </div>
             <div className="selector-grid">
@@ -445,7 +671,7 @@ function App() {
           <div className="selector-block">
             <div className="block-title">
               <strong>手术类型</strong>
-              <span>优先点选，少打字</span>
+              <span>基于产品线的快速模板</span>
             </div>
             <div className="chip-row">
               {selectedProductLine.quickProcedures.map((item) => (
@@ -529,7 +755,8 @@ function App() {
 
           <div className="selector-block compact-block">
             <div className="block-title">
-              <strong>临床工程师</strong>
+              <strong>跟台工程师</strong>
+              <span>默认取当前登录人</span>
             </div>
             <div className="chip-row">
               {engineerOptions.map((item) => (
@@ -599,7 +826,7 @@ function App() {
 
           <label className="switch-card">
             <div>
-              <strong>是否出现异常</strong>
+              <strong>是否异常</strong>
               <p>用于标记报警、阻抗波动、路径偏移或温控异常。</p>
             </div>
             <button
@@ -629,6 +856,7 @@ function App() {
               <h3>本次跟台摘要</h3>
             </div>
           </div>
+
           <dl className="summary-list">
             <div>
               <dt>医院</dt>
@@ -639,7 +867,7 @@ function App() {
               <dd>{formState.doctorName}</dd>
             </div>
             <div>
-              <dt>产品线</dt>
+              <dt>产品</dt>
               <dd>{selectedProductLine.name}</dd>
             </div>
             <div>
@@ -647,15 +875,10 @@ function App() {
               <dd>{selectedDevice.modelName}</dd>
             </div>
             <div>
-              <dt>状态</dt>
-              <dd>{formState.status}</dd>
+              <dt>录入模式</dt>
+              <dd>{getModeLabel()}</dd>
             </div>
           </dl>
-
-          <div className="tip-card">
-            <strong>数据库策略</strong>
-            <p>提交后会写入本地病例库，方便后续接入 Supabase 或企业数据库。</p>
-          </div>
         </section>
       </div>
     )
@@ -668,7 +891,7 @@ function App() {
           <div className="section-head">
             <div>
               <p className="section-kicker">Step 3</p>
-              <h3>耗材尽量点选录入</h3>
+              <h3>耗材追踪</h3>
             </div>
             <button type="button" className="ghost-button" onClick={fillDeviceConsumables}>
               一键套用设备模板
@@ -705,16 +928,18 @@ function App() {
                     />
                   </label>
                 </div>
+
                 <label className="field">
                   <span>批号 / Batch No.</span>
                   <input
                     value={item.batchNo}
                     onChange={(event) => updateConsumable(index, 'batchNo', event.target.value)}
-                    placeholder="支持后续接扫码"
+                    placeholder="支持后续扫码录入"
                   />
                 </label>
+
                 <div className="inline-actions">
-                  <span className="mini-pill">相机扫码入口预留</span>
+                  <span className="mini-pill">拍照 / OCR 入口预留</span>
                   <button type="button" className="text-button" onClick={() => removeConsumable(index)}>
                     删除
                   </button>
@@ -728,18 +953,18 @@ function App() {
           <div className="section-head">
             <div>
               <p className="section-kicker">Capture</p>
-              <h3>图片辅助留档</h3>
+              <h3>图像留档</h3>
             </div>
           </div>
 
           <label className="upload-panel">
             <input type="file" accept="image/*" capture="environment" onChange={handleAttachmentChange} />
             <strong>拍摄耗材标签</strong>
-            <p>当前先记录图片元数据，后续可扩展 OCR 和条码识别。</p>
+            <p>后续可直接接 Supabase Storage 或 OCR 识别。</p>
           </label>
 
           <div className="tip-card strong">
-            <strong>当前推荐模板</strong>
+            <strong>推荐模板</strong>
             <p>{selectedDevice.defaultConsumables.join(' / ')}</p>
           </div>
         </section>
@@ -756,7 +981,9 @@ function App() {
               <p className="section-kicker">Step 4</p>
               <h3>总结与归档</h3>
             </div>
-            <span className="mini-pill">提交后写入数据库</span>
+            <span className="mini-pill">
+              {supabaseConfigured ? '提交到 Supabase' : '提交到本地演示库'}
+            </span>
           </div>
 
           <div className="selector-block">
@@ -844,6 +1071,7 @@ function App() {
               <h3>提交摘要</h3>
             </div>
           </div>
+
           <dl className="summary-list">
             <div>
               <dt>医院</dt>
@@ -883,6 +1111,35 @@ function App() {
     return renderSummaryStep()
   }
 
+  if (!authReady) {
+    return (
+      <main className="auth-shell">
+        <section className="auth-card">
+          <p className="eyebrow">Loading</p>
+          <h1>正在初始化系统</h1>
+          <p className="hero-text">正在检查 Supabase 会话和病例数据，请稍候。</p>
+        </section>
+      </main>
+    )
+  }
+
+  if (supabaseConfigured && !session) {
+    return (
+      <AuthScreen
+        authMode={authMode}
+        authForm={authForm}
+        authMessage={authMessage}
+        authPending={authPending}
+        onChange={updateAuthField}
+        onSubmit={handleAuthSubmit}
+        onToggleMode={() => {
+          setAuthMode((current) => (current === 'signin' ? 'signup' : 'signin'))
+          setAuthMessage('')
+        }}
+      />
+    )
+  }
+
   return (
     <div className="app-shell">
       <header className="hero-shell">
@@ -891,15 +1148,14 @@ function App() {
             <p className="eyebrow">Curaway Clinical Case Support</p>
             <h1>临床跟台工作台</h1>
             <p className="hero-text">
-              面向 CT 引导导航机器人、IRE、射频消融、活检穿刺、静脉闭合、高频电刀和神经热凝等产品线，
-              通过产品模板减少现场文字录入，并把病例写入数据库。
+              现在支持真实 Supabase 登录与在线数据库。配置完成后，病例会直接写入云端；未配置时仍可使用本地演示模式。
             </p>
           </div>
           <div className="brand-logo-card">
             <img src="/curaway-logo.jpg" alt="Curaway" className="brand-logo" />
             <div className="status-ribbon">
               <span className={`status-dot ${saveState}`} />
-              {saveState === 'saving' ? '草稿保存中' : '数据库已接通'}
+              {saveState === 'saving' ? '草稿保存中' : getModeLabel()}
             </div>
           </div>
         </section>
@@ -921,22 +1177,43 @@ function App() {
               新建跟台
             </button>
           </div>
-          <div className="hero-mini-stats">
-            <div>
-              <strong>{caseStats.totalCases}</strong>
-              <span>病例总数</span>
+
+          <div className="hero-side">
+            <div className="hero-mini-stats">
+              <div>
+                <strong>{caseStats.totalCases}</strong>
+                <span>病例总数</span>
+              </div>
+              <div>
+                <strong>{caseStats.completedCases}</strong>
+                <span>已完成</span>
+              </div>
+              <div>
+                <strong>{caseStats.pendingSync}</strong>
+                <span>待同步</span>
+              </div>
             </div>
-            <div>
-              <strong>{caseStats.completedCases}</strong>
-              <span>已完成</span>
-            </div>
-            <div>
-              <strong>{caseStats.pendingSync}</strong>
-              <span>待同步</span>
+
+            <div className="account-card">
+              <strong>{profile?.name || demoProfile.name}</strong>
+              <span>{supabaseConfigured ? profile?.email : '本地演示模式'}</span>
+              <span>{profile?.role || demoProfile.role}</span>
+              {supabaseConfigured ? (
+                <button type="button" className="ghost-button" onClick={handleLogout}>
+                  退出登录
+                </button>
+              ) : null}
             </div>
           </div>
         </section>
       </header>
+
+      {!supabaseConfigured ? (
+        <div className="notice-banner">
+          当前未配置 Supabase 环境变量，系统已回退到本地演示模式。配置
+          `VITE_SUPABASE_URL` 与 `VITE_SUPABASE_PUBLISHABLE_KEY` 后会自动启用在线登录和数据库。
+        </div>
+      ) : null}
 
       {notice ? <div className="notice-banner">{notice}</div> : null}
 
@@ -963,6 +1240,7 @@ function App() {
                   新建跟台记录
                 </button>
               </div>
+
               <div className="task-list">
                 {todayTasks.map((task) => (
                   <div key={task.id} className="task-item">
@@ -985,6 +1263,7 @@ function App() {
                   <h2>主要产品线</h2>
                 </div>
               </div>
+
               <div className="product-summary-grid">
                 {productLines.map((item) => (
                   <div key={item.id} className={`summary-product ${item.accent}`}>
@@ -1003,6 +1282,7 @@ function App() {
                   <h2>最近病例</h2>
                 </div>
               </div>
+
               <div className="case-list">
                 {recentCaseList.slice(0, 4).map((item) => (
                   <div key={item.id} className="case-item">
@@ -1042,8 +1322,8 @@ function App() {
             <article className="surface-card">
               <div className="section-head">
                 <div>
-                  <p className="section-kicker">Database</p>
-                  <h2>数据库表设计</h2>
+                  <p className="section-kicker">Schema</p>
+                  <h2>Supabase 表结构</h2>
                 </div>
               </div>
               <div className="schema-list">
@@ -1067,7 +1347,7 @@ function App() {
             <div>
               <p className="section-kicker">Case Form</p>
               <h2>临床跟台录入</h2>
-              <p className="muted-text">尽量用卡片和点选完成录入，提交后写入病例数据库。</p>
+              <p className="muted-text">登录后提交将写入 Supabase；未配置时写入本地演示数据库。</p>
             </div>
             <div className="topbar-actions">
               <button type="button" className="ghost-button" onClick={clearDraftState}>

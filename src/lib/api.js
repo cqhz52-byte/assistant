@@ -13,11 +13,11 @@ async function request(path, options = {}) {
   return data
 }
 
-export function getCaseSupportBootstrap() {
+export function getLocalCaseSupportBootstrap() {
   return request('/api/case-support/bootstrap')
 }
 
-export function createCaseRecord(payload) {
+export function createLocalCaseRecord(payload) {
   return request('/api/case-support/cases', {
     method: 'POST',
     headers: jsonHeaders,
