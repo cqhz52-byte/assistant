@@ -274,11 +274,6 @@ function App() {
   )
   const selectedDevice = useMemo(() => getDeviceById(formState.deviceId), [formState.deviceId])
 
-  const featuredHospitals = useMemo(
-    () => hospitals.filter((item) => item.featured).slice(0, 12),
-    [],
-  )
-
   const hospitalProvinceOptions = useMemo(
     () => ['全部省份', ...new Set(hospitals.map((hospital) => hospital.province).filter(Boolean))],
     [],
@@ -669,13 +664,11 @@ function App() {
               <p className="section-kicker">Step 1</p>
               <h3>产品与医院</h3>
             </div>
-            <span className="mini-pill">尽量使用快捷项</span>
           </div>
 
           <div className="selector-block compact-product-block">
             <div className="block-title">
               <strong>产品系统</strong>
-              <span>改为紧凑选择，减少页面占用。</span>
             </div>
 
             <label className="field">
@@ -696,90 +689,61 @@ function App() {
               <span className="product-icon">{selectedProductLine.icon}</span>
               <div>
                 <strong>{selectedProductLine.name}</strong>
-                <p>{selectedProductLine.description}</p>
               </div>
             </div>
           </div>
 
           <div className="selector-block">
-              <div className="block-title">
-                <strong>医院</strong>
-                <span>独立医院数据库文件，支持热门医院一键选、区域筛选和跨省市搜索</span>
-              </div>
+            <div className="block-title">
+              <strong>医院</strong>
+            </div>
 
-              <div className="selector-block compact-block">
-                <div className="block-title">
-                  <strong>热门医院</strong>
-                  <span>不输入也可以直接点击常用头部医院</span>
-                </div>
-                <div className="chip-row">
-                  {featuredHospitals.map((hospital) => (
-                    <button
-                      key={hospital.id}
-                      type="button"
-                      className={`chip ${formState.hospitalId === hospital.id ? 'active' : ''}`}
-                      onClick={() => selectHospital(hospital)}
-                    >
-                      {hospital.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="selector-block compact-block">
-                <div className="block-title">
-                  <strong>区域筛选</strong>
-                  <span>先按区域和省份缩小范围，再从医院库快速选择</span>
-                </div>
-                <div className="chip-row">
+            <div className="field-row compact-filter-row">
+              <label className="field">
+                <span>区域</span>
+                <select value={hospitalRegion} onChange={(event) => setHospitalRegion(event.target.value)}>
                   {hospitalRegions.map((region) => (
-                    <button
-                      key={region}
-                      type="button"
-                      className={`chip ${hospitalRegion === region ? 'active' : ''}`}
-                      onClick={() => setHospitalRegion(region)}
-                    >
+                    <option key={region} value={region}>
                       {region}
-                    </button>
+                    </option>
                   ))}
-                </div>
-              </div>
+                </select>
+              </label>
 
-              <div className="field-row">
-                <label className="field">
-                  <span>省份</span>
-                  <select
-                    value={hospitalProvince}
-                    onChange={(event) => setHospitalProvince(event.target.value)}
-                  >
-                    {hospitalProvinceOptions.map((province) => (
-                      <option key={province} value={province}>
-                        {province}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+              <label className="field">
+                <span>省份</span>
+                <select
+                  value={hospitalProvince}
+                  onChange={(event) => setHospitalProvince(event.target.value)}
+                >
+                  {hospitalProvinceOptions.map((province) => (
+                    <option key={province} value={province}>
+                      {province}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
-                <label className="field">
-                  <span>搜索医院</span>
-                  <input
-                    value={hospitalKeyword}
-                    onChange={(event) => setHospitalKeyword(event.target.value)}
-                    placeholder="例如：协和 / 华西 / 瑞金 / 浙江 / 广州 / 三甲"
-                  />
-                </label>
-              </div>
+            <label className="field compact-search-field">
+              <span>搜索医院</span>
+              <input
+                value={hospitalKeyword}
+                onChange={(event) => setHospitalKeyword(event.target.value)}
+                placeholder="输入医院名、省份或城市"
+              />
+            </label>
 
-              <div className="search-result-meta">
-                <span>匹配 {filteredHospitals.length} 家医院</span>
-                {filteredHospitals.length > visibleHospitals.length ? (
-                  <span>当前仅展示前 {visibleHospitals.length} 家</span>
-                ) : null}
+            <div className="search-result-meta">
+              <span>{filteredHospitals.length} 家</span>
+              {filteredHospitals.length > visibleHospitals.length ? (
+                <span>显示前 {visibleHospitals.length} 家</span>
+              ) : null}
             </div>
 
             <div className="hospital-list">
               {visibleHospitals.length === 0 ? (
-                <div className="empty-search-state">未找到匹配医院，请换个关键词再试。</div>
+                <div className="empty-search-state">未找到医院</div>
               ) : (
                 visibleHospitals.map((hospital) => (
                   <button
@@ -800,68 +764,76 @@ function App() {
 
           <div className="selector-block">
             <div className="block-title">
-              <strong>快捷选择</strong>
-              <span>医生、工程师和术式优先使用按钮，减少打字。</span>
-            </div>
-            <div className="chip-row">
-              {doctorSuggestions.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`chip ${formState.doctorName === item ? 'active' : ''}`}
-                  onClick={() => updateField('doctorName', item)}
-                >
-                  {item}
-                </button>
-              ))}
+              <strong>基础信息</strong>
             </div>
 
-            <div className="chip-row">
-              {engineerOptions.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`chip ${formState.engineerName === item ? 'active' : ''}`}
-                  onClick={() => updateField('engineerName', item)}
+            <div className="field-row compact-filter-row">
+              <label className="field">
+                <span>医生</span>
+                <select
+                  value={formState.doctorName}
+                  onChange={(event) => updateField('doctorName', event.target.value)}
                 >
-                  {item}
-                </button>
-              ))}
+                  {doctorSuggestions.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="field">
+                <span>跟台人员</span>
+                <select
+                  value={formState.engineerName}
+                  onChange={(event) => updateField('engineerName', event.target.value)}
+                >
+                  {engineerOptions.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
 
-            <div className="chip-row">
-              {selectedProductLine.quickProcedures.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`chip ${formState.surgeryType === item ? 'active' : ''}`}
-                  onClick={() => updateField('surgeryType', item)}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
+            <label className="field">
+              <span>手术技术</span>
+              <select
+                value={formState.surgeryType}
+                onChange={(event) => updateField('surgeryType', event.target.value)}
+              >
+                {selectedProductLine.quickProcedures.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
 
           <div className="selector-block">
             <div className="block-title">
               <strong>设备型号</strong>
-              <span>按产品线自动筛选</span>
             </div>
-            <div className="selector-grid">
-              {devicesForLine.map((device) => (
-                <button
-                  key={device.id}
-                  type="button"
-                  className={`selector-card ${formState.deviceId === device.id ? 'selected' : ''}`}
-                  onClick={() => selectDevice(device.id)}
-                >
-                  <strong>{device.modelName}</strong>
-                  <span>
-                    {device.category} · SN 前缀 {device.snPrefix}
-                  </span>
-                </button>
-              ))}
+            <label className="field">
+              <span>选择设备</span>
+              <select value={formState.deviceId} onChange={(event) => selectDevice(event.target.value)}>
+                {devicesForLine.map((device) => (
+                  <option key={device.id} value={device.id}>
+                    {device.modelName}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="compact-selection-card compact-device-card">
+              <div>
+                <strong>{selectedDevice.modelName}</strong>
+                <p>
+                  {selectedDevice.category} · SN {selectedDevice.snPrefix}
+                </p>
+              </div>
             </div>
           </div>
         </section>
