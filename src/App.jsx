@@ -44,6 +44,20 @@ const steps = [
   { id: 'summary', label: '总结归档', hint: '提交到公司内部病例数据库。' },
 ]
 
+const hospitalRegions = ['全部', '华北', '华东', '华中', '华南', '西南', '西北']
+const featuredHospitalIds = [
+  'hsp-bjxh',
+  'hsp-bj301',
+  'hsp-shruj',
+  'hsp-shrh',
+  'hsp-whxt',
+  'hsp-gzzy',
+  'hsp-cdhx',
+  'hsp-cqzl',
+  'hsp-xajt1',
+  'hsp-shlh',
+]
+
 function formatDateTime(value) {
   if (!value) return '未保存'
   const date = new Date(value)
@@ -227,6 +241,7 @@ function App() {
   const [stepIndex, setStepIndex] = useState(0)
   const [formState, setFormState] = useState(() => normalizeDraft(null))
   const [hospitalKeyword, setHospitalKeyword] = useState('')
+  const [hospitalRegion, setHospitalRegion] = useState('全部')
   const [notice, setNotice] = useState('')
   const [saveState, setSaveState] = useState('loading')
   const [lastSavedAt, setLastSavedAt] = useState('')
@@ -264,17 +279,30 @@ function App() {
   )
   const selectedDevice = useMemo(() => getDeviceById(formState.deviceId), [formState.deviceId])
 
+  const featuredHospitals = useMemo(
+    () =>
+      featuredHospitalIds
+        .map((id) => hospitals.find((item) => item.id === id))
+        .filter(Boolean),
+    [],
+  )
+
   const filteredHospitals = useMemo(() => {
     const keyword = hospitalKeyword.trim().toLowerCase()
-    if (!keyword) return hospitals
+    const regionMatched =
+      hospitalRegion === '全部'
+        ? hospitals
+        : hospitals.filter((hospital) => hospital.region === hospitalRegion)
 
-    return hospitals.filter((hospital) => {
+    if (!keyword) return regionMatched
+
+    return regionMatched.filter((hospital) => {
       const target = `${hospital.name} ${hospital.region} ${hospital.level}`.toLowerCase()
       return target.includes(keyword)
     })
-  }, [hospitalKeyword])
+  }, [hospitalKeyword, hospitalRegion])
 
-  const visibleHospitals = useMemo(() => filteredHospitals.slice(0, 8), [filteredHospitals])
+  const visibleHospitals = useMemo(() => filteredHospitals.slice(0, 12), [filteredHospitals])
 
   const metrics = useMemo(
     () => [
@@ -341,7 +369,8 @@ function App() {
 
         const nextDraft = normalizeDraft(draft, profile?.name || demoProfile.name)
         setFormState(nextDraft)
-        setHospitalKeyword(getHospitalById(nextDraft.hospitalId).name)
+        setHospitalKeyword('')
+        setHospitalRegion('全部')
         setLastSavedAt(draft?.savedAt ?? '')
 
         if (draft) {
@@ -413,7 +442,8 @@ function App() {
   }
 
   function selectHospital(hospital) {
-    setHospitalKeyword(hospital.name)
+    setHospitalKeyword('')
+    setHospitalRegion(hospital.region)
     updateField('hospitalId', hospital.id)
   }
 
@@ -500,7 +530,8 @@ function App() {
   async function clearDraftState() {
     const nextDraft = normalizeDraft(null, profile?.name || demoProfile.name)
     setFormState(nextDraft)
-    setHospitalKeyword(getHospitalById(nextDraft.hospitalId).name)
+    setHospitalKeyword('')
+    setHospitalRegion('全部')
     setStepIndex(0)
     setNotice('已清空草稿并恢复默认模板。')
     setLastSavedAt('')
@@ -598,7 +629,8 @@ function App() {
       await removeDraft(DRAFT_KEY)
       const nextDraft = normalizeDraft(null, profile?.name || demoProfile.name)
       setFormState(nextDraft)
-      setHospitalKeyword(getHospitalById(nextDraft.hospitalId).name)
+      setHospitalKeyword('')
+      setHospitalRegion('全部')
       setView('dashboard')
       setStepIndex(0)
       setLastSavedAt('')
@@ -653,24 +685,63 @@ function App() {
           </div>
 
           <div className="selector-block">
-            <div className="block-title">
-              <strong>医院</strong>
-              <span>内置全国重点医院库，支持按医院、区域和等级搜索</span>
-            </div>
-            <label className="field">
-              <span>搜索医院</span>
-              <input
-                value={hospitalKeyword}
-                onChange={(event) => setHospitalKeyword(event.target.value)}
+              <div className="block-title">
+                <strong>医院</strong>
+                <span>内置全国重点医院库，支持热门医院一键选、区域筛选和搜索</span>
+              </div>
+
+              <div className="selector-block compact-block">
+                <div className="block-title">
+                  <strong>热门医院</strong>
+                  <span>不输入也可以直接点击常用大医院</span>
+                </div>
+                <div className="chip-row">
+                  {featuredHospitals.map((hospital) => (
+                    <button
+                      key={hospital.id}
+                      type="button"
+                      className={`chip ${formState.hospitalId === hospital.id ? 'active' : ''}`}
+                      onClick={() => selectHospital(hospital)}
+                    >
+                      {hospital.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="selector-block compact-block">
+                <div className="block-title">
+                  <strong>区域筛选</strong>
+                  <span>先按区域缩小范围，再从医院库快速选择</span>
+                </div>
+                <div className="chip-row">
+                  {hospitalRegions.map((region) => (
+                    <button
+                      key={region}
+                      type="button"
+                      className={`chip ${hospitalRegion === region ? 'active' : ''}`}
+                      onClick={() => setHospitalRegion(region)}
+                    >
+                      {region}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <label className="field">
+                <span>搜索医院</span>
+                <input
+                  value={hospitalKeyword}
+                  onChange={(event) => setHospitalKeyword(event.target.value)}
                 placeholder="例如：协和 / 华西 / 上海 / 华东 / 三甲"
               />
             </label>
 
-            <div className="search-result-meta">
-              <span>匹配 {filteredHospitals.length} 家医院</span>
-              {filteredHospitals.length > visibleHospitals.length ? (
-                <span>当前仅展示前 {visibleHospitals.length} 家</span>
-              ) : null}
+              <div className="search-result-meta">
+                <span>匹配 {filteredHospitals.length} 家医院</span>
+                {filteredHospitals.length > visibleHospitals.length ? (
+                  <span>当前仅展示前 {visibleHospitals.length} 家</span>
+                ) : null}
             </div>
 
             <div className="hospital-list">
