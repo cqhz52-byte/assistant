@@ -1,13 +1,5 @@
 const CACHE_NAME = 'clinical-case-support-v1'
-const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './favicon.svg',
-  './icon-192.png',
-  './icon-512.png',
-  './apple-touch-icon.png',
-]
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './favicon.svg']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
