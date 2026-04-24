@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clinical-case-support-v1'
+const CACHE_NAME = 'clinical-case-support-v2'
 const APP_SHELL = [
   './',
   './index.html',
